@@ -12,18 +12,18 @@
 <hr />
 <p><strong>add to 1.3.3</strong></p>
 <blockquote>
-<p>A &quot;set&quot; is defined as an unordered collection of data instances containing no duplicate data instances. When a property is defined in terms of a &quot;list&quot;, the data type of the data instances in the list is also provided</p>
-<p>An &quot;int&quot; is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval [-1, 32767]</p>
+<p>A &quot;set&quot; is defined as an unordered collection of data instances containing no duplicate data instances.<br />When a property is defined in terms of a &quot;list&quot;, the data type of the data instances in the list is also provided</p>
+<p>An &quot;int&quot; is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval <br /><span class="math"> − 1, 32767</span><br /></p>
 </blockquote>
 <hr />
 <p><strong>add to 2. a new subsection 2.8, as follows</strong></p>
 <p><a name="reasoning"/></p>
-<h2 id="the-reasoning-data-type">2.8 the &quot;Reasoning&quot; Data Type</h2>
-<p>The <code>Reasoning</code> data type describes the details of a reasoning network used to develop and support the possible version of the past described by the <code>http://gedcomx.org/v1/Conclusion</code>s in the data.</p>
-<h3 id="identifier">identifier</h3>
+<h2>2.8 the &quot;Reasoning&quot; Data Type</h2>
+<p>The <code>Reasoning</code> data type describes the details of a reasoning network<br />used to develop and support the possible version of the past described by the<br /><code>http://gedcomx.org/v1/Conclusion</code>s in the data.</p>
+<h3>identifier</h3>
 <p>The identifier for the <code>Reasoning</code> data type is</p>
 <p><code>http://gedcomx.polygenea.org/v1/Reasoning</code></p>
-<h3 id="properties">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -119,12 +119,12 @@
 <hr />
 <p><strong>Add to 3. several new subsections, as follows</strong></p>
 <p><a name="reasoning-node"/></p>
-<h2 id="the-reasoningnode-data-type">3.22 The &quot;ReasoningNode&quot; Data Type</h2>
+<h2>3.22 The &quot;ReasoningNode&quot; Data Type</h2>
 <p>The <code>ReasoningNode</code> data type defines the abstract concept of a single atomic piece of the reasoning process.</p>
-<h3 id="identifier-1">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>ReasoningNode</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></p>
-<h3 id="properties-1">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -151,15 +151,15 @@
 </table>
 <p>It is RECOMMENDED that the <code>id</code> of each <code>ReasoningNode</code> be the (upper-case) initial letter of the name of the <code>ReasoningNode</code>s element type (which will be one of {&quot;A&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;I&quot;, &quot;P&quot;, &quot;S&quot;, &quot;T&quot;}), followed by the (non-padded) decimal string representation of 0-based index of the <code>ReasoningNode</code> within its containing element.</p>
 <p><a name="claim"/></p>
-<h2 id="the-claim-data-type">3.23 The &quot;Claim&quot; Data Type</h2>
+<h2>3.23 The &quot;Claim&quot; Data Type</h2>
 <p>The <code>Claim</code> data type defines the abstract concept of a research <em>claim</em>, either made by a source or derived by a researcher.</p>
-<h3 id="identifier-2">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Claim</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Claim</code></p>
-<h3 id="extension">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></p>
-<h3 id="properties-2">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -179,12 +179,12 @@
 </tbody>
 </table>
 <p><a name="claim-reference"/></p>
-<h2 id="the-claimreference-data-type">3.24 The &quot;ClaimReference&quot; Data Type</h2>
+<h2>3.24 The &quot;ClaimReference&quot; Data Type</h2>
 <p>The <code>ClaimReference</code> data type defines a reference to a <a href="#claim"><code>Claim</code></a>.</p>
-<h3 id="identifier-3">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the &quot;ClaimReference&quot; data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ClaimReference</code></p>
-<h3 id="properties-3">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -210,16 +210,16 @@
 </tbody>
 </table>
 <p><a name="subject-node"/></p>
-<h2 id="the-subject-node-data-type">3.25 The &quot;Subject Node&quot; Data Type</h2>
+<h2>3.25 The &quot;Subject Node&quot; Data Type</h2>
 <p>The <code>SubjectNode</code> data type defines the abstract concept of a genealogical <em>subject</em> attested by a single source.</p>
-<p>The related <code>http://gedcomx.org/v1/Subject</code> data type represents something with unique and intrinsic identity, and only one <code>Subject</code> is expected to exist for any given entity. The <code>http://gedcomx.polygenea.org/v1/SubjectNode</code> data type represents one <code>Subject</code> referenced in one source or one part of one source; there are generally many <code>SubjectNode</code>s for each <code>Subject</code>, one for each reference to that subject known to exist.</p>
-<h3 id="identifier-4">identifier</h3>
+<p>The related <code>http://gedcomx.org/v1/Subject</code> data type represents something with unique and intrinsic identity, and only one <code>Subject</code> is expected to exist for any given entity.<br />The <code>http://gedcomx.polygenea.org/v1/SubjectNode</code> data type represents one <code>Subject</code> referenced in one source or one part of one source;<br />there are generally many <code>SubjectNode</code>s for each <code>Subject</code>, one for each reference to that subject known to exist.</p>
+<h3>identifier</h3>
 <p>The identifier for the <code>SubjectNode</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/SubjectNode</code></p>
-<h3 id="extension-1">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Claim</code></p>
-<h3 id="properties-4">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -239,16 +239,16 @@
 </tbody>
 </table>
 <p><a name="property"/></p>
-<h2 id="the-property-data-type">3.26 The &quot;Property&quot; Data Type</h2>
+<h2>3.26 The &quot;Property&quot; Data Type</h2>
 <p>The <code>Property</code> data type defines a string-valued detail about a <code>ResearchNode</code>, most commonly a <code>SourceNode</code>.</p>
 <p>The <code>http://gedcomx.polygenea.org/v1/Property</code> data type is approximately the research parallal to the <code>http://gedcomx.org/v1/Fact</code> data type in conclusions, but also serves additional purposes, such as identifying the &quot;type&quot; of a <code>SubjectNode</code>.</p>
-<h3 id="identifier-5">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Property</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Property</code></p>
-<h3 id="extension-2">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Claim</code></p>
-<h3 id="properties-5">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -280,16 +280,16 @@
 </tbody>
 </table>
 <p><a name="connection"/></p>
-<h2 id="the-connection-data-type">3.27 The &quot;Connection&quot; Data Type</h2>
+<h2>3.27 The &quot;Connection&quot; Data Type</h2>
 <p>The <code>Connection</code> data type defines a directed pair-wise relationship between two <code>ResearchNode</code>s.</p>
 <p>The <code>http://gedcomx.polygenea.org/v1/Connection</code> data type is approximately the research parallal to the <code>http://gedcomx.org/v1/Relationship</code> and <code>http://gedcomx.org/v1/EventRole</code> data types in conclusions; but also serves additional purposes, such as identifying one node as the &quot;update&quot; of another.</p>
-<h3 id="identifier-6">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Connection</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Connection</code></p>
-<h3 id="extension-3">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Claim</code></p>
-<h3 id="properties-6">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -321,16 +321,16 @@
 </tbody>
 </table>
 <p><a name="tag"/></p>
-<h2 id="the-tag-data-type">3.28 The &quot;Tag&quot; Data Type</h2>
+<h2>3.28 The &quot;Tag&quot; Data Type</h2>
 <p>The <code>Tag</code> data type defines metadata asserted about various other claims during research.</p>
 <p>Each tag type has a significantly different meaning; see the list of <a href="#known-tag-types">known tag types</a> for details.</p>
-<h3 id="identifier-7">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Tag</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Tag</code></p>
-<h3 id="extension-4">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Claim</code></p>
-<h3 id="properties-7">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -356,16 +356,16 @@
 </tbody>
 </table>
 <p><a name="aggregated-subject"/></p>
-<h2 id="the-aggregated-subject-data-type">3.29 The &quot;Aggregated Subject&quot; Data Type</h2>
+<h2>3.29 The &quot;Aggregated Subject&quot; Data Type</h2>
 <p>The <code>AggregatedSubject</code> data type is a semantic placeholder for the idea &quot;the subject you get if you assume that all of these other subjects are the same&quot;.</p>
 <p>Every <code>http://gedcomx.org/v1/Subject</code> that has two or more sources is conceptually an <code>http://gedcomx.polygenea.org/v1/AggregatedSubject</code>.</p>
-<h3 id="identifier-8">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>AggregatedSubject</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/AggregatedSubject</code></p>
-<h3 id="extension-5">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></p>
-<h3 id="properties-8">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -385,15 +385,15 @@
 </tbody>
 </table>
 <p><a name="derivation"/></p>
-<h2 id="the-derivation-data-type">3.30 The &quot;Derivation&quot; Data Type</h2>
+<h2>3.30 The &quot;Derivation&quot; Data Type</h2>
 <p>The <code>Derivation</code> data type stores free-text descriptions of reasoning processes.</p>
-<h3 id="identifier-9">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Derivation</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Derivation</code></p>
-<h3 id="extension-6">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></p>
-<h3 id="properties-9">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -419,15 +419,15 @@
 </tbody>
 </table>
 <p><a name="inference"/></p>
-<h2 id="the-inference-data-type">3.31 The &quot;Inference&quot; Data Type</h2>
+<h2>3.31 The &quot;Inference&quot; Data Type</h2>
 <p>The <code>Inference</code> data type stores structured, machine-understandable descriptions of single steps in the reasoning processes.</p>
-<h3 id="identifier-10">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Inference</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Inference</code></p>
-<h3 id="extension-7">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></p>
-<h3 id="properties-10">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
@@ -453,15 +453,15 @@
 </tbody>
 </table>
 <p><a name="expectation"/></p>
-<h2 id="the-expectation-data-type">3.32 The &quot;Expectation&quot; Data Type</h2>
+<h2>3.32 The &quot;Expectation&quot; Data Type</h2>
 <p>The <code>Expectation</code> data type stores a structured description of a trends, inference rule, or other guidelines about what a researcher expects to be true.</p>
-<h3 id="identifier-11">identifier</h3>
+<h3>identifier</h3>
 <p>The identifier for the <code>Expectation</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/Expectation</code></p>
-<h3 id="extension-8">extension</h3>
+<h3>extension</h3>
 <p>This data type extends the following data type:</p>
 <p><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></p>
-<h3 id="properties-11">properties</h3>
+<h3>properties</h3>
 <table>
 <thead>
 <tr class="header">
