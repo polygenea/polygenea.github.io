@@ -1,3 +1,6 @@
+This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.
+
+
 Specification of Reasoning
 ==========================
 
