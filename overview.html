@@ -18,23 +18,43 @@
 <dt><strong>string</strong></dt>
 <dd><p>a finite-length sequence of characters.</p>
 </dd>
-<dt><strong>byte</strong></dt>
-<dd><p>an octet; equivalently either an integer between 0 and 255 (inclusive) or a sequence of eight bits, each either 0 or 1.</p>
+<dt><strong>octet</strong></dt>
+<dd><p>a sequence of eight bits, each either 0 or 1.</p>
 </dd>
 <dt><strong>blob</strong></dt>
-<dd><p>a finite-length sequence of bytes.</p>
+<dd><p>a finite-length sequence of octets.</p>
 </dd>
 <dt><strong>datum</strong></dt>
-<dd><p>a (string, string, string, blob) tuple. Each string specifies part of the interpretation of the blob; they mean (in order) 1. MIME (media) type, as specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a>; if &quot;&quot;, missing, assumed to be &quot;text/plain&quot; 2. Encoding, as specified by <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">RFC 2616, Section 14</a>; if &quot;&quot;, assumed to be &quot;UTF-8&quot; 3. Language, as specified by <a href="http://tools.ietf.org/html/bcp47">IETF BCP 47</a>; if &quot;&quot;, assumed to be locale-independent (i.e., may be processed using the default locale of the processor)</p>
+<dd><p>a (string, string, blob) tuple. Each string specifies part of the interpretation of the blob; they mean (in order)</p>
+<ol>
+<li>Media type, as specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a>; if &quot;&quot;, assumed to be &quot;text/plain;charset=UTF-8&quot;. If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various &quot;text&quot; types) are REQUIRED.</li>
+<li>Language, as specified by <a href="http://tools.ietf.org/html/bcp47">IETF BCP 47</a>; if &quot;&quot;, assumed to be locale-independent (i.e., may be processed using the default locale of the processor)</li>
+</ol>
 </dd>
 <dt><strong>reference</strong></dt>
 <dd><p>indicating exactly one node within the same dataset. Because they do not span datasets, references may have an implementation-defined format.</p>
+<p>The phrase &quot;reference to a <em>X</em>&quot;, where <em>X</em> is Node or one of Node's subtypes, means the reference indicates an element of type <em>X</em> or one of <em>X</em>'s subtypes.</p>
 </dd>
 <dt><strong>integer</strong></dt>
-<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32766]. During serialisation or deserialisation the maximum number of nodes an implemenation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
+<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32766]. During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
 </dd>
 </dl>
-<h2 id="predicate-and-producer-types">Predicate and Producer Types</h2>
+<h2 id="composite-datatypes">Composite Datatypes</h2>
+<dl>
+<dt><strong>set</strong> of <em>X</em></dt>
+<dd><p>(where <em>X</em> is a datatype): an unordered collection of zero or more elements of type <em>X</em>, containing no duplicates.</p>
+</dd>
+<dt><strong>list</strong> of <em>X</em></dt>
+<dd><p>(where <em>X</em> is a datatype): an ordered sequence of zero or more elements of type <em>X</em>, possibly containing duplicates. Given a list of <em>n</em> elements, the first element is identified by the index 0, and each subsequent element by the index (1 + index-of-previous-element).</p>
+</dd>
+<dt><strong>tuple</strong></dt>
+<dd><p>A fixed, ordered group of values, each with a given type. Tuple values may be referenced by index (starting with 0, like a <em>list</em>) or, if the elements are given names in the specification, by name.</p>
+</dd>
+<dt><strong><em>X</em>↦<em>Y</em> pair</strong></dt>
+<dd><p>A tuple of two elements. If <em>X</em> and <em>Y</em> are types, they specify the types of the elements. Otherwise, <em>X</em> and <em>Y</em> are the names of the elements and types are given elsewhere in the specification text.</p>
+</dd>
+</dl>
+<h2 id="predicate-and-producer-datatypes">Predicate and Producer Datatypes</h2>
 <h3 id="predicates">Predicates</h3>
 <p>This specification uses the term &quot;<em>X</em> predicate&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameters</p>
 <ul>
@@ -42,7 +62,7 @@
 <li>a list of node tuples (called <em>m</em> in the table below)</li>
 </ul>
 <p>and returns either <code>true</code> or <code>false</code>.</p>
-<p>Predicates are only ever evaluated when matching a list of Node Queries against a list of node references; the value of <em>m</em> is created by taking the prefix of that list of node references up to and including the node reference being matches against the Node Query containing the predicate and derefrencing each.</p>
+<p>Predicates are only ever evaluated when matching a list of Node Queries against a list of node references; the value of <em>m</em> is created by taking the prefix of that list of node references up to and including the node reference being matches against the Node Query containing the predicate and dereferencing each.</p>
 <p>Inside a predicate, neither <em>m</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>m</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
 <table>
 <thead>
@@ -77,17 +97,31 @@
 <td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em></td>
 </tr>
 <tr class="even">
+<td align="left">Has</td>
+<td align="left">RECOMMENDED</td>
+<td align="left">set or list of <em>X</em></td>
+<td align="left"><em>X</em> predicate <em>f</em></td>
+<td align="left"><em>f</em>(<em>e</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
+</tr>
+<tr class="odd">
+<td align="left">MapHas</td>
+<td align="left">RECOMMENDED</td>
+<td align="left">set of string ↦ datum pairs</td>
+<td align="left">set <em>x</em> of string ↦ datum predicate pairs</td>
+<td align="left">for each (<em>a</em>↦<em>b</em>) in <em>x</em>, there is a (<em>c</em>↦<em>d</em>) pair in <em>v</em> such that <em>a</em> = <em>c</em> and <em>b</em>(<em>d</em>) is <code>true</code></td>
+</tr>
+<tr class="even">
 <td align="left">Cmp</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">string</td>
-<td align="left">a constant value <em>x</em> and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
+<td align="left">a constant value <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
 <td align="left"><em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
 <tr class="odd">
 <td align="left">Cmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">datum with MIME type that has defined order</td>
-<td align="left">a constant value <em>x</em> and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
+<td align="left">a constant value <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
 <td align="left"><em>v</em> ∙ <em>x</em> under that ordering</td>
 </tr>
 <tr class="even">
@@ -101,45 +135,38 @@
 <td align="left">Regex</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left">a constant PCRE <em>r</em></td>
+<td align="left">a constant regular expression <em>r</em>, as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a></td>
 <td align="left"><em>r</em> matches <em>v</em></td>
 </tr>
 <tr class="even">
-<td align="left">Has</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set or list of <em>X</em></td>
-<td align="left"><em>X</em> predicate <em>f</em></td>
-<td align="left"><em>f</em>(<em>e</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
-</tr>
-<tr class="odd">
 <td align="left">Len</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set or list</td>
-<td align="left">a constant integer <em>x</em> and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
+<td align="left">a constant integer <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
 <td align="left">(the number of elements in <em>v</em>) ∙ <em>x</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left">two <em>X</em> predicates</td>
 <td align="left">both predicates are <em>true</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left">two <em>X</em> predicates</td>
 <td align="left">at least one predicates is <em>true</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left">another <em>X</em> predicates</td>
 <td align="left">the predicate is <code>false</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
@@ -148,7 +175,7 @@
 </tr>
 </tbody>
 </table>
-<p>Implemenations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.</p>
+<p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.</p>
 <h3 id="producers">Producers</h3>
 <p>This specification uses the term &quot;<em>X</em> producer&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameter a list of node tuples (called <em>m</em> in the table below) and returns a value of type <em>X</em>.</p>
 <p>Producers are only ever evaluated when evaluating a Node Template in the context of a list of node references; the value of <em>m</em> is created dereferencing each element of that list.</p>
@@ -182,35 +209,35 @@
 <td align="left">Match</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left">a constant PCRE <em>r</em> and an integer <em>i</em></td>
-<td align="left">the contents of the <em>i</em>th matching group after matching <em>v</em> with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
+<td align="left">a constant regular expression <em>r</em>, as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a><br/>and an integer <em>i</em><br/>and a string producer <em>f</em></td>
+<td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>m</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
 </tr>
 <tr class="even">
 <td align="left">Slice</td>
 <td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left">a string producer <em>f</em> and two integers <em>i</em> and <em>j</em></td>
-<td align="left">the zero-indexed substring of the returned value of <em>f</em> from <em>i</em> (inclusive) to <em>j</em> (exclusive)<br/>negative indices have the length of the string added to them before derefrencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width substrings return the empty string</td>
+<td align="left">string or list</td>
+<td align="left">a string or list producer <em>f</em><br/>and two integers <em>i</em> and <em>j</em></td>
+<td align="left">the zero-indexed subsequence of <em>f</em>(<em>m</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence</td>
 </tr>
 <tr class="odd">
 <td align="left">Cat</td>
 <td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left">two string producers</td>
-<td align="left">the concatenation of the strings produced by the two producers</td>
+<td align="left">string or list</td>
+<td align="left">two string or list producers</td>
+<td align="left">the concatenation of the strings or lists produced by the two producers</td>
 </tr>
 <tr class="even">
 <td align="left">Union</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left">two set predicates</td>
+<td align="left">two set producers</td>
 <td align="left">the union of the sets produced by the two producers</td>
 </tr>
 <tr class="odd">
 <td align="left">Intersect</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left">two set predicates</td>
+<td align="left">two set producers</td>
 <td align="left">the intersection of the sets produced by the two producers</td>
 </tr>
 <tr class="even">
@@ -222,7 +249,7 @@
 </tr>
 </tbody>
 </table>
-<p>Implemenations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
+<p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
 <h2 id="the-nine-node-types">The Nine Node Types</h2>
 <p>Reasoning is a set of nodes. Node types are expressed in the following hierarchy:</p>
 <ul>
@@ -290,7 +317,7 @@
 <li><p>Inference</p>
 <p>A tuple <code>(support, reason)</code>, where</p>
 <ul>
-<li><code>support</code> is an ordered list of references to nodes</li>
+<li><code>support</code> is an list of references to nodes</li>
 <li><code>reason</code> is a reference to an Expectation</li>
 </ul>
 <p>It must be the case that the <code>support</code> matches the <code>antecedent</code> of the <code>reason</code>.</p></li>
@@ -298,8 +325,8 @@
 <li><p>Expectation</p>
 <p>A tuple <code>(antecedent, consequent)</code>, where</p>
 <ul>
-<li><code>antecedent</code> is an ordered list of Node Queries</li>
-<li><code>consequent</code> is an ordered list of Node Templates</li>
+<li><code>antecedent</code> is an list of Node Queries</li>
+<li><code>consequent</code> is an list of Node Templates</li>
 </ul>
 <p>A Node Query may be any Node except that</p>
 <ul>
@@ -316,35 +343,45 @@
 </ul>
 <h2 id="definitions-and-constraints">Definitions and Constraints</h2>
 <p>The <strong>dependencies</strong> of a node is defined to be the set of all nodes that the node references unioned with all of those nodes' dependencies, recursively.</p>
-<p>It is required that all references be acyclic; in other words, no node may be included in its own dependencies.</p>
+<p>It is REQUIRED that all references be acyclic; in other words, no node may be included in its own dependencies.</p>
 <p>Node and value <strong>equality</strong> is defined as follows:</p>
 <ul>
 <li><p>Two nodes are equal if and only if both (1) they are the same type of node and (2) each field of one node is equal to the corresponding field of the other node.</p></li>
 <li><p>Two references are equal if and only if they refer to nodes that are equal.</p></li>
-<li><p>Two sets are equal if and only if, for every element in each set there is an equal element in the other set.</p></li>
-<li><p>Two lists are equal if and only if both (1) they have the same length and (2) for each valid list index for the lists, the elements in both lists at that index are equal.</p></li>
-<li><p>Two functions are equal if they are represented using the same bytes, and they are not equal if there exists an input for which their results are not equal. If they are represented by different bytes but give the same results for all inputs, their equality is not defined by this specification.</p></li>
+<li><p>Two sets are equal if and only if each element in each set has an equal element in the other set.</p></li>
+<li><p>Two lists are equal if and only if both (1) they have the same length and (2) for each valid index for the lists, the elements in both lists at that index are equal.</p></li>
+<li><p>Two predicates are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give different results. If they are defined differently but give the same result for all inputs, their equality is not specified by this specification.</p></li>
+<li><p>Two producers are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give non-equal results. If they are defined differently but give equal result for all inputs, their equality is not specified by this specification.</p></li>
 <li><p>Two strings are equal if they contain the same conceptual characters in the same order.</p></li>
-<li><p>Two (MIME-type, bytestring) pairs are equal if they have the same MIME-type and byte-for-byte equivalent bytestrings.</p></li>
+<li><p>Two data are equal if and only if either (1) there is an official notion of eqaulity for the given MIME-type and the blobs are equal under than definition of (2) the strings are equal and the blobs have the same bytes in the same order.</p></li>
 </ul>
-<p>The <strong>constituents</strong> of any node other than an Aggregated Subject node is defined to be the singleton set containing just that Node itself.</p>
-<p>The <strong>constituents</strong> of an Aggregated Subject node is defined to be the singleton set containing just the Aggregated Subject node itself unioned with the <strong>constituents</strong> of each of the nodes referenced by its <code>parts</code>.</p>
+<p>The <strong>constituents</strong> of any node <em>except</em> an Aggregated Subject node is defined to be the singleton set containing just that Node itself.</p>
+<p>The <strong>constituents</strong> of an Aggregated Subject node is defined to be the singleton set containing the Aggregated Subject node itself and the elements of the <strong>constituents</strong> of each of the nodes referenced in the <code>of</code> field of the node referenced by the Aggregated Subject's <code>parts</code> field.</p>
 <p>Node and value <strong>matching</strong> is defined as follows:</p>
 <ul>
-<li><p>Any pair that are equal also match</p></li>
-<li><p>A predicate and a value match if the function can be evaluated with the value as an argument and if doing so results in the Boolean value <code>true</code>.</p></li>
+<li><p>A predicate and a value match if all of the following are true:</p>
+<ol>
+<li>the matching is occurring within the context of matching a list of Node Queries and a list of node references</li>
+<li>the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section <a href="#producers">Producers</a></li>
+<li>evaluating the predicate with the value and the list of tuples yields the value <code>true</code></li>
+</ol>
+<p>Optionally, if the predicate does not utilise its list of tuples parameter then the predicate may be said to match if condition 3 alone would be true for any list of tuples supplied.</p></li>
 <li><p>The special value <code>-1</code> matches any node reference.</p></li>
-<li>A non-negative integer <em>i</em> matches a node reference <em>r</em> if and only if both
-(1) there is a list of node references that was used to initiate the matching process and (2) there is an element of that list at index <em>i</em> and
-<p>(3) the element at the index <em>i</em> is a constituent of <em>r</em>.</p></li>
+<li><p>A set of integers matches a set of node references if each integer in the set of integers matches some node reference in the set of node references.</p></li>
+<li><p>A non-negative integer <em>i</em> matches a node reference <em>r</em> if and only if all of the following are true:</p>
+<ol>
+<li>there is a list of node references that was used to initiate the matching process</li>
+<li>there is an element of that list at index <em>i</em></li>
+<li>the node referenced by the element at the index <em>i</em> is a constituent of <em>r</em>.</li>
+</ol></li>
 <li><p>A list of node references matches a list of Node Queries if and only if both (1) they have the same length and (2) for each valid list index for the lists, the elements in the list of node reference at that index matches the element in the list of Node Queries at that index.</p></li>
-<li><p>A node reference matches a Node Query if and only if both (1) the referenced node and the Node Query are of the same node type, and (2) each field in the referenced node matches the corresponding node in the Node Query.</p></li>
+<li><p>A node reference matches a Node Query if and only if both (1) the referenced node and the Node Query are of the same node type and (2) each field in the referenced node matches the corresponding node in the Node Query.</p></li>
 </ul>
 <p>The <strong>instantiated node list</strong> of an Inference is defined to be a list of Nodes having the same length as the <code>consequent</code> of the <code>reason</code> of the Inference such that the Node at index <em>i</em> of the instantiated node list is created from the Node Template at index <em>i</em> of the <code>consequent</code> by doing all of the following (in any order)</p>
 <ul>
-<li><p>replacing any producer values with the result of applying that function with the <code>antecedent</code> of the Inference as the function's argument.</p></li>
+<li><p>replacing any producer values with the result of applying that function using the <code>antecedent</code> of the Inference as the function's argument.</p></li>
 <li><p>replacing the <code>source</code> value (which is <code>-1</code> in Node Templates) with a reference to the Inference.</p></li>
-<li><p>replacing any non-negative integers with the node reference in the <code>antecedent</code> list at the integer's index if the integer is smaller than the length of the <code>antecedent</code> list; otherwise with a reference to the node at index <em>i</em>−<em>x</em> of the instantiated node list being constructed, where <em>x</em> is the length of the <code>antecedent</code> list.</p></li>
+<li><p>replacing any non-negative integers with the node reference in the <code>support</code> list at the integer's index if the integer is smaller than the length of the <code>support</code> list; otherwise with a reference to the node at index <em>i</em>−<em>x</em> of the instantiated node list being constructed, where <em>x</em> is the length of the <code>support</code> list.</p></li>
 </ul>
 <p>A Sourced Claim may only reference an Inference in its <code>source</code> field if it is an element of the instantiated node list of that Inference.</p>
 <h1 id="discussion">Discussion</h1>
@@ -352,87 +389,42 @@
 <p>Node identity is determined only by the node's contents. There is no notion of durable URI, UUID, GUID, or other unique, durable identifier for a node in this specification, nor should one be introduced unless that identifier can be uniquely determined from the contents of the node alone, as for example a hash-based UUID.</p>
 <p>Because node contents determine node identity, there is no intrinsic notion of versions of a node, nor of updating or editing its contents. The concept that one node is an update of another should be expressed using a Connection with <code>key</code> &quot;update&quot;.</p>
 <h2 id="term-normalisation">Term Normalisation</h2>
-<p>When extracting the contents of an external source as a set of Sourced Claim nodes citing the OutRef of the external source, there is a quality-of-use expectation that the <code>slug</code> of each Subject is a description (in any language) of some specific part of the source that references the Subject in question; and that the various Properties and Connections reflect, as closely as possible, the language of the source (e.g., using a Connection with key <code>Papa</code> if that is the wording used to describe the relationship in the source).</p>
+<p>When extracting the contents of an external source as a set of Sourced Claim nodes citing the OutRef of the external source, there is a quality-of-use expectation that the <code>slug</code> of each Subject be a description (in any language) of some specific part of the source that references the Subject in question; and that the various Properties and Connections reflect, as closely as possible, the language of the source (e.g., using a Connection with key <code>Papa</code> if that is the wording used to describe the relationship in the source).</p>
 <p>Term normalisation should then happen by introducing new, normalised-term properties and connections <code>source</code>d to either Inference or Derivation nodes that use the non-normalised terms as (part of) their <code>support</code>. In many cases, the <code>support</code> should also include some contextual information such as the date, location, and/or language of the underlying document.</p>
 <h2 id="inferences-vs.-derivations-and-the-creation-of-expectations">Inferences vs. Derivations, and the creation of Expectations</h2>
 <p>Inferences and Derivations are both intended to fulfil the same objective: to represent the fact that some claims were constructed using other pieces of information.</p>
-<p>The Derivation node is flexible and does not require the relatively complicated support for matches and Node Queries and Node Templates and so on that Inferences do require. However, they leave the <code>reason</code> in machine-opaque human-language text, which means they are not readily analysed by the computer and dependent on any users encountering the Derivation to be fluent in the same language and understand the way the creator of the Derivation chose to express their reasoning.</p>
-<p>The Inference node, on the other hand, is purely machine-understandable representation of reasoning. Like a Derivation, an Inference is flexible enough to be created for any finite-support inference. However, Inferences require the creation of Expectation nodes.</p>
-<p>Sophisticated Expectation nodes are possible, but many Expectations can be readily created using the following interactive process:</p>
+<p>The Derivation node is flexible and does not require the relatively complicated support for matches and predicates and producers, etc., which Inferences do require. However, they leave the <code>reason</code> in machine-opaque human-language text, which means that they are not readily analysed by the computer, are language-dependent, may lack necessary detail or contain text not in keeping with their support, etc.</p>
+<p>The Inference node, on the other hand, is a purely machine-understandable representation of reasoning. Like a Derivation, an Inference is flexible enough to be created for any finite-support inference. However, Inferences require the creation of Expectation nodes.</p>
+<p>Sophisticated Expectation nodes are possible, particularly with <code>Script</code>-type predicates and producers, but many Expectations can be readily created using the following interactive process:</p>
 <ol>
-<li><p>Have the user specify the nodes they intend to infer and select the nodes they recognise as the support for their inference. This step would need to be done for Derivation nodes as well...</p></li>
-<li><p>Build a set of candidate antecedents from the nodes they identified as support augmented with any nodes referenced by the nodes they identified as being inferred that are not already in the <code>antecedent</code> or inferred collections.</p></li>
-<li><p>For each field of each candidate antecedents, ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a <em>Lit</em> (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
+<li><p>Have the user specify the nodes they intend to infer and select the nodes they recognise as the support for their inference. This step would be done for Derivation nodes as well...</p></li>
+<li><p>Build a set of candidate antecedents from the nodes they identified as support augmented with any nodes referenced by the nodes the user identified as being inferred that are not already in the <code>antecedent</code> or inferred collections.</p></li>
+<li><p>For each field of each candidate antecedent, ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a <em>Lit</em> (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
 <p>You could optionally ask additional questions, such as &quot;we notice that these two nodes both have the same <code>value</code>; is that same-value characteristic important?&quot;, to help build more advanced predicates, if you so desire.</p></li>
-<li><p>Organise the candidate antecedents so that each node appears at a larger index than any of its dependencies included that are also antecedents; then replace all remaining node references with indices into the new <code>antecedent</code> list.</p></li>
-<li><p>Organise the inferred nodes so that each node appears at a larger index than any of its dependencies included that are also inferred; then replace all remaining node references with indices into the new <code>antecedent</code> list concatenated with the new <code>consequent</code> list, or with <code>-1</code> if the <code>source</code> field.</p></li>
+<li><p>Organise the candidate antecedents such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are antecedents then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>antecedent</code> list and to replace node references with integers.</p></li>
+<li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p></li>
 </ol>
 <h1 id="partial-implementation-and-extension">Partial Implementation and Extension</h1>
-<p>Because some family history and genealogical software does not currently support formal inference at all, implementers should expect that it will take some time for full implementations of all features of this specification to be adopted. It is also expected that many implementers will wish to add some extensions to the core terminology provided by this specification. This section discusses appropriate ways to interact with partial implementations and extensions.</p>
-<h2 id="removing-inferences-and-expectations">Removing Inferences and Expectations</h2>
-<p>Software may convert all Inferences into Derivations with the same <code>support</code> and a textual representation of the Expectation as the <code>reason</code>. If the software is unable or unwilling to convert the Expectation to text, it is suggested that the text &quot;(reasoning lost during import)&quot; be used instead.<br />Once all Inferences have been replaced by Derivations, all Expectations can be removed.</p>
-<h2 id="reducing-to-conclusion-source-format">Reducing to Conclusion + Source format</h2>
-<p>Software may remove all reasoning altogether by</p>
+<p>For various reasons, implementers should expect to interact with other software that has adopted only portions of this specification and that have extended this specification in various ways. This section discusses appropriate ways to interact with partial implementations and extensions.</p>
+<h2 id="policies-and-suggestions">Policies and Suggestions</h2>
+<p>The set of elements in each node type is fixed, and MUST NOT be extended or reduced.</p>
+<p>The set of node types MAY be extended, though it is RECOMMENDED that extensions be handled with custom <code>key</code>s in Properties, Connections, and/or Tags instead. It is RECOMMENDED that software ignore new node types when receiving extended data.</p>
+<p>Software MAY chose to ignore any node upon receipt of a dataset provided that all nodes that depend upon it are also ignored.</p>
+<p>Software MAY chose to omit any node while sending a dataset provided that all nodes that depend upon it are also omitted.</p>
+<p>Software MAY chose to omit or ignore all Inferences and Expectations by converting each Inference into a Derivation with the same <code>support</code> and a textual representation of the Expectation as the <code>reason</code>. If the software is unable to convert the Expectation to text, it SHOULD use the text &quot;(reasoning omitted)&quot;, or equivalent text in another language, as the <code>reason</code>.</p>
+<p>Software MAY chose to omit or ignore all reasoning and reduce the dataset to a set of Subjects, Properties, Connections, Derivations, and SourceReferences where every Claim's <code>source</code> is a Derivation and every element of each Derivation's <code>support</code> is an OutRef. And outline of a process for reducing data to this form is:</p>
 <ol>
-<li>Creating a Subject for each group of Subjects and Aggregated Subjects linked by &quot;same&quot; Tags.</li>
-<li>Copying all Properties and Connections that pointed to the original nodes to point to the new nodes instead.</li>
-<li>Replacing all <code>source</code>s with a pointer to a Derivation node with all of the OutRef nodes in the original <code>source</code>'s dependencies as the Derivation's <code>support</code> and &quot;(reasoning lost during import)&quot; as its <code>reason</code>.</li>
-<li>Replacing any pair of Sourced Claims that differ only in <code>source</code> with a single node having as its <code>source</code> a Derivation with the union of the two original claim's <code>source</code>s' <code>support</code> as the new Derivation's <code>support</code>.</li>
+<li>Create a Subject for each group of Subjects and Aggregated Subjects linked by &quot;same&quot; Tags. The new Subject's <code>source</code> should be a Derivation whose <code>support</code> is the set of all OutRef nodes in any of the original nodes' dependencies.</li>
+<li>Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node. The new Properties' and Connections' <code>source</code>s should be Derivations whose <code>support</code>s are the sets of all OutRef nodes in any of the original nodes' dependencies.</li>
+<li>Replacing any set of Properties or Connections that differ only in <code>source</code> with a single node having as its <code>source</code> a Derivation with the union of the original claims' <code>source</code>s' <code>support</code> as the new Derivation's <code>support</code>.</li>
 </ol>
-<p>At the conclusion of this process, the data will be a set of Sourced Claims whose sources are all Derivations with only OutRefs as their <code>support</code>. While this has discarded the vast majority of the work performed, it does closely match the structure of other family history and genealogy data formats.</p>
-<h2 id="handling-unexpected-keys-and-values">Handling Unexpected <code>key</code>s and <code>value</code>s</h2>
-<p>Some software may not have the ability to process arbitrary <code>key</code> and/or <code>value</code> values wherever they appear. A non-exhaustive sample of approaches for handling these cases follow:</p>
-<ul>
-<li><p>Automatically apply a set of Expectations to convert between the provided format and the desired format. These could be as simple as term normalisation (e.g., &quot;father&quot; implies &quot;http://schema.org/parent&quot;) or more complicated (e.g., a &quot;birthdate&quot; Property and some &quot;parent&quot; connections implies a birth Subject with a &quot;date&quot; Property and various &quot;parent&quot; and &quot;child&quot; connections between the birth and the participants, and possibly also a family Subject with various Connections with its participants).</p></li>
-<li><p>Simply discard the node in question; for example, if a tool does not care about marriages it could simply ignore all marriage Connections and Subjects and all nodes that depend on them. If it was part of the <code>support</code> for an Inference or Derivation, replace that source with a Derivation using the dependencies of the discarded node as part of its <code>support</code>.</p></li>
-<li><p>In some cases it might be appropriate to discard the node and some of the nodes on which it depends. For example, software that is interested only in human lineage would probably not have support for Property nodes indicating that a Subject has &quot;type&quot;:&quot;pet&quot;, and if it found such would probably discard not only that Property but also the described Subject and everything that depends upon it.</p></li>
-</ul>
-<p>Because node identity is determined only by content, discarding nodes does not impede collaboration; returning the kept subsets with any new nodes to the originator allows the originator to add the new nodes to their existing set, potentially without even realizing that some of the nodes sent were not returned.</p>
-<p>A similar argument suggests that the various &quot;replace with&quot; approaches to handling unexpected or unwanted nodes. Replacement doesn't actually modify or destroy any existing nodes went the replaced data is given back to the originator, it merely adds additional nodes which contain only information that could have been derived from the initially-provided information. Keeping these redundant nodes around does not impede research as long as the user interface keeps the redundant information from distracting the user. That said, redundant nodes of this kind could be discarded upon receipt without loss of communication ability as the next time the originator sends the data the same replacements will occur and the same nodes recreated.</p>
-<h2 id="different-sets-of-node-types">Different sets of Node Types</h2>
-<p>It is hoped that most implementations based off of this specification will chose to implement all nine node types. However, we anticipate that some will chose to implement the following subsets:</p>
-<ul>
-<li><p>No Inference or Expectation (see <a href="">Removing Inferences and Expectations</a> above).</p></li>
-<li><p>No Derivations (every Derivation can be replaced by an Inference + Expectation pair by the <a href="">creation of Expectations</a> discussed above; if no user is involved, a minimal conversion answers &quot;yes&quot; for all non-reference fields and &quot;no&quot; for all reference fields in that algorithm).</p></li>
-<li><p>Only five node types: OutRef, Derivation, Subject, Property, and Connection (see <a href="">Reducing to Conclusion + Source</a> format above).</p></li>
-</ul>
-<p>However, new node types are not anticipated and specification-compliant software does not need to accept input containing any node type beyond the nine in this standard. If developers wish, they may make software that allows other node types to be present but ignores them; however, that practice is discouraged for security reasons: while no known vulnerability exists, implementations of some data standards in other fields have suffered from attacks based on embedding special code in the ignored part of the those standards.</p>
-<h1 id="serialisation">Serialisation</h1>
-<h2 id="custom-small-strings">Custom Small Strings</h2>
-<p>Serialise the node set as follows:</p>
-<ol>
-<li><p>Sort the nodes such that each node appears after all of its dependencies. Note that there are multiple ways to achieve this.</p></li>
-<li><p>Assign to the first node in this ordering the index 0, and each other node the index 1 + the index of the node appearing immediately before it in the ordering.</p></li>
-<li><p>For each node in order, put the serialisation of the node followed by the newline character (U+000A).</p></li>
-</ol>
-<p>Serialise a node as follows:</p>
-<ol>
-<li><p>put the (upper-case) first letter of the node type (e.g., 'A' for AggregatedSource, 'P' for Property, etc.).</p></li>
-<li><p>for each element of the node's tuple definition in the order defined, put the ';' character (U+0038) followed by the serialisation of the element.</p></li>
-</ol>
-<p>Serialise a reference as the decimal string of the index of the referenced node.</p>
-<p>Serialise a string as a '&quot;' character (U+0022) followed by the serialisation of each character in the string in order followed by another '&quot;' character (U+0022).</p>
-<p>Serialise a character as itself except as follows:</p>
-<ul>
-<li>serialise the '&quot;' character as two '&quot;' characters in a row</li>
-<li>serialise non-whitespace control characters as '', 'x', and the two-digit (zero-padded) upper-case hexidecimal number of the character's unicode code point.</li>
-</ul>
-<p>Serialise a (MIME-type, bytestring) pair by serialising the string created by converting the pair into a data URL as defined in <a href="https://tools.ietf.org/html/rfc2397">RFC 2397</a> (i.e., the concatenation of &quot;data:&quot;, the MIME-type, &quot;;base64,&quot;, and the base64 encoding of the bytestring as defined in <a href="https://tools.ietf.org/html/rfc4648">RFC 4648</a>).</p>
-<p>Serialise a key↦value pair by puting the serialisation of the key, the character ':' (U+003A), and the serialisation of the value.</p>
-<p>Serialise a list by serialising each element in order, preceeding all but the first element by a ',' character (U+002C).</p>
-<p>Serialise a list by serialising each element of the set, sorting them from least-to-greatest in lexicographical order of serialised string, and putting the serialized values in that order, preceeding all but the first by a ',' character (U+002C).</p>
-<p>Serialise the predicate that always returns <code>true</code> as the empty string.</p>
-<p>The serialisation of other functions should be defined when the function class is defined.</p>
-<h2 id="xml">XML</h2>
-<h2 id="json">JSON</h2>
-<h2 id="json-ld">JSON-LD</h2>
-<!-- JSON-LD is serialised exactly like JSON except list-type values (in Expectation and Inference nodes) are wrapped with prefix `{"@list":` and suffix `}`, and the entire document is wrapped with `{"@graph":` prefix and `}` suffix. -->
-
-
-
-
-<h2 id="graphviz-dot">Graphviz dot</h2>
-<h2 id="graphml">GraphML</h2>
-<h2 id="cbor">CBOR</h2>
+<p>When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate, it is RECOMMENDED that the recieving software keep the Expectation as received but treat the extra predicate as being equivalent to <em>Top</em> when error-checking received data and as equivalent to <em>Not</em>(<em>Top</em>) when deciding if the user can create new Inferences based on the Expectation.</p>
+<p>When software that supports Expectation nodes receives a dataset including Expectations that contain producers that the receiving software cannot evaluate, it is RECOMMENDED that the receiving software keep the Expectation as received but treat them as unchecked (like a Derivation).</p>
+<p>If software desires a particular set of keys in its data, it is RECOMMENDED that a set of term-normalising Expectations be used to automatically create new Inferences and normalised terms upon receipt of new datasets.</p>
+<p>If software desires a particular structure in its data, for example desiring birthdate Properties instead of birth Subjects, it is RECOMMENDED that a set of Expectations be used to automatically create new Inferences and normalised structures upon receipt of new datasets.</p>
+<p>In some cases, software may decide to discard additional nodes; for example, software that tracks human relationships might chose to omit not only a &quot;species&quot;:&quot;horse&quot; Property but also the Subject to which it is attached and all other claims <code>of</code> that Subject.</p>
+<h2 id="identity-redundancy-and-node-creating-changes">Identity, Redundancy, and Node-Creating Changes</h2>
+<p>Because node identity is determined only by content, discarding nodes does not impede collaboration; returning the kept subsets with any new nodes to the originator allows the originator to add the new nodes to their existing set, potentially without even realising that some of the nodes sent were not returned.</p>
+<p>Some of the suggestions in the previous section permit or suggest the replacement of nodes or the creation of new nodes containing information that is redundant with previous data. Replacement doesn't actually modify or destroy any existing nodes: they are values and if the sender of data does not chose to discard them they cannot be modified or destroyed by the recipient. When the recipient sends back data, it may contain new derivative nodes; however, the information in these nodes, while redundant, is not new. Keeping these redundant nodes around does not impede research provided that the user interface prevents redundant information from distracting the user. If nodes are clearly redundant, the originator's software could also omit them upon receipt of the redundant data.</p>
 </body>
 </html>

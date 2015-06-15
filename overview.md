@@ -26,7 +26,7 @@ __datum__
     
     1.  Media type, as specified by [RFC 4288](http://tools.ietf.org/html/rfc4288); 
         if "", assumed to be "text/plain;charset=UTF-8".
-        If media type alone does not specify an unambiguous interpetation of the bytes, clarifying parameters (as the charset of various "text" types)
+        If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various "text" types)
         are REQUIRED. 
     3.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
         if "", assumed to be locale-independent (i.e., 
@@ -45,7 +45,7 @@ __integer__
     Every implementations must be able to represent (at least)
     all integers in the interval \[−1, 32766\].
     During serialisation or deserialisation the maximum number of nodes 
-    an implemenation can handle may be constrained by the largest magnitude integer
+    an implementation can handle may be constrained by the largest magnitude integer
     that the implementation can represent.
 
 
@@ -90,7 +90,7 @@ Predicates are only ever evaluated when matching a list of Node Queries
 against a list of node references;
 the value of _m_ is created by taking the prefix of that list of node references
 up to and including the node reference being matches against the Node Query containing the predicate
-and derefrencing each.
+and dereferencing each.
 
 Inside a predicate, neither _m_ nor _v_ may be modified
 and any node references inside tuples inside _m_ are treated as opaque types 
@@ -103,17 +103,17 @@ Lit | REQUIRED | any | a constant value _x_ | _v_ equals _x_
 Same | RECOMMENDED | any | two indices _i_ and _j_ | _v_ equals the _j_th value of the _i_th tuple in _m_
 Has | RECOMMENDED | set or list of _X_ | _X_ predicate _f_ | _f_(_e_) is `true` for any _e_ in _v_
 MapHas | RECOMMENDED | set of string ↦ datum pairs | set _x_ of string ↦ datum predicate pairs | for each (_a_↦_b_) in _x_, there is a (_c_↦_d_) pair in _v_ such that _a_ = _c_ and _b_(_d_) is `true`
-Cmp | RECOMMENDED | string | a constant value _x_ and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under a lexicographical ordering
-Cmp | OPTIONAL | datum with MIME type that has defined order | a constant value _x_ and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under that ordering
+Cmp | RECOMMENDED | string | a constant value _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under a lexicographical ordering
+Cmp | OPTIONAL | datum with MIME type that has defined order | a constant value _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under that ordering
 ICmp | OPTIONAL | as `Cmp` | as `Cmp`, but two indices _i_ and _j_ instead of constant _x_ | as `Cmp`, but using the _j_th value of the _i_th tuple in _m_ instead of _v_
-Regex | OPTIONAL | string | a constant PCRE _r_ | _r_ matches _v_
-Len | OPTIONAL | set or list | a constant integer _x_ and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | (the number of elements in _v_) ∙ _x_
+Regex | OPTIONAL | string | a constant regular expression _r_, as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10) | _r_ matches _v_
+Len | OPTIONAL | set or list | a constant integer _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | (the number of elements in _v_) ∙ _x_
 And | OPTIONAL | any (call it _X_) | two _X_ predicates | both predicates are _true_
 Or | OPTIONAL | any (call it _X_) | two _X_ predicates | at least one predicates is _true_
 Not | OPTIONAL | any (call it _X_) | another _X_ predicates | the predicate is `false`
 Script | OPTIONAL | any | a datum with major type "script" defining a single function | evaluating the function in the script returns `true`
 
-Implemenations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
+Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
 
 ### Producers
 
@@ -134,14 +134,14 @@ name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
 Lit | REQUIRED | any | a constant value _x_ | _x_
 Lookup | RECOMMENDED | any | two indices _i_ and _j_ | the _j_th value of the _i_th tuple in _m_
-Match | OPTIONAL | string | a constant PCRE _r_<br/>and an integer _i_<br/>and a string producer _f_ | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | a string or list producer _f_ and two integers _i_ and _j_ | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before derefrencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
+Match | OPTIONAL | string | a constant regular expression _r_, as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10)<br/>and an integer _i_<br/>and a string producer _f_ | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
+Slice | OPTIONAL | string or list | a string or list producer _f_<br/>and two integers _i_ and _j_ | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | two string or list producers | the concatenation of the strings or lists produced by the two producers
 Union | OPTIONAL | set | two set producers | the union of the sets produced by the two producers
 Intersect | OPTIONAL | set | two set producers | the intersection of the sets produced by the two producers
 Script | OPTIONAL | any | a datum with major type "script" defining a single function | the value returned when evaluating the function in the script
 
-Implemenations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.
+Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.
 
 
 
@@ -293,11 +293,11 @@ Node and value __equality__ is defined as follows:
 
 -   Two predicates are equal if they have the same type and are defined with equal values.
     They are not equal if there exists some inputs for which they give different results.
-    If they are defined differently but give the same result for all inputs, their equality is not specified by this standard.
+    If they are defined differently but give the same result for all inputs, their equality is not specified by this specification.
 
 -   Two producers are equal if they have the same type and are defined with equal values.
     They are not equal if there exists some inputs for which they give non-equal results.
-    If they are defined differently but give equal result for all inputs, their equality is not specified by this standard.
+    If they are defined differently but give equal result for all inputs, their equality is not specified by this specification.
 
 -   Two strings are equal if they contain the same conceptual characters in 
     the same order.
@@ -323,7 +323,7 @@ Node and value __matching__ is defined as follows:
     2.  the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section [Producers](#producers)
     3.  evaluating the predicate with the value and the list of tuples yields the value `true`
     
-    Optionally, if the predicate does not utilize its list of tuples parameter
+    Optionally, if the predicate does not utilise its list of tuples parameter
     then the predicate may be said to match if condition 3 alone would be true for any list of tuples supplied.
     
 -   The special value `-1` matches any node reference.
@@ -459,7 +459,7 @@ but many Expectations can be readily created using the following interactive pro
     such that, if node _A_ is in node _B_'s dependencies and both are being inferred
     then _A_ appears before _B_.
     Use this ordering to populate the `consequent` list and to replace node references with integers.
-    Additionally, replace all infered node `source` values with `-1`, as required by the definition of Node Template.
+    Additionally, replace all inferred node `source` values with `-1`, as required by the definition of Node Template.
 
 
 
@@ -467,8 +467,8 @@ Partial Implementation and Extension
 ====================================
 
 For various reasons, implementers should expect to interact with other software
-that has adopted only portions of this standard
-and that have extended this standard in various ways.
+that has adopted only portions of this specification
+and that have extended this specification in various ways.
 This section discusses appropriate ways to interact with partial implementations and extensions.
 
 
@@ -478,7 +478,7 @@ Policies and Suggestions
 The set of elements in each node type is fixed, and MUST NOT be extended or reduced.
 
 The set of node types MAY be extended, though it is RECOMMENDED that extensions be handled with custom `key`s in Properties, Connections, and/or Tags instead.
-It is RECOMMENDED that software ignore new node types when recieving extended data.
+It is RECOMMENDED that software ignore new node types when receiving extended data.
 
 Software MAY chose to ignore any node upon receipt of a dataset provided that all nodes that depend upon it are also ignored.
 
@@ -500,27 +500,27 @@ And outline of a process for reducing data to this form is:
 2.  Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node.
 	The new Properties' and Connections' `source`s should be 
 	Derivations whose `support`s are the sets of all OutRef nodes in any of the original nodes' dependencies.
-3.  Replacing any set of Properties or Conenctions that differ only in `source` 
+3.  Replacing any set of Properties or Connections that differ only in `source` 
 	with a single node having as its `source`
 	a Derivation with the union of the original claims' `source`s' `support` as the new Derivation's `support`.
 
-When software that supports Expectation nodes receives a dataset including Expectations that utilize predicates that the recieving software cannot evaluate,
-it is RECOMMENDED that the recieving software keep the Expectation as recieved
+When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate,
+it is RECOMMENDED that the recieving software keep the Expectation as received
 but treat the extra predicate as being equivalent to _Top_ when error-checking received data
 and as equivalent to _Not_(_Top_) when deciding if the user can create new Inferences based on the Expectation.
 
-When software that supports Expectation nodes receives a dataset including Expectations that utilize producers that the recieving software cannot evaluate,
-it is RECOMMENDED that the recieving software keep the Expectation as recieved
+When software that supports Expectation nodes receives a dataset including Expectations that contain producers that the receiving software cannot evaluate,
+it is RECOMMENDED that the receiving software keep the Expectation as received
 but treat them as unchecked (like a Derivation).
 
 If software desires a particular set of keys in its data,
-it is RECOMMENDED that a set of term-normalizing Expectations be used
-to automatically create new Inferences and normalized terms upon receipt of new datasets.
+it is RECOMMENDED that a set of term-normalising Expectations be used
+to automatically create new Inferences and normalised terms upon receipt of new datasets.
 
-If software desires a particular sructure in its data,
+If software desires a particular structure in its data,
 for example desiring birthdate Properties instead of birth Subjects,
 it is RECOMMENDED that a set of Expectations be used
-to automatically create new Inferences and normalized structures upon receipt of new datasets.
+to automatically create new Inferences and normalised structures upon receipt of new datasets.
 
 In some cases, software may decide to discard additional nodes;
 for example, software that tracks human relationships might chose to omit
@@ -529,27 +529,27 @@ but also the Subject to which it is attached
 and all other claims `of` that Subject.
 
 
-Identity, Redundency, and Node-Creating Changes
+Identity, Redundancy, and Node-Creating Changes
 -----------------------------------------------
 
 Because node identity is determined only by content,
 discarding nodes does not impede collaboration;
 returning the kept subsets with any new nodes to the originator
 allows the originator to add the new nodes to their existing set, 
-potentially without even realizing that some of the nodes sent were not returned.
+potentially without even realising that some of the nodes sent were not returned.
 
 Some of the suggestions in the previous section
 permit or suggest the replacement of nodes
 or the creation of new nodes
-containing information that is redundent with previous data.
+containing information that is redundant with previous data.
 Replacement doesn't actually modify or destroy any existing nodes:
 they are values and if the sender of data does not chose to discard them
 they cannot be modified or destroyed by the recipient.
-When the recipient sends back data, it may contain new deriviative nodes;
-however, the information in these nodes, while redundent, is not new.
+When the recipient sends back data, it may contain new derivative nodes;
+however, the information in these nodes, while redundant, is not new.
 Keeping these redundant nodes around does not impede research
 provided that the user interface prevents redundant information from distracting the user.
-If nodes are clearly redundent, the originator's software could also omit them upon reciept of the redundent data.
+If nodes are clearly redundant, the originator's software could also omit them upon receipt of the redundant data.
 
 
 
