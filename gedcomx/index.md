@@ -7,7 +7,7 @@ __add to 1.3.3__
 > A "set" is defined as an unordered collection of data instances containing no duplicate data instances.
 > When a property is defined in terms of a "list", the data type of the data instances in the list is also provided
 >
-> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval \[-1, 32767\]
+> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval \[−1, 32767\]
 
 ----
 
@@ -346,7 +346,56 @@ name  | description | data type | constraints
 antecedent | A list of `NodeQuery`s describing what must be true for this `Expectation` to hold | List of `http://gedcomx.polygenea.org/v1/NodeQuery`. Order is preserved. | REQUIRED.
 consequent | A list of `NodeTemplate`s describing what may be inferred if the `antecedent` is satisfied | List of `http://gedcomx.polygenea.org/v1/NodeTemplate`. Order is preserved. | REQUIRED.
 
+The __index__ of a `NodeQuery` in its containing `Expectation` is defined to be the 0-based index of the node in the `antecedent` list.
+
+The __index__ of a `NodeTemplate` in its containing `Expectation` is defined to be the 0-based index of the node in the `consequent` list plus the number of elements in the `antecedent` list.
 
 
+<a name="node-template"/>
+
+## 3.32 The "NodeTemplate" Data Type
+
+The `NodeTemplate` data type describes how to construct a node given some context.
+
+### identifier
+
+The identifier for the `NodeTemplate` data type is:
+
+`http://gedcomx.polygenea.org/v1/NodeTemplate`
+
+### extension
+
+For every concrete node type named _X_ extending `Claim`, there is a concrete node type named _X_`Template` extending `NodeTemplate`.
+
+### properties
+
+None; in particular, `NodeTemplate` (and hence its extension nodes) does not have either an `attribution` nor a `source` property.
+
+Nodes that extend `NodeTemplate` MUST use type int instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and MUST be greater than or equal to 0.
+
+Nodes that extend `NodeTemplate` MAY use a function type as the value of a string or 
 
 
+<a name="node-template"/>
+
+## 3.32 The "NodeTemplate" Data Type
+
+The `NodeTemplate` data type describes how to construct a node given some context.
+
+### identifier
+
+The identifier for the `NodeTemplate` data type is:
+
+`http://gedcomx.polygenea.org/v1/NodeTemplate`
+
+### extension
+
+For every concrete node type named _X_ extending `Claim`, there is a concrete node type named _X_`Template` extending `NodeTemplate`.
+
+### properties
+
+None; in particular, `NodeTemplate` (and hence its extension nodes) does not have either an `attribution` nor a `source` property.
+
+Nodes that extend `NodeTemplate` MUST use type int instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and must be greater than or equal to −1.
+
+Nodes that extend `NodeTemplate` MAY use a function type 
