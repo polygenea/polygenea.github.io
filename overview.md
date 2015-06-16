@@ -113,31 +113,31 @@ This specification uses the term "_X_ predicate", where _X_ is a datatype,
 to mean a function that takes as its parameters
 
 -   a single value (called _v_ in the table below) of type _X_, and
--   a list of node tuples (called _m_ in the table below)
+-   a list of node tuples (called _s_ in the table below)
 
 and returns either `true` or `false`.
 
-Predicates are only ever evaluated when matching a list of Node Queries
+In this specification, predicates are only evaluated when matching a list of Node Queries
 against a list of node references;
-the value of _m_ is created by taking the prefix of that list of node references,
+the value of _s_ is created by taking the prefix of that list of node references,
 up to and including the node reference being matched against the Node Query containing the predicate,
 and dereferencing each.
 
-Inside a predicate, neither _m_ nor _v_ may be modified
-and any node references inside tuples inside _m_ are treated as opaque types 
+Inside a predicate, neither _s_ nor _v_ may be modified
+and any node references inside tuples inside _s_ are treated as opaque types 
 (i.e., they may not be dereferenced).
 
 name | status | types | defined with | returns `true` when
 -----|--------|-------|--------------|--------------------
 Top | REQUIRED | any | (nothing) | always
 Lit | REQUIRED | any | _x_, a value of the same type as the predicate | _v_ equals _x_
-Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _m_
+Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
 Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_) is `true` for any _e_ in _v_
 SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_) is `true`
 MapHas | RECOMMENDED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_ ↦ _b_) in _x_, there is a (_c_ ↦ _d_) pair in _v_ such that _a_ = _c_ and _b_(_d_) is `true`
 Cmp | RECOMMENDED | string | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a string value | _v_ ∙ _x_ under a lexicographical ordering
 Cmp | OPTIONAL | datum with media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a datum value with the same media type | _v_ ∙ _x_ under that media type's ordering
-ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _m_ instead of _v_
+ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
 Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
 Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
 And | OPTIONAL | any (call it _X_) | two or more _X_ predicates | all of the predicates are _true_
@@ -151,23 +151,23 @@ Implementations supporting the `Script` predicate type SHOULD ensure that all sc
 
 This specification uses the term "_X_ producer", where _X_ is a datatype,
 to mean a function that takes as its parameter 
-a list of node tuples (called _m_ in the table below)
+a list of node tuples (called _s_ in the table below)
 and returns a value of type _X_.
 
-Producers are only ever evaluated when evaluating a Node Template
+In this specification, producers are only evaluated when evaluating a Node Template
 in the context of a list of node references;
-the value of _m_ is created dereferencing each element of that list.
+the value of _s_ is created by dereferencing each element of that list.
 
-Inside a producer, _m_ may not be modified
-and any node references inside tuples inside _m_ are treated as opaque types 
+Inside a producer, _s_ may not be modified
+and any node references inside tuples inside _s_ are treated as opaque types 
 (i.e., they may not be dereferenced).
 
 name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
 Lit | REQUIRED | any | _x_, a value | _x_
-Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _m_
-Match | OPTIONAL | string | _r_, a regex<br/>_i_, an integer<br/>_f_, a string producer | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
+Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_
+Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
+Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | two string or list producers | the concatenation of the strings or lists produced by the two producers
 Union | OPTIONAL | set | two set producers | the union of the sets produced by the two producers
 Intersect | OPTIONAL | set | two set producers | the intersection of the sets produced by the two producers

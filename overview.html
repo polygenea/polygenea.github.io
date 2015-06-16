@@ -75,11 +75,11 @@ th{border-bottom:1px solid black;}
 <p>This specification uses the term &quot;<em>X</em> predicate&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameters</p>
 <ul>
 <li>a single value (called <em>v</em> in the table below) of type <em>X</em>, and</li>
-<li>a list of node tuples (called <em>m</em> in the table below)</li>
+<li>a list of node tuples (called <em>s</em> in the table below)</li>
 </ul>
 <p>and returns either <code>true</code> or <code>false</code>.</p>
-<p>Predicates are only ever evaluated when matching a list of Node Queries against a list of node references; the value of <em>m</em> is created by taking the prefix of that list of node references, up to and including the node reference being matched against the Node Query containing the predicate, and dereferencing each.</p>
-<p>Inside a predicate, neither <em>m</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>m</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
+<p>In this specification, predicates are only evaluated when matching a list of Node Queries against a list of node references; the value of <em>s</em> is created by taking the prefix of that list of node references, up to and including the node reference being matched against the Node Query containing the predicate, and dereferencing each.</p>
+<p>Inside a predicate, neither <em>s</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
 <table>
 <thead>
 <tr class="header">
@@ -110,7 +110,7 @@ th{border-bottom:1px solid black;}
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
 <td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em></td>
+<td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
 </tr>
 <tr class="even">
 <td align="left">Has</td>
@@ -152,7 +152,7 @@ th{border-bottom:1px solid black;}
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em> instead of <em>v</em></td>
+<td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
 </tr>
 <tr class="even">
 <td align="left">Regex</td>
@@ -200,9 +200,9 @@ th{border-bottom:1px solid black;}
 </table>
 <p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.</p>
 <h3 id="producers">Producers</h3>
-<p>This specification uses the term &quot;<em>X</em> producer&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameter a list of node tuples (called <em>m</em> in the table below) and returns a value of type <em>X</em>.</p>
-<p>Producers are only ever evaluated when evaluating a Node Template in the context of a list of node references; the value of <em>m</em> is created dereferencing each element of that list.</p>
-<p>Inside a producer, <em>m</em> may not be modified and any node references inside tuples inside <em>m</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
+<p>This specification uses the term &quot;<em>X</em> producer&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameter a list of node tuples (called <em>s</em> in the table below) and returns a value of type <em>X</em>.</p>
+<p>In this specification, producers are only evaluated when evaluating a Node Template in the context of a list of node references; the value of <em>s</em> is created by dereferencing each element of that list.</p>
+<p>Inside a producer, <em>s</em> may not be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
 <table>
 <thead>
 <tr class="header">
@@ -226,21 +226,21 @@ th{border-bottom:1px solid black;}
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
 <td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em></td>
+<td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Match</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left"><em>r</em>, a regex<br/><em>i</em>, an integer<br/><em>f</em>, a string producer</td>
-<td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>m</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
+<td align="left"><em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer</td>
+<td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
 </tr>
 <tr class="even">
 <td align="left">Slice</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string or list</td>
 <td align="left"><em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the zero-indexed subsequence of <em>f</em>(<em>m</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence</td>
+<td align="left">the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence</td>
 </tr>
 <tr class="odd">
 <td align="left">Cat</td>
