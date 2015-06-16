@@ -135,61 +135,54 @@ th{border-bottom:1px solid black;}
 </tr>
 <tr class="odd">
 <td align="left">Cmp</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">string</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a string value</td>
-<td align="left"><em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
+<td align="left">OPTIONAL</td>
+<td align="left">string, or datum with a media type that has defined order</td>
+<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
+<td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
 <tr class="even">
-<td align="left">Cmp</td>
-<td align="left">OPTIONAL</td>
-<td align="left">datum with media type that has defined order</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a datum value with the same media type</td>
-<td align="left"><em>v</em> ∙ <em>x</em> under that media type's ordering</td>
-</tr>
-<tr class="odd">
 <td align="left">ICmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Regex</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
 <td align="left"><em>r</em>, a regex</td>
 <td align="left"><em>r</em> matches <em>v</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Len</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set or list</td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
 <td align="left">((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>f</em>, an <em>X</em> predicate</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
