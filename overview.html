@@ -38,8 +38,8 @@ th{border-bottom:1px solid black;}
 <dt><strong>datum</strong></dt>
 <dd><p>a (string, string, blob) tuple. Each string specifies part of the interpretation of the blob; they mean (in order)</p>
 <ol>
-<li><p>Media type, as specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a>; if &quot;&quot;, assumed to be &quot;text/plain;charset=UTF-8&quot;. If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various &quot;text&quot; types) are REQUIRED.</p>
-<p>Alternatively, this may be an absolute IRI describing a type, such as <code>http://gedcomx.org/date/v1</code>. Because absolute IRIs always contain a COLON <code>:</code> and media types never contain a COLON, it is unambiguous which form of media type is being specified.</p></li>
+<li><p>Media type, as specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a>, such as &quot;application/javascript&quot;. If &quot;&quot;, assumed to be &quot;text/plain;charset=UTF-8&quot;. If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various text types) are REQUIRED.</p>
+<p>Alternatively, this may be an absolute IRI describing a type, such as &quot;http://gedcomx.org/date/v1&quot;. Because absolute IRIs always contain a COLON <code>:</code> and media types never contain a COLON, it is unambiguous which form of media type is being specified.</p></li>
 <li><p>Language, as specified by <a href="http://tools.ietf.org/html/bcp47">IETF BCP 47</a>; if &quot;&quot;, assumed to be locale-independent (i.e., may be processed using the default locale of the processor)</p></li>
 </ol>
 </dd>
