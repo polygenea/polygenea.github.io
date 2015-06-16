@@ -48,7 +48,7 @@ __datum__
 
     2.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
         if "", assumed to be locale-independent (i.e., 
-        may be processed using the default locale of the processor)
+        may be processed using the default locale of the processor).
 
 __reference__
 :   indicating exactly one node within the same dataset.
