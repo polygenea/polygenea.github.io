@@ -166,7 +166,7 @@ name | status | types | defined with | returns
 Lit | REQUIRED | any | _x_, a value | _x_
 Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_
 Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
+Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds;<br/>and negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | _x_, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of _x_ in order
 Union | OPTIONAL | set | _x_, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
 Intersect | OPTIONAL | set | _x_, a set of set producers | a set containing those values that are in every set produced by each element of _x_
