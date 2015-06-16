@@ -117,14 +117,14 @@ th{border-bottom:1px solid black;}
 <td align="left">RECOMMENDED</td>
 <td align="left">set or list of <em>X</em></td>
 <td align="left"><em>f</em>, an <em>X</em> predicate</td>
-<td align="left"><em>f</em>(<em>e</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
+<td align="left"><em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
 </tr>
 <tr class="odd">
 <td align="left">SetHas</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">set of <em>X</em></td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>) is <code>true</code></td>
+<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code></td>
 </tr>
 <tr class="even">
 <td align="left">MapHas</td>
@@ -172,29 +172,29 @@ th{border-bottom:1px solid black;}
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">two or more <em>X</em> predicates</td>
-<td align="left">all of the predicates are <em>true</em></td>
+<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
+<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">two or more <em>X</em> predicates</td>
-<td align="left">at least one predicates is <em>true</em></td>
+<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
+<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">another <em>X</em> predicate</td>
-<td align="left">the predicate is <code>false</code></td>
+<td align="left"><em>f</em>, an <em>X</em> predicate</td>
+<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
 </tr>
 <tr class="odd">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
-<td align="left">a datum defining a single function in some programming language</td>
-<td align="left">evaluating the function in the script returns <code>true</code></td>
+<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
+<td align="left">evaluating the function in <em>x</em> with arguments <em>v</em> and <em>s</em> returns <code>true</code></td>
 </tr>
 </tbody>
 </table>
@@ -246,29 +246,29 @@ th{border-bottom:1px solid black;}
 <td align="left">Cat</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string or list</td>
-<td align="left">two string or list producers</td>
-<td align="left">the concatenation of the strings or lists produced by the two producers</td>
+<td align="left"><em>x</em>, a list of string or list producers</td>
+<td align="left">the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order</td>
 </tr>
 <tr class="even">
 <td align="left">Union</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left">two set producers</td>
-<td align="left">the union of the sets produced by the two producers</td>
+<td align="left"><em>x</em>, a set of set producers</td>
+<td align="left">a set containing every value contained in any of the sets produced by each of the elements of <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Intersect</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left">two set producers</td>
-<td align="left">the intersection of the sets produced by the two producers</td>
+<td align="left"><em>x</em>, a set of set producers</td>
+<td align="left">a set containing those values that are in every set produced by each element of <em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
-<td align="left">a datum defining a single function in some programming language</td>
-<td align="left">the value returned when evaluating the function in the script</td>
+<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
+<td align="left">the value returned when evaluating the function in <em>x</em> with argument <em>s</em></td>
 </tr>
 </tbody>
 </table>
