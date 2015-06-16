@@ -10,6 +10,11 @@ th{border-bottom:1px solid black;}
 
 This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.
 
+An important missing component of this specification is a discussion of standard values
+for the various string and datum fields.
+This draft does discuss "same", "wrong", "distinct", and "misinterpreted" Tag `key`s
+but the discussion is incomplete and the names of those keys may change in future drafts.
+
 
 Specification of Reasoning
 ==========================
@@ -131,10 +136,10 @@ name | status | types | defined with | returns `true` when
 -----|--------|-------|--------------|--------------------
 Top | REQUIRED | any | (nothing) | always
 Lit | REQUIRED | any | _x_, a value of the same type as the predicate | _v_ equals _x_
+MapHas | REQUIRED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_ ↦ _b_) in _x_, there is a (_c_ ↦ _d_) pair in _v_ such that _a_ equals _c_ and _b_(_d_) is `true`
 Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
 Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_, _s_) is `true` for any _e_ in _v_
 SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_, _s_) is `true`
-MapHas | RECOMMENDED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_ ↦ _b_) in _x_, there is a (_c_ ↦ _d_) pair in _v_ such that _a_ equals _c_ and _b_(_d_) is `true`
 Cmp | OPTIONAL | either datum with a media type that has defined order<br/>or string | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
 ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
 Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
@@ -166,7 +171,7 @@ name | status | types | defined with | returns
 Lit | REQUIRED | any | _x_, a value | _x_
 Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_
 Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds;<br/>and negative-width subsequences return the empty sequence
+Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | _x_, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of _x_ in order
 Union | OPTIONAL | set | _x_, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
 Intersect | OPTIONAL | set | _x_, a set of set producers | a set containing those values that are in every set produced by each element of _x_
@@ -299,6 +304,13 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
 Definitions and Constraints
 ---------------------------
 
+A set of nodes is called a __dataset__.
+This specification only discusses complete datasets, where all node references are to other nodes within the dataset.
+Communication protocols that communicate via partial datasets
+are neither forbidden by this specification
+nor discussed by it.
+
+
 ### Dependencies and Cycles
 
 The __dependencies__ of a node is defined to be the set of all nodes that the 
@@ -332,8 +344,7 @@ Node and value __equality__ is defined as follows:
     They are not equal if there exists some inputs for which they give non-equal results.
     If they are defined differently but give equal result for all inputs, their equality is not specified by this specification.
 
--   Two strings are equal if they contain the same conceptual characters in 
-    the same order.
+-   Two strings are equal if they contain the same characters in the same order.
 
 -   Two data are equal if and only if
     either (1) there is an official notion of eqaulity for the given media type(s)
@@ -342,12 +353,12 @@ Node and value __equality__ is defined as follows:
 
 ### Constituents
 
-The __constituents__ of any node *except* an Aggregated Subject node
+The __constituents__ of any node that is not an Aggregated Subject node
 is defined to be the singleton set containing just that Node itself.
 
 The __constituents__ of an Aggregated Subject node 
-is defined to be the singleton set containing the Aggregated Subject node itself 
-and the elements of the __constituents__ of each of the nodes referenced in the `of` field
+is defined to be the set containing the Aggregated Subject node itself 
+and the elements of the _constituents_ of each of the nodes referenced in the `of` field
 of the node referenced by the Aggregated Subject's `parts` field.
 
 ### Matching
@@ -360,14 +371,15 @@ Node and value __matching__ is defined as follows:
     2.  the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section [Producers](#producers)
     3.  evaluating the predicate with the value and the list of tuples yields the value `true`
     
-    Optionally, if the predicate does not utilise its list of tuples parameter
-    then the predicate may be said to match if condition 3 alone would be true for any list of tuples supplied.
+    Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., _s_ is not referenced in the table in section [Producers](#producers))
+    then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.
     
--   The special value `-1` matches any node reference.
+-   The integer value `-1` matches any node reference.
 
 -   A set of integers matches a set of node references if
     each integer in the set of integers
     matches some node reference in the set of node references.
+    Note that it is *not* necessary for every node reference to match some integer.
 
 -   A non-negative integer _i_ matches a node reference _r_ if and only if all of the following are true:
     
@@ -381,9 +393,9 @@ Node and value __matching__ is defined as follows:
     the elements in the list of node reference at that index
     matches the element in the list of Node Queries at that index.
 
--   A node reference matches a Node Query if and only if
+-   A Node Query matches a node reference if and only if
 	both (1) the referenced node and the Node Query are of the same node type
-	and (2) each field in the referenced node matches the corresponding node in the Node Query.
+	and (2) each field in the Node Query matches the corresponding field in the referenced node.
 
 -   A string matches a regex if and only if the algorithm outlined
     in [ECMA 262 section 15.10.6.3](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10.6.3)
@@ -401,7 +413,7 @@ by doing all of the following (in any order)
 
 -   replacing any producer values 
     with the result of applying that function 
-    using the `antecedent` of the Inference as the function's argument.
+    using a list of tuples created by dereferencing the elements of the `antecedent` of the Inference as the function's argument.
 
 -   replacing the `source` value (which is `-1` in Node Templates)
     with a reference to the Inference.
@@ -413,9 +425,8 @@ by doing all of the following (in any order)
     of the instantiated node list being constructed,
     where _x_ is the length of the `support` list.
 
-A Claim may only reference an Inference in its `source` field 
-if it is an element of the instantiated node list of that Inference.
-
+A Claim SHOULD NOT reference an Inference in its `source` field 
+UNLESS it is an element of the instantiated node list of that Inference.
 
 
 Partial Implementation and Extension
@@ -446,21 +457,20 @@ Software MAY chose to omit any node or set of nodes while sending a dataset prov
 #### Removing Expectations and Inferences
 
 Software sending/receiving a dataset MAY chose to omit/ignore all Inferences and Expectations
-by converting each Inference into a Derivation 
+by converting each Inference into a Derivation
 with the same `support` as the Inference
-and a textual representation of the Expectation as the `reason`.
-If the software is unable to convert the Expectation to text, it SHOULD use the text "(reasoning omitted)", or equivalent text in another language, as the `reason`.
+and a textual representation of the Expectation as the Derivation's `reason`.
+If the software is unable to convert the Expectation to text, it SHOULD use the text "(reason omitted)" as the Derivation's `reason`.
 
 #### Removing all reasoning
 
 Software sending/receiving a dataset MAY chose to omit/ignore all reasoning,
 reducing the dataset to a "belief snapshot".
-Belief snapshots are valid datasets under this specification
-with the following additional constraints:
+Belief snapshots are datasets that satisfy the following constraints:
 
 -   Only five node types are used: Subject, Property, Connection, Derivation, and OutRef
--   Each Claim's `source` is a Derivation
--   Each element of a Derivation's `support` is an OutRef
+-   Each Claim's `source` references a Derivation
+-   Each element of each Derivation's `support` references an OutRef
 
 General datasets may be reduced to a belief snapshot via the following process:
 
@@ -525,35 +535,37 @@ Discussion
 Node Identity and Redundancy
 ----------------------------
 
-Node identity is determined only by the node's contents.
-There is no notion of durable URI, UUID, GUID, or other unique, durable identifier for a node 
+Node identity is determined only [equality](#equality).
+There is no notion of durable URI, UUID, GUID, DOI, PURL, ARK,
+or any other form of unique, durable identifier for a node 
 in this specification,
-nor should one be introduced 
+nor should one be introduced
 unless that identifier can be uniquely determined from the contents of the node alone,
 as for example a hash-based UUID.
+Equality does require access to the dependencies of a node,
+but because dependencies are acyclic that is always a finite set.
 
 Because node contents determine node identity,
 there is no intrinsic notion of versions of a node,
-nor of updating or editing its contents.
+nor of updating or editing a node's contents.
 The concept that one node is an update of another should be expressed using a Connection with `key` "update".
 
 Because node identity is determined only by content,
-discarding nodes does not impede collaboration;
-returning the kept subsets with any new nodes to the originator
-allows the originator to add the new nodes to their existing set, 
-potentially without even realising that some of the nodes sent were not returned.
+omitting nodes does not impede collaboration;
+the non-omitted nodes can still be linked to new research and shared between clients.
 
 The some of the practices for removing information
 outlined in [Partial implementations and data reductions](#partial-implementations-and-data-reductions)
-can replace nodes or introduce new nodes containing information that is redundant with previous data.
-Replacement doesn't actually modify or destroy any existing nodes:
-they are values and if the sender of data does not chose to discard them
-they cannot be modified or destroyed by the recipient.
-When the recipient sends back data, it may contain new derivative nodes;
-however, the information in these nodes, while redundant, is not new.
+can "replace" nodes
+or introduce new nodes containing information that is redundant with previous data.
+Replacement doesn't actually modify or destroy any existing nodes,
+instead creating new, similar nodes.
+When the recipient sends these new nodes back to the sender
+the sender will now have nodes expressing redundant information.
 Keeping these redundant nodes around does not impede research
-provided that the user interface prevents redundant information from distracting the user.
-If nodes are clearly redundant, the originator's software could also omit them upon receipt of the redundant data.
+provided that the user interface prevents redundant information from distracting the user,
+as (for example) displaying only one copy of a set of Properties that differ only in `source`.
+New nodes containing no new information could also be omitted upon receipt, assuming that the recipient can identify those nodes as redundant.
 
 
 
@@ -568,8 +580,8 @@ the language of the source
 (e.g., using a Connection with key `Papa` if that is the wording used to describe the relationship in the source).
 
 Term normalisation should then happen by introducing new, normalised-term properties and connections 
-`source`d to either Inference or Derivation nodes that use the non-normalised terms as (part of) their `support`.
-In many cases, the `support` should also include some contextual information
+`source`d to Inference or Derivation nodes that use the non-normalised terms as (part of) their `support`.
+In many cases, the `support` should also include the contextual information used in normalisation
 such as the date, location, and/or language of the underlying document.
 
 
@@ -578,44 +590,56 @@ Inferences vs. Derivations, and the creation of Expectations
 
 Inferences and Derivations are both intended to fulfil the same objective:
 to represent the fact that some claims were constructed using other pieces of information.
+Either can be used to model any reasoning that is based on a finite set of other nodes.
+They differ primarily in that Inferences are more complicated to implement
+but are more language-independent and machine-understandable than Derivations.
 
-The Derivation node is flexible and does not require the relatively 
-complicated support for matches and predicates and producers, etc.,
-which Inferences do require.
-However, they leave the `reason` in machine-opaque human-language text, which means that
-they are not readily analysed by the computer,
+The Derivation node does not require the use of Expectations
+and their associated Node Queries, Node Templates, matches, predicates, and producers.
+However, they leave the `reason` in machine-opaque human-language text,
+meaning that they are not readily analysed by the computer,
 are language-dependent,
-may lack necessary detail or contain text not in keeping with their support,
+may lack necessary detail to communicate the reasoning process,
+may contain text not in keeping with their support,
 etc.
 
-The Inference node, on the other hand, is 
-a purely machine-understandable representation of reasoning.
-Like a Derivation, an Inference is flexible enough to be created for any finite-support inference.
-However, Inferences require the creation of Expectation nodes.
+The Inference node is a purely machine-understandable representation of reasoning.
+However, Inferences require the creation of Expectation nodes,
+with the corresponding complexities of Node Queries, Node Templates, matches, predicates, and producers.
 
-Sophisticated Expectation nodes are possible, particularly with `Script`-type predicates and producers,
-but many Expectations can be readily created using the following interactive process:
+It is anticipated that some users of tools supporting Inference nodes
+will not be comfortable creating their own Expectations manually
+and will not be willing to limit themselves to a set of pre-built Expectations.
+The following set of steps is provided as a suggested way of assisting users
+in creating nontrivial Expectation nodes without needing to understand their underlying structure.
 
 1.  Have the user specify the nodes they intend to infer
     and select the nodes they recognise as the support for their inference.
-    This step would be done for Derivation nodes as well...
+    
+    If creating Derivations, ask the user to type up their `reason` and stop.
+    The remaining steps are for constructing an Expectation and Inference.
 
 2.  Build a set of candidate antecedents
     from the nodes they identified as support 
     augmented with any nodes referenced by the nodes the user identified as being inferred that are not already in the `antecedent` or inferred collections.
 
-3.  For each field of each candidate antecedent,
+3.  For each field of each candidate antecedent (except `details` in an OutRef; see below),
     ask the user "is this field important to your reasoning?"
-    If the answer is "no", replace the field with `-1` (if a node reference) or _Top_ (otherwise).
-    If the answer is "yes", add the referenced node to the candidate antecedent set (if a node reference) or replace it with a _Lit_ (otherwise).
+    If the answer is "no", replace the field with `-1` (if a node reference) or predicate _Top_ (otherwise).
+    If the answer is "yes", add the referenced node to the candidate antecedent set (if a node reference) or replace it with a predicate _Lit_ (otherwise).
     Continue until you have asked about all nodes of all fields in the antecedent set.
     
-    You could optionally ask additional questions,
-    such as "we notice that these two nodes both have the same `value`;
-    is that same-value characteristic important?",
-    to help build more advanced predicates, if you so desire.
+    For the `details` field of an OutRef,
+    instead ask this question of each pair in the set
+    and, if the answer is "no", remove the pair completely
+    to create a predicate _MapHas_.
+    
+    You could optionally ask additional questions to build more advanced predicates;
+    for example, to create a _Same_ predicate you could ask something like 
+    "we notice that these two nodes both have the same `value`;
+    is that same-value characteristic important?"
 
-4.  Organise the candidate antecedents
+4.  Order the candidate antecedents
     such that, if node _A_ is in node _B_'s dependencies and both are antecedents
     then _A_ appears before _B_.
     Use this ordering to populate the `antecedent` list and to replace node references with integers.
