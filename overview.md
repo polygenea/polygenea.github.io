@@ -38,7 +38,7 @@ __datum__
         if "", assumed to be "text/plain;charset=UTF-8".
         If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various "text" types)
         are REQUIRED. 
-    3.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
+    2.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
         if "", assumed to be locale-independent (i.e., 
         may be processed using the default locale of the processor)
 
@@ -58,6 +58,16 @@ __integer__
     an implementation can handle may be constrained by the largest magnitude integer
     that the implementation can represent.
 
+__regex__
+:   a string containing 
+    either (a) a _RegularExpressionLiteral_ 
+    or (b) a _RegularExpressionBody_, 
+    both defined in [ECMA 262 section 7.8.5](http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5)
+    Unlike the ECMA 262 standard, empty regular expressions are allowed.
+    If only a _RegularExpressionBody_ is provided, it is treated as if it had no flags.
+    
+    Values of type regexs are used in some predicates and producers and behave as documented in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10).
+    
 
 Composite Datatypes
 -------------------
@@ -119,7 +129,7 @@ MapHas | RECOMMENDED | set of string ↦ datum pairs | _x_, a set of string ↦ 
 Cmp | RECOMMENDED | string | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a string value | _v_ ∙ _x_ under a lexicographical ordering
 Cmp | OPTIONAL | datum with media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a datum value with the same media type | _v_ ∙ _x_ under that media type's ordering
 ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _m_ instead of _v_
-Regex | OPTIONAL | string | _r_, a string containing a regular expression as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10) | _r_ matches _v_
+Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
 Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
 And | OPTIONAL | any (call it _X_) | two or more _X_ predicates | all of the predicates are _true_
 Or | OPTIONAL | any (call it _X_) | two or more _X_ predicates | at least one predicates is _true_
@@ -147,7 +157,7 @@ name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
 Lit | REQUIRED | any | _x_, a value | _x_
 Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _m_
-Match | OPTIONAL | string | _r_, a string containing a regular expression as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10)<br/>_i_, an integer<br/>_f_, a string producer | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
+Match | OPTIONAL | string | _r_, a regex<br/>_i_, an integer<br/>_f_, a string producer | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
 Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | two string or list producers | the concatenation of the strings or lists produced by the two producers
 Union | OPTIONAL | set | two set producers | the union of the sets produced by the two producers
@@ -204,7 +214,7 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             
             -   `key`s "same" and "distinct" require sets of cardinality ≥ 2.
             -   `key` "misinterpreted" requires a set of cardinality = 1 
-                and that the node referenced in the set be a Sourced Claim.
+                and that the node referenced in the set be a Claim.
             -   `key` "wrong" may neither reference a Subject nor another "wrong" Tag
                 in the `of`,
                 unless also including the `source` of that Claim.
@@ -282,11 +292,15 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
 Definitions and Constraints
 ---------------------------
 
+### Dependencies and Cycles
+
 The __dependencies__ of a node is defined to be the set of all nodes that the 
 node references unioned with all of those nodes' dependencies, recursively.
 
 It is REQUIRED that all references be acyclic; in other words, no node may be 
 included in its own dependencies.
+
+### Equality
 
 Node and value __equality__ is defined as follows:
 
@@ -315,9 +329,11 @@ Node and value __equality__ is defined as follows:
     the same order.
 
 -   Two data are equal if and only if
-    either (1) there is an official notion of eqaulity for the given media-type
+    either (1) there is an official notion of eqaulity for the given media type(s)
     and the blobs are equal under than definition
-    of (2) the strings are equal and the blobs have the same bytes in the same order.
+    or (2) the media types are equal and the blobs have the same bytes in the same order.
+
+### Constituents
 
 The __constituents__ of any node *except* an Aggregated Subject node
 is defined to be the singleton set containing just that Node itself.
@@ -326,6 +342,8 @@ The __constituents__ of an Aggregated Subject node
 is defined to be the singleton set containing the Aggregated Subject node itself 
 and the elements of the __constituents__ of each of the nodes referenced in the `of` field
 of the node referenced by the Aggregated Subject's `parts` field.
+
+### Matching
 
 Node and value __matching__ is defined as follows:
 
@@ -360,6 +378,13 @@ Node and value __matching__ is defined as follows:
 	both (1) the referenced node and the Node Query are of the same node type
 	and (2) each field in the referenced node matches the corresponding node in the Node Query.
 
+-   A string matches a regex if and only if the algorithm outlined
+    in [ECMA 262 section 15.10.6.3](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10.6.3)
+    would return `true`.
+
+
+### Instantiating Nodes from Inferences
+
 The __instantiated node list__ of an Inference is defined to be 
 a list of Nodes
 having the same length as the `consequent` of the `reason` of the Inference
@@ -381,15 +406,117 @@ by doing all of the following (in any order)
     of the instantiated node list being constructed,
     where _x_ is the length of the `support` list.
 
-A Sourced Claim may only reference an Inference in its `source` field 
+A Claim may only reference an Inference in its `source` field 
 if it is an element of the instantiated node list of that Inference.
+
+
+
+Partial Implementation and Extension
+====================================
+
+For various reasons, implementers should expect to interact with other software
+that has adopted only portions of this specification
+and that have extended this specification in various ways.
+This section discusses appropriate ways to interact with partial implementations and extensions.
+
+
+Policies and Suggestions
+------------------------
+
+The set of elements in each node type is fixed, and MUST NOT be extended or reduced.
+
+The set of node types MAY be extended, though it is RECOMMENDED that extensions be handled with custom `key`s in Properties, Connections, and/or Tags instead.
+It is RECOMMENDED that software ignore new node types when receiving extended data.
+
+### Partial implementations and data reductions
+
+#### Removing unwanted or private information
+
+Software MAY chose to ignore any node or set of nodes when receiving a dataset provided that all nodes that depend upon the ignored node(s) are also ignored.
+
+Software MAY chose to omit any node or set of nodes while sending a dataset provided that all nodes that depend upon the omitted node(s) are also omitted.
+
+#### Removing Expectations and Inferences
+
+Software sending/receiving a dataset MAY chose to omit/ignore all Inferences and Expectations
+by converting each Inference into a Derivation 
+with the same `support` as the Inference
+and a textual representation of the Expectation as the `reason`.
+If the software is unable to convert the Expectation to text, it SHOULD use the text "(reasoning omitted)", or equivalent text in another language, as the `reason`.
+
+#### Removing all reasoning
+
+Software sending/receiving a dataset MAY chose to omit/ignore all reasoning,
+reducing the dataset to a "belief snapshot".
+Belief snapshots are valid datasets under this specification
+with the following additional constraints:
+
+-   Only five node types are used: Subject, Property, Connection, Derivation, and OutRef
+-   Each Claim's `source` is a Derivation
+-   Each element of a Derivation's `support` is an OutRef
+
+General datasets may be reduced to a belief snapshot via the following process:
+
+1.  Create a Subject for each group of Subjects and Aggregated Subjects linked by "same" Tags.
+	The new Subject's `source` should be
+	a Derivation whose `support` is the set of all OutRef nodes in any of the original nodes' dependencies.
+2.  Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node.
+	The new Properties' and Connections' `source`s should be 
+	Derivations whose `support`s are the sets of all OutRef nodes in any of the original nodes' dependencies.
+3.  Replacing any set of Properties or Connections that differ only in `source` 
+	with a single node having as its `source`
+	a Derivation with the union of the original claims' `source`s' `support` as the new Derivation's `support`.
+
+### Handling Unsupported Values
+
+#### Optional predicates and producers
+
+When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate,
+it is RECOMMENDED that the recieving software keep the Expectation as received
+but treat the extra predicate as being equivalent to _Top_ when error-checking received data
+and as equivalent to _Not_(_Top_) when deciding if the user can create new Inferences based on the Expectation.
+
+When software that supports Expectation nodes receives a dataset including Expectations that contain producers that the receiving software cannot evaluate,
+it is RECOMMENDED that the receiving software keep the Expectation as received
+but treat them as unchecked (like a Derivation).
+
+#### Constrained vocabularies
+
+If software desires a particular set of keys in its data,
+it is RECOMMENDED that a set of term-normalising Expectations be used
+to automatically create new Inferences and normalised terms upon receipt of new datasets,
+keeping the pre-normalised terms as `support` for the Inferences.
+
+For software not supporting Expectations, it is RECOMMENDED that Derivations be used,
+resulting in a dataset equivalent to creating the Expectations and Inferences
+and then applying the process outlined in [Removing Expectations and Inferences](#removing-expectations-and-inferences).
+For software not supporting any reasoning, it is RECOMMENDED that 
+the resulting dataset be equivalent to creating the Expectations and Inferences
+and then applying the process outlined in [Removing all reasoning](#removing-all-reasoning).
+
+If the software does not know how to normalise a particular term,
+or does but does not care to represent the resulting normalised term,
+it MAY omit the term and its containing node, as outlined in [Removing unwanted or private information](#removing-unwanted-or-private-information).
+
+#### Constrained representations and topics
+
+If software desires a particular structure in its data,
+for example desiring birthdate Properties instead of birth Subjects,
+it is RECOMMENDED that a set of Expectations be used
+to automatically create new Inferences and normalised structures upon receipt of new datasets.
+
+In some cases, software may decide to discard additional nodes;
+for example, software that tracks human relationships might chose to omit
+not only a "species":"horse" Property
+but also the Subject to which it is attached
+and all other claims `of` that Subject.
 
 
 Discussion
 ==========
 
-Node Identity
--------------
+Node Identity and Redundancy
+----------------------------
 
 Node identity is determined only by the node's contents.
 There is no notion of durable URI, UUID, GUID, or other unique, durable identifier for a node 
@@ -403,11 +530,30 @@ there is no intrinsic notion of versions of a node,
 nor of updating or editing its contents.
 The concept that one node is an update of another should be expressed using a Connection with `key` "update".
 
+Because node identity is determined only by content,
+discarding nodes does not impede collaboration;
+returning the kept subsets with any new nodes to the originator
+allows the originator to add the new nodes to their existing set, 
+potentially without even realising that some of the nodes sent were not returned.
+
+The some of the practices for removing information
+outlined in [Partial implementations and data reductions](#partial-implementations-and-data-reductions)
+can replace nodes or introduce new nodes containing information that is redundant with previous data.
+Replacement doesn't actually modify or destroy any existing nodes:
+they are values and if the sender of data does not chose to discard them
+they cannot be modified or destroyed by the recipient.
+When the recipient sends back data, it may contain new derivative nodes;
+however, the information in these nodes, while redundant, is not new.
+Keeping these redundant nodes around does not impede research
+provided that the user interface prevents redundant information from distracting the user.
+If nodes are clearly redundant, the originator's software could also omit them upon receipt of the redundant data.
+
+
 
 Term Normalisation
 ------------------
 
-When extracting the contents of an external source as a set of Sourced Claim nodes citing the OutRef of the external source,
+When extracting the contents of an external source as a set of Claim nodes citing the OutRef of the external source,
 there is a quality-of-use expectation that the `slug` of each Subject
 be a description (in any language) of some specific part of the source that references the Subject in question; 
 and that the various Properties and Connections reflect, as closely as possible,
@@ -472,97 +618,5 @@ but many Expectations can be readily created using the following interactive pro
     then _A_ appears before _B_.
     Use this ordering to populate the `consequent` list and to replace node references with integers.
     Additionally, replace all inferred node `source` values with `-1`, as required by the definition of Node Template.
-
-
-
-Partial Implementation and Extension
-====================================
-
-For various reasons, implementers should expect to interact with other software
-that has adopted only portions of this specification
-and that have extended this specification in various ways.
-This section discusses appropriate ways to interact with partial implementations and extensions.
-
-
-Policies and Suggestions
-------------------------
-
-The set of elements in each node type is fixed, and MUST NOT be extended or reduced.
-
-The set of node types MAY be extended, though it is RECOMMENDED that extensions be handled with custom `key`s in Properties, Connections, and/or Tags instead.
-It is RECOMMENDED that software ignore new node types when receiving extended data.
-
-Software MAY chose to ignore any node upon receipt of a dataset provided that all nodes that depend upon it are also ignored.
-
-Software MAY chose to omit any node while sending a dataset provided that all nodes that depend upon it are also omitted.
-
-Software MAY chose to omit or ignore all Inferences and Expectations
-by converting each Inference into a Derivation 
-with the same `support` and a textual representation of the Expectation as the `reason`.
-If the software is unable to convert the Expectation to text, it SHOULD use the text "(reasoning omitted)", or equivalent text in another language, as the `reason`.
-
-Software MAY chose to omit or ignore all reasoning
-and reduce the dataset to a set of Subjects, Properties, Connections, Derivations, and SourceReferences
-where every Claim's `source` is a Derivation and every element of each Derivation's `support` is an OutRef.
-And outline of a process for reducing data to this form is:
-
-1.  Create a Subject for each group of Subjects and Aggregated Subjects linked by "same" Tags.
-	The new Subject's `source` should be
-	a Derivation whose `support` is the set of all OutRef nodes in any of the original nodes' dependencies.
-2.  Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node.
-	The new Properties' and Connections' `source`s should be 
-	Derivations whose `support`s are the sets of all OutRef nodes in any of the original nodes' dependencies.
-3.  Replacing any set of Properties or Connections that differ only in `source` 
-	with a single node having as its `source`
-	a Derivation with the union of the original claims' `source`s' `support` as the new Derivation's `support`.
-
-When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate,
-it is RECOMMENDED that the recieving software keep the Expectation as received
-but treat the extra predicate as being equivalent to _Top_ when error-checking received data
-and as equivalent to _Not_(_Top_) when deciding if the user can create new Inferences based on the Expectation.
-
-When software that supports Expectation nodes receives a dataset including Expectations that contain producers that the receiving software cannot evaluate,
-it is RECOMMENDED that the receiving software keep the Expectation as received
-but treat them as unchecked (like a Derivation).
-
-If software desires a particular set of keys in its data,
-it is RECOMMENDED that a set of term-normalising Expectations be used
-to automatically create new Inferences and normalised terms upon receipt of new datasets.
-
-If software desires a particular structure in its data,
-for example desiring birthdate Properties instead of birth Subjects,
-it is RECOMMENDED that a set of Expectations be used
-to automatically create new Inferences and normalised structures upon receipt of new datasets.
-
-In some cases, software may decide to discard additional nodes;
-for example, software that tracks human relationships might chose to omit
-not only a "species":"horse" Property
-but also the Subject to which it is attached
-and all other claims `of` that Subject.
-
-
-Identity, Redundancy, and Node-Creating Changes
------------------------------------------------
-
-Because node identity is determined only by content,
-discarding nodes does not impede collaboration;
-returning the kept subsets with any new nodes to the originator
-allows the originator to add the new nodes to their existing set, 
-potentially without even realising that some of the nodes sent were not returned.
-
-Some of the suggestions in the previous section
-permit or suggest the replacement of nodes
-or the creation of new nodes
-containing information that is redundant with previous data.
-Replacement doesn't actually modify or destroy any existing nodes:
-they are values and if the sender of data does not chose to discard them
-they cannot be modified or destroyed by the recipient.
-When the recipient sends back data, it may contain new derivative nodes;
-however, the information in these nodes, while redundant, is not new.
-Keeping these redundant nodes around does not impede research
-provided that the user interface prevents redundant information from distracting the user.
-If nodes are clearly redundant, the originator's software could also omit them upon receipt of the redundant data.
-
-
 
 
