@@ -34,7 +34,7 @@ __datum__
     Each string specifies part of the interpretation of the blob;
     they mean (in order)
     
-    1.  Media type, as specified by [RFC 4288](http://tools.ietf.org/html/rfc4288),
+    -   Media type, as specified by [RFC 4288](http://tools.ietf.org/html/rfc4288),
         such as "application/javascript".
         If "", assumed to be "text/plain;charset=UTF-8".
         If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various text types)
@@ -46,7 +46,7 @@ __datum__
         and media types never contain a COLON,
         it is unambiguous which form of media type is being specified.
 
-    2.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
+    -   Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
         if "", assumed to be locale-independent (i.e., 
         may be processed using the default locale of the processor).
 
