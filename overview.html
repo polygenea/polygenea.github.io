@@ -8,6 +8,17 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
+<style type="text/css">
+body{font-family:sans-serif;}
+code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
+table{border-collapse:collapse;}
+tr:nth-child(2n){background-color:#ddd;}
+td,th{padding:0.25ex 1ex;}
+th{border-bottom:1px solid black;}
+</style>
+
+
+
 <p>This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.</p>
 <h1 id="specification-of-reasoning">Specification of Reasoning</h1>
 <h2 id="basic-datatypes">Basic Datatypes</h2>
@@ -36,7 +47,7 @@
 <p>The phrase &quot;reference to a <em>X</em>&quot;, where <em>X</em> is Node or one of Node's subtypes, means the reference indicates an element of type <em>X</em> or one of <em>X</em>'s subtypes.</p>
 </dd>
 <dt><strong>integer</strong></dt>
-<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32766]. During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
+<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32767). During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
 </dd>
 </dl>
 <h2 id="composite-datatypes">Composite Datatypes</h2>
@@ -48,7 +59,7 @@
 <dd><p>(where <em>X</em> is a datatype): an ordered sequence of zero or more elements of type <em>X</em>, possibly containing duplicates. Given a list of <em>n</em> elements, the first element is identified by the index 0, and each subsequent element by the index (1 + index-of-previous-element).</p>
 </dd>
 <dt><strong>tuple</strong></dt>
-<dd><p>A fixed, ordered group of values, each with a given type. Tuple values may be referenced by index (starting with 0, like a <em>list</em>) or, if the elements are given names in the specification, by name.</p>
+<dd><p>A fixed, ordered group of values, each with a given type. Tuple values may be referenced by index (starting with 0, like a <em>list</em>) or, if the individual elements are given names in the specification, by name. Thus, e.g., the first elements of the tuple of a Property node may be referred to as either the <code>key</code> element or element <code>0</code>.</p>
 </dd>
 <dt><strong><em>X</em>↦<em>Y</em> pair</strong></dt>
 <dd><p>A tuple of two elements. If <em>X</em> and <em>Y</em> are types, they specify the types of the elements. Otherwise, <em>X</em> and <em>Y</em> are the names of the elements and types are given elsewhere in the specification text.</p>
@@ -62,7 +73,7 @@
 <li>a list of node tuples (called <em>m</em> in the table below)</li>
 </ul>
 <p>and returns either <code>true</code> or <code>false</code>.</p>
-<p>Predicates are only ever evaluated when matching a list of Node Queries against a list of node references; the value of <em>m</em> is created by taking the prefix of that list of node references up to and including the node reference being matches against the Node Query containing the predicate and dereferencing each.</p>
+<p>Predicates are only ever evaluated when matching a list of Node Queries against a list of node references; the value of <em>m</em> is created by taking the prefix of that list of node references, up to and including the node reference being matched against the Node Query containing the predicate, and dereferencing each.</p>
 <p>Inside a predicate, neither <em>m</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>m</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
 <table>
 <thead>
@@ -86,87 +97,94 @@
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
 <td align="left">any</td>
-<td align="left">a constant value <em>x</em></td>
+<td align="left"><em>x</em>, a value of the same type as the predicate</td>
 <td align="left"><em>v</em> equals <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Same</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
-<td align="left">two indices <em>i</em> and <em>j</em></td>
+<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em></td>
 </tr>
 <tr class="even">
 <td align="left">Has</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">set or list of <em>X</em></td>
-<td align="left"><em>X</em> predicate <em>f</em></td>
+<td align="left"><em>f</em>, an <em>X</em> predicate</td>
 <td align="left"><em>f</em>(<em>e</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
 </tr>
 <tr class="odd">
+<td align="left">SetHas</td>
+<td align="left">RECOMMENDED</td>
+<td align="left">set of <em>X</em></td>
+<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
+<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>) is <code>true</code></td>
+</tr>
+<tr class="even">
 <td align="left">MapHas</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">set of string ↦ datum pairs</td>
-<td align="left">set <em>x</em> of string ↦ datum predicate pairs</td>
+<td align="left"><em>x</em>, a set of string ↦ (datum predicate) pairs</td>
 <td align="left">for each (<em>a</em>↦<em>b</em>) in <em>x</em>, there is a (<em>c</em>↦<em>d</em>) pair in <em>v</em> such that <em>a</em> = <em>c</em> and <em>b</em>(<em>d</em>) is <code>true</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Cmp</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">string</td>
-<td align="left">a constant value <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
+<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a string value</td>
 <td align="left"><em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Cmp</td>
 <td align="left">OPTIONAL</td>
-<td align="left">datum with MIME type that has defined order</td>
-<td align="left">a constant value <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
-<td align="left"><em>v</em> ∙ <em>x</em> under that ordering</td>
+<td align="left">datum with media type that has defined order</td>
+<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a datum value with the same media type</td>
+<td align="left"><em>v</em> ∙ <em>x</em> under that media type's ordering</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">ICmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
-<td align="left">as <code>Cmp</code>, but two indices <em>i</em> and <em>j</em> instead of constant <em>x</em></td>
+<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em> instead of <em>v</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Regex</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left">a constant regular expression <em>r</em>, as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a></td>
+<td align="left"><em>r</em>, a string containing a regular expression as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a></td>
 <td align="left"><em>r</em> matches <em>v</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Len</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set or list</td>
-<td align="left">a constant integer <em>x</em><br/>and an operator <em>∙</em> from {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}</td>
-<td align="left">(the number of elements in <em>v</em>) ∙ <em>x</em></td>
+<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
+<td align="left">((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">two <em>X</em> predicates</td>
-<td align="left">both predicates are <em>true</em></td>
+<td align="left">two or more <em>X</em> predicates</td>
+<td align="left">all of the predicates are <em>true</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">two <em>X</em> predicates</td>
+<td align="left">two or more <em>X</em> predicates</td>
 <td align="left">at least one predicates is <em>true</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
-<td align="left">another <em>X</em> predicates</td>
+<td align="left">another <em>X</em> predicate</td>
 <td align="left">the predicate is <code>false</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
@@ -195,28 +213,28 @@
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
 <td align="left">any</td>
-<td align="left">a constant value <em>x</em></td>
+<td align="left"><em>x</em>, a value</td>
 <td align="left"><em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Lookup</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
-<td align="left">two indices <em>i</em> and <em>j</em></td>
+<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>m</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Match</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left">a constant regular expression <em>r</em>, as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a><br/>and an integer <em>i</em><br/>and a string producer <em>f</em></td>
+<td align="left"><em>r</em>, a string containing a regular expression as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a><br/><em>i</em>, an integer<br/><em>f</em>, a string producer</td>
 <td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>m</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
 </tr>
 <tr class="even">
 <td align="left">Slice</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string or list</td>
-<td align="left">a string or list producer <em>f</em><br/>and two integers <em>i</em> and <em>j</em></td>
+<td align="left"><em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left">the zero-indexed subsequence of <em>f</em>(<em>m</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence</td>
 </tr>
 <tr class="odd">
@@ -306,7 +324,7 @@
 <p>A tuple <code>(partOf, details)</code>, where</p>
 <ul>
 <li><code>partOf</code> is a (possibly empty) set of references to OutRefs</li>
-<li><code>details</code> is a set of key↦value pairs, where each key is a string and each value is a datum</li>
+<li><code>details</code> is a set of string↦datum pairs</li>
 </ul></li>
 <li><p>Derivation</p>
 <p>A tuple <code>(support, reason)</code>, where</p>
@@ -353,7 +371,7 @@
 <li><p>Two predicates are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give different results. If they are defined differently but give the same result for all inputs, their equality is not specified by this specification.</p></li>
 <li><p>Two producers are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give non-equal results. If they are defined differently but give equal result for all inputs, their equality is not specified by this specification.</p></li>
 <li><p>Two strings are equal if they contain the same conceptual characters in the same order.</p></li>
-<li><p>Two data are equal if and only if either (1) there is an official notion of eqaulity for the given MIME-type and the blobs are equal under than definition of (2) the strings are equal and the blobs have the same bytes in the same order.</p></li>
+<li><p>Two data are equal if and only if either (1) there is an official notion of eqaulity for the given media-type and the blobs are equal under than definition of (2) the strings are equal and the blobs have the same bytes in the same order.</p></li>
 </ul>
 <p>The <strong>constituents</strong> of any node <em>except</em> an Aggregated Subject node is defined to be the singleton set containing just that Node itself.</p>
 <p>The <strong>constituents</strong> of an Aggregated Subject node is defined to be the singleton set containing the Aggregated Subject node itself and the elements of the <strong>constituents</strong> of each of the nodes referenced in the <code>of</code> field of the node referenced by the Aggregated Subject's <code>parts</code> field.</p>

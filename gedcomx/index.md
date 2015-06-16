@@ -5,9 +5,9 @@ __To `conceptual-model-specification` make the following changes:__
 __add to 1.3.3__
 
 > A "set" is defined as an unordered collection of data instances containing no duplicate data instances.
-> When a property is defined in terms of a "list", the data type of the data instances in the list is also provided
+> When a property is defined in terms of a "set", the data type of the data instances in the set is also provided
 >
-> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval \[−1, 32767\]
+> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval \[−1, 32767)
 
 ----
 
@@ -32,14 +32,14 @@ The identifier for the `Reasoning` data type is
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-subjects | The subjects of study during research | List of [`http://gedcomx.polygenea.org/v1/SubjectNode`](#subject-node).  Order is preserved. | OPTIONAL.
-properties | The information about single things encountered during research | List of [`http://gedcomx.polygenea.org/v1/Property`](#property).  Order is preserved. | OPTIONAL.
-connections | The information about pairs things encountered during research | List of [`http://gedcomx.polygenea.org/v1/Connection`](#connection).  Order is preserved. | OPTIONAL.
-tags | Metadata asserted about various other claims during research | List of [`http://gedcomx.polygenea.org/v1/Tag`](#tag).  Order is preserved. | OPTIONAL.
-aggregates | Semantically-merged collections of subjects | List of [`http://gedcomx.polygenea.org/v1/AggregatedSubject`](#aggregated-subject).  Order is preserved. | OPTIONAL.
-derivations | Free-text descriptions of reasoning processes | List of [`http://gedcomx.polygenea.org/v1/Derivation`](#derivation).  Order is preserved. | OPTIONAL.
-inferences | Structured descriptions of reasoning processes | List of [`http://gedcomx.polygenea.org/v1/Inference`](#inference).  Order is preserved. | OPTIONAL.
-expectations | Structured descriptions of trends, inference rules, and other guidelines about what a researcher expects to be true | List of [`http://gedcomx.polygenea.org/v1/Expectation`](#expectation).  Order is preserved. | OPTIONAL.
+subjects | The subjects of study during research | Set of [`http://gedcomx.polygenea.org/v1/SubjectNode`](#subject-node). | OPTIONAL.
+properties | The information about single things encountered during research | Set of [`http://gedcomx.polygenea.org/v1/Property`](#property). | OPTIONAL.
+connections | The information about pairs things encountered during research | Set of [`http://gedcomx.polygenea.org/v1/Connection`](#connection). | OPTIONAL.
+tags | Metadata asserted about various other claims during research | Set of [`http://gedcomx.polygenea.org/v1/Tag`](#tag). | OPTIONAL.
+aggregates | Semantically-merged collections of subjects | Set of [`http://gedcomx.polygenea.org/v1/AggregatedSubject`](#aggregated-subject). | OPTIONAL.
+derivations | Free-text descriptions of reasoning processes | Set of [`http://gedcomx.polygenea.org/v1/Derivation`](#derivation). | OPTIONAL.
+inferences | Structured descriptions of reasoning processes | Set of [`http://gedcomx.polygenea.org/v1/Inference`](#inference). | OPTIONAL.
+expectations | Structured descriptions of trends, inference rules, and other guidelines about what a researcher expects to be true | Set of [`http://gedcomx.polygenea.org/v1/Expectation`](#expectation). | OPTIONAL.
 attribution | The attribution of this reasoning. | `http://gedcomx.org/Attribution` | OPTIONAL. If not provided, the attribution of the containing data set (e.g., file) of the `Reasoning` is assumed.
 
 
@@ -49,8 +49,8 @@ __Modify section 3.10, subsection "properties", adding the following row to the 
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-supportingClaims | The list of references to the reasoning elements that support this conclusion. | List of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). Order is preserved. | OPTIONAL.
-refutingClaims | The list of references to the reasoning elements that contradict this conclusion. | List of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). Order is preserved. | OPTIONAL.
+supportingClaims | The list of references to the reasoning elements that support this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). OPTIONAL.
+refutingClaims | The list of references to the reasoning elements that contradict this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). | OPTIONAL.
 
 
 ----
@@ -62,7 +62,7 @@ __Add to 3. several new subsections, as follows__
 
 ## 3.22 The "ReasoningNode" Data Type
 
-The `ReasoningNode` data type defines the abstract concept of a single atomic piece of the reasoning process.
+The `ReasoningNode` data type defines the abstract concept of a single atomic element in the reasoning process.
 
 ### identifier
 
@@ -159,7 +159,7 @@ slug | Something to distinguish this subject from other subjects in the same sou
 
 ## 3.26 The "Property" Data Type
 
-The `Property` data type defines a string-valued detail about a `ResearchNode`, most commonly a `SourceNode`.
+The `Property` data type defines a string-valued detail about a `ResearchNode`, most commonly a `SubjectNode`.
 
 The `http://gedcomx.polygenea.org/v1/Property` data type is approximately the research parallal to the `http://gedcomx.org/v1/Fact` data type in conclusions, but also serves additional purposes, such as identifying the "type" of a `SubjectNode`.
 
@@ -353,7 +353,7 @@ The __index__ of a `NodeTemplate` in its containing `Expectation` is defined to 
 
 <a name="node-template"/>
 
-## 3.32 The "NodeTemplate" Data Type
+## 3.33 The "NodeTemplate" Data Type
 
 The `NodeTemplate` data type describes how to construct a node given some context.
 
@@ -371,31 +371,32 @@ For every concrete node type named _X_ extending `Claim`, there is a concrete no
 
 None; in particular, `NodeTemplate` (and hence its extension nodes) does not have either an `attribution` nor a `source` property.
 
-Nodes that extend `NodeTemplate` MUST use type int instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and MUST be greater than or equal to 0.
+Nodes that extend `NodeTemplate` MUST use type `int` instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and MUST be greater than or equal to 0.
 
 Nodes that extend `NodeTemplate` MAY use a function type as the value of a string or 
+__FIXME__: _as will be described later_
 
+<a name="node-query"/>
 
-<a name="node-template"/>
+## 3.34 The "NodeQuery" Data Type
 
-## 3.32 The "NodeTemplate" Data Type
-
-The `NodeTemplate` data type describes how to construct a node given some context.
+The `NodeQuery` data type describes an acceptable set of nodes.
 
 ### identifier
 
-The identifier for the `NodeTemplate` data type is:
+The identifier for the `NodeQuery` data type is:
 
-`http://gedcomx.polygenea.org/v1/NodeTemplate`
+`http://gedcomx.polygenea.org/v1/NodeQuery`
 
 ### extension
 
-For every concrete node type named _X_ extending `Claim`, there is a concrete node type named _X_`Template` extending `NodeTemplate`.
+For every node type named _X_ extending `ResearchNode`, there is a concrete node type named _X_`Template` extending `NodeQuery`.
 
 ### properties
 
-None; in particular, `NodeTemplate` (and hence its extension nodes) does not have either an `attribution` nor a `source` property.
+As per `ResearchNode` and its subtypes, except as noted below.
 
-Nodes that extend `NodeTemplate` MUST use type int instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and must be greater than or equal to −1.
+Nodes that extend `NodeQuery` MUST use type `int` instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeQuery` in its containing `Expectation` and must be greater than or equal to −1.
 
-Nodes that extend `NodeTemplate` MAY use a function type 
+Nodes that extend `NodeQuery` MAY use a predicate type
+__FIXME__: _as will be described later_

@@ -1,3 +1,13 @@
+<style type="text/css">
+body{font-family:sans-serif;}
+code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
+table{border-collapse:collapse;}
+tr:nth-child(2n){background-color:#ddd;}
+td,th{padding:0.25ex 1ex;}
+th{border-bottom:1px solid black;}
+</style>
+
+
 This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.
 
 
@@ -43,7 +53,7 @@ __reference__
 __integer__
 :   a signed integer.
     Every implementations must be able to represent (at least)
-    all integers in the interval \[−1, 32766\].
+    all integers in the interval [−1, 32767).
     During serialisation or deserialisation the maximum number of nodes 
     an implementation can handle may be constrained by the largest magnitude integer
     that the implementation can represent.
@@ -65,7 +75,9 @@ __list__ of _X_
 __tuple__
 :	A fixed, ordered group of values, each with a given type.
 	Tuple values may be referenced by index (starting with 0, like a _list_)
-	or, if the elements are given names in the specification, by name.
+	or, if the individual elements are given names in the specification, by name.
+    Thus, e.g., the first elements of the tuple of a Property node 
+    may be referred to as either the `key` element or element `0`.
 
 **_X_↦_Y_ pair**
 :	A tuple of two elements.
@@ -88,8 +100,8 @@ and returns either `true` or `false`.
 
 Predicates are only ever evaluated when matching a list of Node Queries
 against a list of node references;
-the value of _m_ is created by taking the prefix of that list of node references
-up to and including the node reference being matches against the Node Query containing the predicate
+the value of _m_ is created by taking the prefix of that list of node references,
+up to and including the node reference being matched against the Node Query containing the predicate,
 and dereferencing each.
 
 Inside a predicate, neither _m_ nor _v_ may be modified
@@ -99,18 +111,19 @@ and any node references inside tuples inside _m_ are treated as opaque types
 name | status | types | defined with | returns `true` when
 -----|--------|-------|--------------|--------------------
 Top | REQUIRED | any | (nothing) | always
-Lit | REQUIRED | any | a constant value _x_ | _v_ equals _x_
-Same | RECOMMENDED | any | two indices _i_ and _j_ | _v_ equals the _j_th value of the _i_th tuple in _m_
-Has | RECOMMENDED | set or list of _X_ | _X_ predicate _f_ | _f_(_e_) is `true` for any _e_ in _v_
-MapHas | RECOMMENDED | set of string ↦ datum pairs | set _x_ of string ↦ datum predicate pairs | for each (_a_↦_b_) in _x_, there is a (_c_↦_d_) pair in _v_ such that _a_ = _c_ and _b_(_d_) is `true`
-Cmp | RECOMMENDED | string | a constant value _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under a lexicographical ordering
-Cmp | OPTIONAL | datum with MIME type that has defined order | a constant value _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | _v_ ∙ _x_ under that ordering
-ICmp | OPTIONAL | as `Cmp` | as `Cmp`, but two indices _i_ and _j_ instead of constant _x_ | as `Cmp`, but using the _j_th value of the _i_th tuple in _m_ instead of _v_
-Regex | OPTIONAL | string | a constant regular expression _r_, as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10) | _r_ matches _v_
-Len | OPTIONAL | set or list | a constant integer _x_<br/>and an operator _∙_ from {`<`, `≤`, `=`, `≠`, `≥`, `>`} | (the number of elements in _v_) ∙ _x_
-And | OPTIONAL | any (call it _X_) | two _X_ predicates | both predicates are _true_
-Or | OPTIONAL | any (call it _X_) | two _X_ predicates | at least one predicates is _true_
-Not | OPTIONAL | any (call it _X_) | another _X_ predicates | the predicate is `false`
+Lit | REQUIRED | any | _x_, a value of the same type as the predicate | _v_ equals _x_
+Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _m_
+Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_) is `true` for any _e_ in _v_
+SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_) is `true`
+MapHas | RECOMMENDED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_↦_b_) in _x_, there is a (_c_↦_d_) pair in _v_ such that _a_ = _c_ and _b_(_d_) is `true`
+Cmp | RECOMMENDED | string | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a string value | _v_ ∙ _x_ under a lexicographical ordering
+Cmp | OPTIONAL | datum with media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a datum value with the same media type | _v_ ∙ _x_ under that media type's ordering
+ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _m_ instead of _v_
+Regex | OPTIONAL | string | _r_, a string containing a regular expression as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10) | _r_ matches _v_
+Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
+And | OPTIONAL | any (call it _X_) | two or more _X_ predicates | all of the predicates are _true_
+Or | OPTIONAL | any (call it _X_) | two or more _X_ predicates | at least one predicates is _true_
+Not | OPTIONAL | any (call it _X_) | another _X_ predicate | the predicate is `false`
 Script | OPTIONAL | any | a datum with major type "script" defining a single function | evaluating the function in the script returns `true`
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
@@ -132,10 +145,10 @@ and any node references inside tuples inside _m_ are treated as opaque types
 
 name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
-Lit | REQUIRED | any | a constant value _x_ | _x_
-Lookup | RECOMMENDED | any | two indices _i_ and _j_ | the _j_th value of the _i_th tuple in _m_
-Match | OPTIONAL | string | a constant regular expression _r_, as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10)<br/>and an integer _i_<br/>and a string producer _f_ | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | a string or list producer _f_<br/>and two integers _i_ and _j_ | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
+Lit | REQUIRED | any | _x_, a value | _x_
+Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _m_
+Match | OPTIONAL | string | _r_, a string containing a regular expression as defined in [ECMA 262 section 15.10](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10)<br/>_i_, an integer<br/>_f_, a string producer | the contents of the _i_th matching group after matching _f_(_m_) with _r_, or the empty string if it does not match or the match has no such group
+Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_m_) from _i_ (inclusive) to _j_ (exclusive)<br/>negative indices have the length of the sequence added to them before dereferencing<br/>out-of-bounds indices are clamped to bounds<br/>negative-width subsequences return the empty sequence
 Cat | OPTIONAL | string or list | two string or list producers | the concatenation of the strings or lists produced by the two producers
 Union | OPTIONAL | set | two set producers | the union of the sets produced by the two producers
 Intersect | OPTIONAL | set | two set producers | the intersection of the sets produced by the two producers
@@ -214,8 +227,7 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             A tuple `(partOf, details)`, where
             
             -   `partOf` is a (possibly empty) set of references to OutRefs
-            -   `details` is a set of key↦value pairs,
-                where each key is a string and each value is a datum
+            -   `details` is a set of string↦datum pairs
         
         -   Derivation
             
@@ -303,7 +315,7 @@ Node and value __equality__ is defined as follows:
     the same order.
 
 -   Two data are equal if and only if
-    either (1) there is an official notion of eqaulity for the given MIME-type
+    either (1) there is an official notion of eqaulity for the given media-type
     and the blobs are equal under than definition
     of (2) the strings are equal and the blobs have the same bytes in the same order.
 
