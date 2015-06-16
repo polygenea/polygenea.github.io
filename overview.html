@@ -50,7 +50,7 @@ th{border-bottom:1px solid black;}
 <dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32767). During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
 </dd>
 <dt><strong>regex</strong></dt>
-<dd><p>a string containing either (a) a <em>RegularExpressionLiteral</em> or (b) a <em>RegularExpressionBody</em>, both defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a> Unlike the ECMA 262 standard, empty regular expressions are allowed. If only a <em>RegularExpressionBody</em> is provided, it is treated as if it had no flags.</p>
+<dd><p>a string containing either (a) a <em>RegularExpressionLiteral</em> or (b) a <em>RegularExpressionBody</em>, both defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a>. Because <em>RegularExpressionLiteral</em>s always begin with a SOLIDUS <code>/</code> and <em>RegularExpressionBody</em>s never begin with a SOLIDUS, it is unambiguous which is present in a string. Unlike the ECMA 262 standard, empty regular expressions are allowed. If only a <em>RegularExpressionBody</em> is provided, it is treated as if it had no flags.</p>
 <p>Values of type regexs are used in some predicates and producers and behave as documented in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a>.</p>
 </dd>
 </dl>

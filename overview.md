@@ -62,7 +62,8 @@ __regex__
 :   a string containing 
     either (a) a _RegularExpressionLiteral_ 
     or (b) a _RegularExpressionBody_, 
-    both defined in [ECMA 262 section 7.8.5](http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5)
+    both defined in [ECMA 262 section 7.8.5](http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5).
+    Because _RegularExpressionLiteral_s always begin with a SOLIDUS `/` and _RegularExpressionBody_s never begin with a SOLIDUS, it is unambiguous which is present in a string.
     Unlike the ECMA 262 standard, empty regular expressions are allowed.
     If only a _RegularExpressionBody_ is provided, it is treated as if it had no flags.
     
