@@ -135,7 +135,7 @@ Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`,
 And | OPTIONAL | any (call it _X_) | two or more _X_ predicates | all of the predicates are _true_
 Or | OPTIONAL | any (call it _X_) | two or more _X_ predicates | at least one predicates is _true_
 Not | OPTIONAL | any (call it _X_) | another _X_ predicate | the predicate is `false`
-Script | OPTIONAL | any | a datum with major type "script" defining a single function | evaluating the function in the script returns `true`
+Script | OPTIONAL | any | a datum defining a single function in some programming language | evaluating the function in the script returns `true`
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
 
@@ -163,10 +163,9 @@ Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an i
 Cat | OPTIONAL | string or list | two string or list producers | the concatenation of the strings or lists produced by the two producers
 Union | OPTIONAL | set | two set producers | the union of the sets produced by the two producers
 Intersect | OPTIONAL | set | two set producers | the intersection of the sets produced by the two producers
-Script | OPTIONAL | any | a datum with major type "script" defining a single function | the value returned when evaluating the function in the script
+Script | OPTIONAL | any | a datum defining a single function in some programming language | the value returned when evaluating the function in the script
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.
-
 
 
 The Nine Node Types
