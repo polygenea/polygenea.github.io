@@ -38,6 +38,12 @@ __datum__
         if "", assumed to be "text/plain;charset=UTF-8".
         If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various "text" types)
         are REQUIRED. 
+        
+        Alternatively, this may be an absolute IRI describing a type, such as `http://gedcomx.org/date/v1`.
+        Because absolute IRIs always contain a COLON `:`
+        and media types never contain a COLON,
+        it is unambiguous which form of media type is being specified.
+
     2.  Language, as specified by [IETF BCP 47](http://tools.ietf.org/html/bcp47); 
         if "", assumed to be locale-independent (i.e., 
         may be processed using the default locale of the processor)
