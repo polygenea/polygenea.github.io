@@ -1,32 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
-</head>
-<body>
-<style type="text/css">
-body{font-family:sans-serif; counter-reset:h1;}
-code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
-table{border-collapse:collapse;}
-tr:nth-child(2n){background-color:#ddd;}
-td,th{padding:0.25ex 1ex;}
-th{border-bottom:1px solid black;}
-h1:before { content: counter(h1) ". "; counter-increment: h1; }
-h1 {counter-reset:h2;}
-h2:before { content: counter(h1) "." counter(h2) ". "; counter-increment: h2; }
-h2 {counter-reset: h3;}
-h3:before { content: counter(h1) "." counter(h2) "." counter(h3) ". "; counter-increment: h3; }
-h3 {counter-reset: h4;}
-h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
-h4 {counter-reset: h5;}
-</style>
-
-
-
 <p>This is an alpha version of a specification of a model for representing family history and genealogical research.</p>
 <p>The central goal of this model is the representation of reasoning processes, as realised by the Inference, Derivation, and Expectation node types. A secondary goal is to ensure, at a data model level, that it is impossible to have two communicating parties think they understand one another when in fact they have different versions of some element of their shared universe of discourse. To reach these goals, the model uses a representation of beliefs about the past that somewhat resembles RDF, in that information about a given entity is stored outside of the entity. Unlike RDF, each of these Claim elements has a source, representing where it came from; the structure and presence of these sources is key to achieving the central goal of this model. Additionally, Claims and other elements are defined not to have identity (a.k.a, they are compare-by-value, bit-copiable, identity=value, immutable, etc.); by definition, changing the contents of any element actually creates a new element, leaving the old one present and unchanged. The notion that a different element is intended as an update of another element is itself a claim made during reasoning and represented as such in this model.</p>
 <p>This document is an alpha release intended to present a self-consistent and fairly complete specification that can be used to understand how the various conceptual pieces of this approach could fit together and to form a starting point for discussions of this approach. Many times while writing this document the optimal choice was not evident; rather than list each of these decision points, this document simply makes decisions so that the presentation can hold together as a whole, optimal or not.</p>
@@ -683,5 +654,3 @@ h4 {counter-reset: h5;}
 <li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p>
 <p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
 </ol>
-</body>
-</html>
