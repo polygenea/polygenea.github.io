@@ -268,6 +268,165 @@ th{border-bottom:1px solid black;}
 </table>
 <p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
 <h2 id="the-nine-node-types">The Nine Node Types</h2>
+<h3 id="tabular-summary">Tabular Summary</h3>
+<p>This specification defines the following concrete types:</p>
+<h4 id="nodes">Nodes</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Node subtype</th>
+<th align="left">is a</th>
+<th align="left">Properties<br/>index. name : type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Subject</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>slug</code> : string <br/>1. <code>source</code> : reference to a Source</td>
+</tr>
+<tr class="even">
+<td align="left">Property</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : reference to a Node<br/>2. <code>value</code> : datum<br/>3. <code>source</code> : reference to a Source</td>
+</tr>
+<tr class="odd">
+<td align="left">Connection</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : reference to a Node<br/>2. <code>value</code> : int<br/>3. <code>source</code> : reference to a Source</td>
+</tr>
+<tr class="even">
+<td align="left">Tag</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : set of references to Nodes<br/>2. <code>source</code> : reference to a Source</td>
+</tr>
+<tr class="odd">
+<td align="left">Aggregated Subject</td>
+<td align="left"></td>
+<td align="left">0. <code>parts</code> : reference to a Tag</td>
+</tr>
+<tr class="even">
+<td align="left">OutRef</td>
+<td align="left">Source</td>
+<td align="left">0. <code>parents</code> : set of (string ↦ reference to OutRef) pairs<br/>1. <code>details</code> : set of (string ↦ datum) pairs</td>
+</tr>
+<tr class="odd">
+<td align="left">Derivation</td>
+<td align="left">Source</td>
+<td align="left">0. <code>support</code> : set of references to Nodes<br/>1. <code>reason</code> : string</td>
+</tr>
+<tr class="even">
+<td align="left">Inference</td>
+<td align="left">Source</td>
+<td align="left">0. <code>support</code> : list of references to Nodes<br/>1. <code>reason</code> : reference to Expectation</td>
+</tr>
+<tr class="odd">
+<td align="left">Expectation</td>
+<td align="left"></td>
+<td align="left">0. <code>antecedent</code> : list of Node Queries<br/>1. <code>consequent</code> : list of Node Templates</td>
+</tr>
+</tbody>
+</table>
+<h4 id="node-queries">Node Queries</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Node Query subtype</th>
+<th align="left">is a</th>
+<th align="left">Properties<br/>index. name : type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Subject Query</td>
+<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : integer</td>
+<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
+</tr>
+<tr class="even">
+<td align="left">Property Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : datum predicate<br/>3. <code>source</code> : integer</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Connection Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : integer</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Tag Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : set of ints<br/>2. <code>source</code> : integer</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">OutRef Query</td>
+<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Derivation Query</td>
+<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Inference Query</td>
+<td align="left">0. <code>support</code> : list of ints<br/>1. <code>reason</code> : integer</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Expectation Query</td>
+<td align="left"><em>exactly the same an Expectation</em></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>FIXME</strong> decide if we need a separate Aggregated Subject Query and/or how Subject and Aggregated Subject queries should be merged</p>
+<p>Each integer value in a Node Query MUST either be <code>-1</code> or satisfy all of the following constraints:</p>
+<ul>
+<li>be inside a Node Query that is inside a list of Node Queries</li>
+<li>be ≥ 0</li>
+<li>be &lt; the index of the containing Node Query in its containing list</li>
+</ul>
+<p>If an int value treated as an index into the containing list does not index a node with a type that the same field in the corresponding Node could reference then the Node Query will never match any Node. Node Queries containing &quot;mistyped&quot; integers of like this probably indicate user error, but are not forbidden by this specification.</p>
+<h4 id="node-templates">Node Templates</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Node Template subtype</th>
+<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Subject Template</td>
+<td align="left">0. <code>slug</code> : string producer<br/>1. <code>source</code> : integer</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="even">
+<td align="left">Property Template</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer<br/>3. <code>source</code> : integer</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Connection Template</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : integer</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="even">
+<td align="left">Tag Template</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : (set of ints) producer<br/>2. <code>source</code> : integer</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each integer value in a Node Template MUST either be <code>-1</code> or satisfy all of the following constraints:</p>
+<ul>
+<li>be inside a Node Template that is inside the <code>consequent</code> of an Expectation that has <em>n</em> elements in its <code>antecedent</code></li>
+<li>be ≥ 0</li>
+<li>be &lt; <em>n</em> + the the index of the containing Node Template the containing Expectation's <code>consequent</code></li>
+</ul>
+<p>All nodes that could be instantiated from a Node Template (see <a href="#instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</a>) MUST satisfy any constraints that apply to other nodes of that type. Implementations SHOULD enforce these constraints during Node Template construction but MAY delay enforcement until Inference construction instead.</p>
+<h3 id="outline-and-discussion">Outline and Discussion</h3>
 <p>Reasoning is a set of nodes. Node types are expressed in the following hierarchy:</p>
 <ul>
 <li><p>Node</p>
@@ -350,94 +509,12 @@ th{border-bottom:1px solid black;}
 <li><p>In place of any value of non-reference type <em>X</em>, the Node Query has an <em>X</em> predicate.</p></li>
 <li><p>In place of any value of reference type <em>X</em>, the Node Query must have either the special value <code>-1</code> or a non-negative integer <em>i</em> such that the <em>i</em>th node in the <code>antecedent</code> is of a type that may be referenced by <em>X</em> and <em>i</em> is strictly smaller than the index of the Node Query that contains it.</p></li>
 </ul>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Node Query subtype</th>
-<th align="left">Properties<br/>index. name : type</th>
-<th align="left">Constraints</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Subject Query</td>
-<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : int</td>
-<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
-</tr>
-<tr class="even">
-<td align="left">Property Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : datum predicate<br/>3. <code>source</code> : int</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Connection Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tag Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">OutRef Query</td>
-<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Derivation Query</td>
-<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Expectation Query</td>
-<td align="left"><em>exactly the same a Expectation</em></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Inference Query</td>
-<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : int</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
 <p>A Node Template may be any Claim except that</p>
 <ul>
 <li><p>It has the special value <code>-1</code> as its <code>source</code></p></li>
 <li><p>In place of any value of non-reference type <em>X</em>, the Node Template has an <em>X</em> producer.</p></li>
 <li><p>In place of any value of reference type <em>X</em>, the Node Query must have a non-negative integer <em>i</em> such that both (1) the <em>i</em>th node in the list created by concatenating <code>antecedent</code> and <code>consequent</code> is of a type that may be referenced by <em>X</em> and (2) <em>i</em> is strictly smaller than the index of the Node Template that contains it in that concatenate list.</p></li>
-</ul>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Node Template subtype</th>
-<th align="left">Properties<br/>index. name : type</th>
-<th align="left">Constraints</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Subject Template</td>
-<td align="left">0. <code>slug</code> : string producer<br/>1. <code>source</code> : int</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
-</tr>
-<tr class="even">
-<td align="left">Property Template</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer<br/>3. <code>source</code> : int</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
-</tr>
-<tr class="odd">
-<td align="left">Connection Template</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
-</tr>
-<tr class="even">
-<td align="left">Tag Template</td>
-<td align="left">0. <code>key</code> : string producers <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
-</tr>
-</tbody>
-</table></li>
+</ul></li>
 </ul></li>
 </ul>
 <h2 id="definitions-and-constraints">Definitions and Constraints</h2>

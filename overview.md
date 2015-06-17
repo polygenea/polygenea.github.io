@@ -183,6 +183,72 @@ Implementations supporting the `Script` predicate type SHOULD ensure that all sc
 The Nine Node Types
 -------------------
 
+### Tabular Summary
+
+This specification defines the following concrete types:
+
+#### Nodes
+
+| Node subtype | is a | Properties<br/>index. name : type | Constraints |
+|--------------------|-----------------------------------|-------------|
+| Subject | Claim | 0. `slug` : string <br/>1. `source` : reference to a Source | |
+| Property | Claim | 0. `key` : string <br/>1. `of` : reference to a Node<br/>2. `value` : datum<br/>3. `source` : reference to a Source | |
+| Connection | Claim | 0. `key` : string <br/>1. `of` : reference to a Node<br/>2. `value` : int<br/>3. `source` : reference to a Source | |
+| Tag | Claim | 0. `key` : string <br/>1. `of` : set of references to Nodes<br/>2. `source` : reference to a Source | some `key`s make constraints on `of` |
+| Aggregated Subject | | 0. `parts` : reference to a Tag | `parts`'s `key` MUST be "same" <br/> Each node referenced in `parts`'s `key`'s `of` MUST be either a Subject or and Aggregated Subject |
+| OutRef | Source | 0. `parents` : set of (string ↦ reference to OutRef) pairs<br/>1. `details` : set of (string ↦ datum) pairs | |
+| Derivation | Source | 0. `support` : set of references to Nodes<br/>1. `reason` : string | |
+| Inference | Source | 0. `support` : list of references to Nodes<br/>1. `reason` : reference to Expectation | `reason`'s `antecedent` SHOULD match `support` |
+| Expectation | | 0. `antecedent` : list of Node Queries<br/>1. `consequent` : list of Node Templates | _See below_ |
+
+#### Node Queries
+
+| Node Query subtype | is a | Properties<br/>index. name : type | Constraints |
+|--------------------|-----------------------------------|-------------|
+| Subject Query | 0. `slug` : string predicate <br/>1. `source` : integer | `slug`'s value MUST be _Top_ |
+| Property Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : datum predicate<br/>3. `source` : integer | |
+| Connection Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : integer | |
+| Tag Query | 0. `key` : string predicate <br/>1. `of` : set of ints<br/>2. `source` : integer | |
+| OutRef Query | 0. `parents` : set of (string ↦ int) pairs<br/>1. `details` : set of (string ↦ datum predicate) pairs | |
+| Derivation Query | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
+| Inference Query | 0. `support` : list of ints<br/>1. `reason` : integer | |
+| Expectation Query | _exactly the same an Expectation_ | |
+
+__FIXME__ decide if we need a separate Aggregated Subject Query and/or how Subject and Aggregated Subject queries should be merged
+
+Each integer value in a Node Query MUST either be `-1` or satisfy all of the following constraints:
+
+-   be inside a Node Query that is inside a list of Node Queries
+-   be ≥ 0
+-   be < the index of the containing Node Query in its containing list 
+
+If an int value treated as an index into the containing list does not index a node with a type
+that the same field in the corresponding Node could reference then the Node Query will never match any Node.
+Node Queries containing "mistyped" integers of like this probably indicate user error, but are not forbidden by this specification.
+
+#### Node Templates
+
+| Node Template subtype | Properties<br/>index. name : type | Constraints |
+|-----------------------|-----------------------------------|--------------|
+| Subject Template | 0. `slug` : string producer<br/>1. `source` : integer | `source`'s value MUST be `-1` |
+| Property Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer<br/>3. `source` : integer | `source`'s value MUST be `-1` |
+| Connection Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : integer | `source`'s value MUST be `-1` |
+| Tag Template | 0. `key` : string producer <br/>1. `of` : (set of ints) producer<br/>2. `source` : integer | `source`'s value MUST be `-1` |
+
+Each integer value in a Node Template MUST either be `-1` or satisfy all of the following constraints:
+
+-   be inside a Node Template that is inside the `consequent` of an Expectation that has _n_ elements in its `antecedent`
+-   be ≥ 0
+-   be < _n_ + the the index of the containing Node Template the containing Expectation's `consequent`
+
+All nodes that could be instantiated from a Node Template (see [Instantiating Nodes from Inferences](#instantiating-nodes-from-inferences))
+MUST satisfy any constraints that apply to other nodes of that type.
+Implementations SHOULD enforce these constraints during Node Template construction
+but MAY delay enforcement until Inference construction instead.
+
+
+### Outline and Discussion
+
 Reasoning is a set of nodes.  Node types are expressed in the following hierarchy:
 
 -   Node
@@ -286,17 +352,6 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             be referenced by _X_ and _i_ is strictly smaller than the index of 
             the Node Query that contains it.
 
-        | Node Query subtype | Properties<br/>index. name : type | Constraints |
-        |--------------------|-----------------------------------|-------------|
-        | Subject Query | 0. `slug` : string predicate <br/>1. `source` : int | `slug`'s value MUST be _Top_ |
-        | Property Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : datum predicate<br/>3. `source` : int | |
-        | Connection Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | |
-        | Tag Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `source` : int | |
-        | OutRef Query | 0. `parents` : set of (string ↦ int) pairs<br/>1. `details` : set of (string ↦ datum predicate) pairs | |
-        | Derivation Query | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
-        | Expectation Query | _exactly the same a Expectation_ | |
-        | Inference Query | 0. `support` : set of ints<br/>1. `reason` : int | |
-
 
         
         A Node Template may be any Claim except that
@@ -311,13 +366,6 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             such that both (1) the _i_th node in the list created by concatenating `antecedent` and `consequent` 
             is of a type that may be referenced by _X_
             and (2) _i_ is strictly smaller than the index of the Node Template that contains it in that concatenate list.
-
-        | Node Template subtype | Properties<br/>index. name : type | Constraints |
-        |-----------------------|-----------------------------------|--------------|
-        | Subject Template | 0. `slug` : string producer<br/>1. `source` : int | `source`'s value MUST be `-1` |
-        | Property Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer<br/>3. `source` : int | `source`'s value MUST be `-1` |
-        | Connection Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | `source`'s value MUST be `-1` |
-        | Tag Template | 0. `key` : string producers <br/>1. `of` : int<br/>2. `source` : int | `source`'s value MUST be `-1` |
 
 
 Definitions and Constraints
