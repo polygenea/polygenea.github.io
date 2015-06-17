@@ -24,26 +24,23 @@ h3 {counter-reset: h4;}
 h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
 h4 {counter-reset: h5;}
 </style>
-
-
-
 <p>This is an alpha version of a specification of a model for representing family history and genealogical research.</p>
-<p>The central goal of this model is the representation of reasoning processes, as realised by the Inference, Derivation, and Expectation node types. A secondary goal is to ensure, at a data model level, that it is impossible to have two communicating parties think they understand one another when in fact they have different versions of some element of their shared universe of discourse. To reach these goals, the model uses a representation of beliefs about the past that somewhat resembles RDF, in that information about a given entity is stored outside of the entity. Unlike RDF, each of these Claim elements has a source, representing where it came from; the structure and presence of these sources is key to achieving the central goal of this model. Additionally, Claims and other elements are defined not to have identity (a.k.a, they are compare-by-value, bit-copiable, identity=value, immutable, etc.); by definition, changing the contents of any element actually creates a new element, leaving the old one present and unchanged. The notion that a different element is intended as an update of another element is itself a claim made during reasoning and represented as such in this model.</p>
+<p>The central goal of this model is the representation of reasoning processes, as realised by the Inference, Derivation, and Expectation node types. A secondary goal is to ensure, at a data model level, that it is impossible to have two communicating parties think they understand one another when in fact they have different versions of some element of their shared universe of discourse. To reach these goals, the model uses a representation of beliefs about the past that somewhat resembles <a href="http://www.w3.org/TR/rdf11-concepts/">RDF</a>, in that information about a given entity is stored outside of the entity. Unlike RDF, each of these Claim elements has a source, representing where it came from; the structure and presence of these sources is key to achieving the central goal of this model. Additionally, Claims and other elements are defined not to have identity (a.k.a, they are compare-by-value, bit-copiable, identity=value, immutable, etc.); by definition, changing the contents of any element actually creates a new element, leaving the old one present and unchanged. The notion that a different element is intended as an update of another element is itself a claim made during reasoning and represented as such in this model.</p>
 <p>This document is an alpha release intended to present a self-consistent and fairly complete specification that can be used to understand how the various conceptual pieces of this approach could fit together and to form a starting point for discussions of this approach. Many times while writing this document the optimal choice was not evident; rather than list each of these decision points, this document simply makes decisions so that the presentation can hold together as a whole, optimal or not.</p>
 <h1 id="representation-of-reasoning">Representation of Reasoning</h1>
 <h2 id="basic-datatypes">Basic Datatypes</h2>
 <dl>
 <dt><strong>character</strong></dt>
-<dd><p>an atomic unit of text as specified by <code>ISO/IEC 10646</code>.</p>
+<dd>an atomic unit of text as specified by <code>ISO/IEC 10646</code>.
 </dd>
 <dt><strong>string</strong></dt>
-<dd><p>a finite-length sequence of characters.</p>
+<dd>a finite-length sequence of characters.
 </dd>
 <dt><strong>octet</strong></dt>
-<dd><p>a sequence of eight bits, each either 0 or 1.</p>
+<dd>a sequence of eight bits, each either 0 or 1.
 </dd>
 <dt><strong>blob</strong></dt>
-<dd><p>a finite-length sequence of octets.</p>
+<dd>a finite-length sequence of octets.
 </dd>
 <dt><strong>datum</strong></dt>
 <dd><p>a (string, string, blob) tuple. Each string specifies part of the interpretation of the blob; they mean (in order)</p>
@@ -58,26 +55,26 @@ h4 {counter-reset: h5;}
 <p>The phrase &quot;reference to a <em>X</em>&quot;, where <em>X</em> is Node or one of Node's subtypes, means the reference indicates an element of type <em>X</em> or one of <em>X</em>'s subtypes.</p>
 </dd>
 <dt><strong>integer</strong></dt>
-<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32767). During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
+<dd>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32767). During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.
 </dd>
 <dt><strong>regex</strong></dt>
-<dd><p>a string containing either (a) a <em>RegularExpressionLiteral</em> or (b) a <em>RegularExpressionBody</em>, both defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a>. Because <em>RegularExpressionLiteral</em>s always begin with a SOLIDUS <code>/</code> and <em>RegularExpressionBody</em>s never begin with a SOLIDUS, it is unambiguous which is present in a string. Unlike the ECMA 262 standard, empty regular expressions are allowed. If only a <em>RegularExpressionBody</em> is provided, it is treated as if it had no flags.</p>
+<dd><p>a string containing either (a) a <em>RegularExpressionLiteral</em> or (b) a <em>RegularExpressionBody</em>, both defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a>. Because _RegularExpressionLiteral_s always begin with a SOLIDUS <code>/</code> and _RegularExpressionBody_s never begin with a SOLIDUS, it is unambiguous which is present in a string. Unlike the ECMA 262 standard, empty regular expressions are allowed. If only a <em>RegularExpressionBody</em> is provided, it is treated as if it had no flags.</p>
 <p>Values of type regexs are used in some predicates and producers and behave as documented in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a>.</p>
 </dd>
 </dl>
 <h2 id="composite-datatypes">Composite Datatypes</h2>
 <dl>
 <dt><strong>set</strong> of <em>X</em></dt>
-<dd><p>(where <em>X</em> is a datatype): an unordered collection of zero or more elements of type <em>X</em>, containing no duplicates.</p>
+<dd>(where <em>X</em> is a datatype): an unordered collection of zero or more elements of type <em>X</em>, containing no duplicates.
 </dd>
 <dt><strong>list</strong> of <em>X</em></dt>
-<dd><p>(where <em>X</em> is a datatype): an ordered sequence of zero or more elements of type <em>X</em>, possibly containing duplicates. Given a list of <em>n</em> elements, the first element is identified by the index 0, and each subsequent element by the index (1 + index-of-previous-element).</p>
+<dd>(where <em>X</em> is a datatype): an ordered sequence of zero or more elements of type <em>X</em>, possibly containing duplicates. Given a list of <em>n</em> elements, the first element is identified by the index 0, and each subsequent element by the index (1 + index-of-previous-element).
 </dd>
 <dt><strong>tuple</strong></dt>
-<dd><p>A fixed, ordered group of values, each with a given type. Tuple values may be referenced by index (starting with 0, like a <em>list</em>) or, if the individual elements are given names in the specification, by name. Thus, e.g., the first elements of the tuple of a Property node may be referred to as either the <code>key</code> element or element <code>0</code>.</p>
+<dd>A fixed, ordered group of values, each with a given type. Tuple values may be referenced by index (starting with 0, like a <em>list</em>) or, if the individual elements are given names in the specification, by name. Thus, e.g., the first elements of the tuple of a Property node may be referred to as either the <code>key</code> element or element <code>0</code>.
 </dd>
 <dt><strong><em>X</em> ↦ <em>Y</em> pair</strong></dt>
-<dd><p>A tuple of two elements. If <em>X</em> and <em>Y</em> are types, they specify the types of the elements. Otherwise, <em>X</em> and <em>Y</em> are the names of the elements and types are given elsewhere in the specification text.</p>
+<dd>A tuple of two elements. If <em>X</em> and <em>Y</em> are types, they specify the types of the elements. Otherwise, <em>X</em> and <em>Y</em> are the names of the elements and types are given elsewhere in the specification text.
 </dd>
 </dl>
 <h2 id="predicate-and-producer-datatypes">Predicate and Producer Datatypes</h2>
@@ -127,72 +124,37 @@ h4 {counter-reset: h5;}
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
 <td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
+<td align="left"><em>v</em> equals the <em>j_th value of the <em>i_th tuple in <em>s</em> Has | RECOMMENDED | set or list of <em>X</em> | <em>f</em>, an <em>X</em> predicate | <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em> SetHas | RECOMMENDED | set of <em>X</em> | <em>x</em>, a set of <em>X</em> predicates | for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> Cmp | OPTIONAL | either string or datum with a media type that has defined order | </em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
 </tr>
 <tr class="odd">
-<td align="left">Has</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set or list of <em>X</em></td>
-<td align="left"><em>f</em>, an <em>X</em> predicate</td>
-<td align="left"><em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
-</tr>
-<tr class="even">
-<td align="left">SetHas</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set of <em>X</em></td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code></td>
-</tr>
-<tr class="odd">
-<td align="left">Cmp</td>
-<td align="left">OPTIONAL</td>
-<td align="left">either string or datum with a media type that has defined order</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
-<td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
-</tr>
-<tr class="even">
 <td align="left">ICmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Regex</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left"><em>r</em>, a regex</td>
-<td align="left"><em>r</em> matches <em>v</em></td>
+<td align="left">as <code>Cmp</code>, but using the <em>j_th value of the <em>i_th tuple in <em>s</em> instead of <em>v</em> Regex | OPTIONAL | string | <em>r</em>, a regex | <em>r</em> matches <em>v</em> Len | OPTIONAL | set or list | </em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
 </tr>
 <tr class="even">
-<td align="left">Len</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set or list</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
-<td align="left">((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code></td>
-</tr>
-<tr class="odd">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any (call it <em>X</em>)</td>
 <td align="left"><em>f</em>, an <em>X</em> predicate</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
@@ -229,49 +191,7 @@ h4 {counter-reset: h5;}
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
 <td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Match</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left"><em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer</td>
-<td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
-</tr>
-<tr class="even">
-<td align="left">Slice</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence</td>
-</tr>
-<tr class="odd">
-<td align="left">Cat</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>x</em>, a list of string or list producers</td>
-<td align="left">the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order</td>
-</tr>
-<tr class="even">
-<td align="left">Union</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
-<td align="left">a set containing every value contained in any of the sets produced by each of the elements of <em>x</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Intersect</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
-<td align="left">a set containing those values that are in every set produced by each element of <em>x</em></td>
-</tr>
-<tr class="even">
-<td align="left">Script</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any</td>
-<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
-<td align="left">the value returned when evaluating the function in <em>x</em> with argument <em>s</em></td>
+<td align="left">the _j_th value of the _i_th tuple in <em>s</em> Match | OPTIONAL | string | <em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer | the contents of the _i_th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group Slice | OPTIONAL | string or list | <em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer | the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence Cat | OPTIONAL | string or list | <em>x</em>, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order Union | OPTIONAL | set | <em>x</em>, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of <em>x</em> Intersect | OPTIONAL | set | <em>x</em>, a set of set producers | a set containing those values that are in every set produced by each element of <em>x</em> Script | OPTIONAL | any | <em>x</em>, a datum defining a single function in some programming language | the value returned when evaluating the function in <em>x</em> with argument <em>s</em></td>
 </tr>
 </tbody>
 </table>
