@@ -449,6 +449,43 @@ prepend it with the URI or IRI of this specification concatenated with "/Tag/key
 | unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` does not justify this Inference or Derivation  | 
 | wrong | `of` cannot include both a "wrong" Tag and any element of that Tag's `of`<br/>`of` cannot include a Subject or Aggregated Subject | the indicated node asserts a falsehood | 
 
+Known Property `key`s
+---------------------
+
+To convert a known Property `key` in this section to a URI or IRI,
+prepend it with the URI or IRI of this specification concatenated with "/Property/key#"
+
+| `key` | constraints | meaning |
+|-------|-------------|---------|
+| type | value is an enumerated type value<br/>`of` is a Subject or Aggregated Subject | what type of entity this subject refers to |
+
+### Enumerated Type Values
+
+To convert a value in this section to a URI or IRI,
+prepend it with the URI or IRI of this specification concatenated with "/Subject/type/"
+
+| `IRI` | supertypes | meaning |
+|-------|------------|---------|
+| person | | a human or putative human |
+| event | | a distinct and recognisable (time period, location) pair or set thereof effecting or attempting to effect a common end |
+| birth | event | the coming forth of an infant from a womb, sometimes expanded to include related events such as conception, naming, legal registration, etc. |
+| death | event | the transition from "alive" to "dead" |
+| place | | a location or region defined politically, geographically, socially, etc. |
+
+The "supertype" column indicates an Expectation that derives supertype from subtype.
+
+Known Connection `key`s
+-----------------------
+
+To convert a known Tag `key` in this section to a URI or IRI,
+prepend it with the URI or IRI of this specification concatenated with "/Connection/key#"
+
+| `key` | constraints | meaning |
+|-------|-------------|---------|
+| update | `of` and `value` have same node type | an error or inaccuracy in `of` has been corrected in `value` |
+
+
+
 Partial Implementation and Extension
 ====================================
 

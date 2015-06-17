@@ -544,6 +544,81 @@ h4 {counter-reset: h5;}
 </tr>
 </tbody>
 </table>
+<h2 id="known-property-keys">Known Property <code>key</code>s</h2>
+<p>To convert a known Property <code>key</code> in this section to a URI or IRI, prepend it with the URI or IRI of this specification concatenated with &quot;/Property/key#&quot;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>key</code></th>
+<th align="left">constraints</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">type</td>
+<td align="left">value is an enumerated type value<br/><code>of</code> is a Subject or Aggregated Subject</td>
+<td align="left">what type of entity this subject refers to</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enumerated-type-values">Enumerated Type Values</h3>
+<p>To convert a value in this section to a URI or IRI, prepend it with the URI or IRI of this specification concatenated with &quot;/Subject/type/&quot;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>IRI</code></th>
+<th align="left">supertypes</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">person</td>
+<td align="left"></td>
+<td align="left">a human or putative human</td>
+</tr>
+<tr class="even">
+<td align="left">event</td>
+<td align="left"></td>
+<td align="left">a distinct and recognisable (time period, location) pair or set thereof effecting or attempting to effect a common end</td>
+</tr>
+<tr class="odd">
+<td align="left">birth</td>
+<td align="left">event</td>
+<td align="left">the coming forth of an infant from a womb, sometimes expanded to include related events such as conception, naming, legal registration, etc.</td>
+</tr>
+<tr class="even">
+<td align="left">death</td>
+<td align="left">event</td>
+<td align="left">the transition from &quot;alive&quot; to &quot;dead&quot;</td>
+</tr>
+<tr class="odd">
+<td align="left">place</td>
+<td align="left"></td>
+<td align="left">a location or region defined politically, geographically, socially, etc.</td>
+</tr>
+</tbody>
+</table>
+<p>The &quot;supertype&quot; column indicates an Expectation that derives supertype from subtype.</p>
+<h2 id="known-connection-keys">Known Connection <code>key</code>s</h2>
+<p>To convert a known Tag <code>key</code> in this section to a URI or IRI, prepend it with the URI or IRI of this specification concatenated with &quot;/Connection/key#&quot;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>key</code></th>
+<th align="left">constraints</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">update</td>
+<td align="left"><code>of</code> and <code>value</code> have same node type</td>
+<td align="left">an error or inaccuracy in <code>of</code> has been corrected in <code>value</code></td>
+</tr>
+</tbody>
+</table>
 <h1 id="partial-implementation-and-extension">Partial Implementation and Extension</h1>
 <p>For various reasons, implementers should expect to interact with other software that has adopted only portions of this specification and that have extended this specification in various ways. This section discusses appropriate ways to interact with partial implementations and extensions.</p>
 <h2 id="policies-and-suggestions">Policies and Suggestions</h2>
