@@ -9,18 +9,25 @@
 </head>
 <body>
 <style type="text/css">
-body{font-family:sans-serif;}
+body{font-family:sans-serif; counter-reset:h1;}
 code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
 table{border-collapse:collapse;}
 tr:nth-child(2n){background-color:#ddd;}
 td,th{padding:0.25ex 1ex;}
 th{border-bottom:1px solid black;}
+h1:before { content: counter(h1) ". "; counter-increment: h1; }
+h1 {counter-reset:h2;}
+h2:before { content: counter(h1) "." counter(h2) ". "; counter-increment: h2; }
+h2 {counter-reset: h3;}
+h3:before { content: counter(h1) "." counter(h2) "." counter(h3) ". "; counter-increment: h3; }
+h3 {counter-reset: h4;}
+h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
+h4 {counter-reset: h5;}
 </style>
 
 
 
-<p>This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.</p>
-<p>An important missing component of this specification is a discussion of standard values for the various string and datum fields. This draft does discuss &quot;same&quot;, &quot;wrong&quot;, &quot;distinct&quot;, and &quot;misinterpreted&quot; Tag <code>key</code>s but the discussion is incomplete and the names of those keys may change in future drafts.</p>
+<p>This is an alpha version of a specification of a model for representing family history and genealogical research.</p>
 <h1 id="specification-of-reasoning">Specification of Reasoning</h1>
 <h2 id="basic-datatypes">Basic Datatypes</h2>
 <dl>
@@ -137,7 +144,7 @@ th{border-bottom:1px solid black;}
 <tr class="odd">
 <td align="left">Cmp</td>
 <td align="left">OPTIONAL</td>
-<td align="left">either datum with a media type that has defined order<br/>or string</td>
+<td align="left">either string or datum with a media type that has defined order</td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
 <td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
@@ -212,7 +219,7 @@ th{border-bottom:1px solid black;}
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
 <td align="left">any</td>
-<td align="left"><em>x</em>, a value</td>
+<td align="left"><em>x</em>, a value of the same type as the producer</td>
 <td align="left"><em>x</em></td>
 </tr>
 <tr class="even">
@@ -268,118 +275,146 @@ th{border-bottom:1px solid black;}
 </table>
 <p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
 <h2 id="the-nine-node-types">The Nine Node Types</h2>
-<h3 id="tabular-summary">Tabular Summary</h3>
-<p>This specification defines the following concrete types:</p>
-<h4 id="nodes">Nodes</h4>
+<p>This specification defines several concrete types. These form a type hierarchy:</p>
+<ul>
+<li>Node
+<ul>
+<li>Claim
+<ul>
+<li>Subject: identifying a single (subject of discussion, source discussing it) pair</li>
+<li>Property: a single piece of information about a node</li>
+<li>Connection: a directed connection between two nodes</li>
+<li>Tag: metaknowledge about a set of nodes</li>
+</ul></li>
+<li>Source
+<ul>
+<li>OutRef: identifying some information source external to this specification</li>
+<li>Derivation: a free-text description of a step in the reasoning processes</li>
+<li>Inference: a structured description of a step in the reasoning processes</li>
+</ul></li>
+<li>Aggregated Subject: a single subject inferred to be discussed by many source</li>
+<li>Expectation: structured descriptions of trends, inference rules, and external knowledge</li>
+</ul></li>
+</ul>
+<p>For each Node type there is a Node Query type, with the exception that Subject and Aggregated Subject nodes share a single Node Query type. Node Queries are used to structure the preconditions or antecedents of an Expectation and contain <a href="#predicates">predicates</a>.</p>
+<p>For each Claim type there is a Node Template type. Node Templates are used to structure the postconditions or consequent of an Expectation and contain <a href="#producers">producers</a>.</p>
+<p>Each type is described in terms of its constituent fields; each field is given both an index and a name. Indices are used to create tuples from nodes and streamline the presentation of <a href="#predicate-and-producer-datatypes">Predicate and Producer Datatypes</a>. Names are used in most other places in this specification because they are more suggestive of the purpose of the various fields.</p>
+<p>By design, each field name corresponds to the same index everywhere it appears. To achieve that end, each Node Template has a dummy <code>source</code> field (index 0, always value <code>-1</code>).</p>
+<h3 id="nodes">Nodes</h3>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Node subtype</th>
 <th align="left">is a</th>
-<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Properties (index. name : type)</th>
+<th align="left">Constraints</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Subject</td>
-<td align="left">Claim</td>
-<td align="left">0. <code>slug</code> : string <br/>1. <code>source</code> : reference to a Source</td>
-</tr>
-<tr class="even">
-<td align="left">Property</td>
-<td align="left">Claim</td>
-<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : reference to a Node<br/>2. <code>value</code> : datum<br/>3. <code>source</code> : reference to a Source</td>
-</tr>
-<tr class="odd">
-<td align="left">Connection</td>
-<td align="left">Claim</td>
-<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : reference to a Node<br/>2. <code>value</code> : int<br/>3. <code>source</code> : reference to a Source</td>
-</tr>
-<tr class="even">
-<td align="left">Tag</td>
-<td align="left">Claim</td>
-<td align="left">0. <code>key</code> : string <br/>1. <code>of</code> : set of references to Nodes<br/>2. <code>source</code> : reference to a Source</td>
-</tr>
-<tr class="odd">
 <td align="left">Aggregated Subject</td>
 <td align="left"></td>
 <td align="left">0. <code>parts</code> : reference to a Tag</td>
+<td align="left"><code>parts</code>'s <code>key</code> MUST be &quot;same&quot; <br/> Each node referenced in <code>parts</code>'s <code>key</code>'s <code>of</code> MUST be either a Subject or and Aggregated Subject</td>
 </tr>
 <tr class="even">
-<td align="left">OutRef</td>
-<td align="left">Source</td>
-<td align="left">0. <code>parents</code> : set of (string ↦ reference to OutRef) pairs<br/>1. <code>details</code> : set of (string ↦ datum) pairs</td>
+<td align="left">Connection</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>source</code> : reference to a Source<br/>1. <code>key</code> : string <br/>2. <code>of</code> : reference to a Node<br/>3. <code>value</code> : int</td>
+<td align="left">some <code>key</code>s make constraints on <code>of</code> and/or <code>value</code></td>
 </tr>
 <tr class="odd">
 <td align="left">Derivation</td>
 <td align="left">Source</td>
 <td align="left">0. <code>support</code> : set of references to Nodes<br/>1. <code>reason</code> : string</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left">Inference</td>
-<td align="left">Source</td>
-<td align="left">0. <code>support</code> : list of references to Nodes<br/>1. <code>reason</code> : reference to Expectation</td>
-</tr>
-<tr class="odd">
 <td align="left">Expectation</td>
 <td align="left"></td>
 <td align="left">0. <code>antecedent</code> : list of Node Queries<br/>1. <code>consequent</code> : list of Node Templates</td>
+<td align="left"><em>See below</em></td>
+</tr>
+<tr class="odd">
+<td align="left">Inference</td>
+<td align="left">Source</td>
+<td align="left">0. <code>support</code> : list of references to Nodes<br/>1. <code>reason</code> : reference to an Expectation</td>
+<td align="left"><code>reason</code>'s <code>antecedent</code> SHOULD <a href="#matching">match</a> <code>support</code><br/><em>See below</em></td>
+</tr>
+<tr class="even">
+<td align="left">OutRef</td>
+<td align="left">Source</td>
+<td align="left">0. <code>parents</code> : set of (string ↦ reference to an OutRef) pairs<br/>1. <code>details</code> : set of (string ↦ datum) pairs</td>
+<td align="left">some string values make constraints on their corresponding reference or datum values</td>
+</tr>
+<tr class="odd">
+<td align="left">Property</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>source</code> : reference to a Source<br/>1. <code>key</code> : string <br/>2. <code>of</code> : reference to a Node<br/>3. <code>value</code> : datum</td>
+<td align="left">some <code>key</code>s make constraints on <code>of</code> and/or <code>value</code></td>
+</tr>
+<tr class="even">
+<td align="left">Subject</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>source</code> : reference to a Source<br/>1. <code>slug</code> : string</td>
+<td align="left"><code>slug</code> SHOULD identify a single subject within the source</td>
+</tr>
+<tr class="odd">
+<td align="left">Tag</td>
+<td align="left">Claim</td>
+<td align="left">0. <code>source</code> : reference to a Source<br/>1. <code>key</code> : string <br/>2. <code>of</code> : set of references to Nodes</td>
+<td align="left">some <code>key</code>s make constraints on <code>of</code></td>
 </tr>
 </tbody>
 </table>
-<h4 id="node-queries">Node Queries</h4>
+<p>All references MUST be acyclic and MUST refer to another node in the same dataset. If some user insists some Claim has no source, it is RECOMMENDED that the <code>source</code> reference an OutRef with <code>details</code> including (&quot;type&quot; ↦ &quot;user assertion&quot;) and (&quot;user&quot; ↦ however the user is identified).</p>
+<p>A Claim SHOULD NOT reference an Inference in its <code>source</code> field UNLESS it is an element of the <a href="#instantiating-nodes-from-inferences">instantiated node list</a> of that Inference.</p>
+<p>Some constraints on Node Queries and Node Templates involve their containing Expectation, and can be seen as constraints on Expectations.</p>
+<p>All nodes that could be <a href="#instantiating-nodes-from-inferences">instantiated from an Inference</a> MUST satisfy any constraints that apply to other nodes of that type. Implementations SHOULD enforce these constraints during Expectation and Node Template construction, but MAY delay enforcement until Inference construction instead.</p>
+<h3 id="node-queries">Node Queries</h3>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Node Query subtype</th>
-<th align="left">is a</th>
-<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Properties (index. name : type)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Subject Query</td>
-<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : integer</td>
-<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
-</tr>
-<tr class="even">
-<td align="left">Property Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : datum predicate<br/>3. <code>source</code> : integer</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
 <td align="left">Connection Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : integer</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tag Query</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : set of ints<br/>2. <code>source</code> : integer</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">OutRef Query</td>
-<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
-<td align="left"></td>
+<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : int<br/>3. <code>value</code> : int</td>
 </tr>
 <tr class="even">
 <td align="left">Derivation Query</td>
 <td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
-<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left">Inference Query</td>
-<td align="left">0. <code>support</code> : list of ints<br/>1. <code>reason</code> : integer</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
 <td align="left">Expectation Query</td>
 <td align="left"><em>exactly the same an Expectation</em></td>
-<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Inference Query</td>
+<td align="left">0. <code>support</code> : list of ints<br/>1. <code>reason</code> : integer</td>
+</tr>
+<tr class="odd">
+<td align="left">OutRef Query</td>
+<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
+</tr>
+<tr class="even">
+<td align="left">Property Query</td>
+<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : int<br/>3. <code>value</code> : datum predicate</td>
+</tr>
+<tr class="odd">
+<td align="left">Subject Query</td>
+<td align="left">0. <code>from</code> : integer</td>
+</tr>
+<tr class="even">
+<td align="left">Tag Query</td>
+<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : set of ints</td>
 </tr>
 </tbody>
 </table>
-<p><strong>FIXME</strong> decide if we need a separate Aggregated Subject Query and/or how Subject and Aggregated Subject queries should be merged</p>
+<p>The Subject Query matches both Subjects and Aggregated Subjects; there is not a separate Aggregated Subject Query.</p>
 <p>Each integer value in a Node Query MUST either be <code>-1</code> or satisfy all of the following constraints:</p>
 <ul>
 <li>be inside a Node Query that is inside a list of Node Queries</li>
@@ -387,35 +422,30 @@ th{border-bottom:1px solid black;}
 <li>be &lt; the index of the containing Node Query in its containing list</li>
 </ul>
 <p>If an int value treated as an index into the containing list does not index a node with a type that the same field in the corresponding Node could reference then the Node Query will never match any Node. Node Queries containing &quot;mistyped&quot; integers of like this probably indicate user error, but are not forbidden by this specification.</p>
-<h4 id="node-templates">Node Templates</h4>
+<h3 id="node-templates">Node Templates</h3>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Node Template subtype</th>
-<th align="left">Properties<br/>index. name : type</th>
-<th align="left">Constraints</th>
+<th align="left">Properties (index. name : type or value)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Subject Template</td>
-<td align="left">0. <code>slug</code> : string producer<br/>1. <code>source</code> : integer</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+<td align="left">Connection Template</td>
+<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : int<br/>3. <code>value</code> : int</td>
 </tr>
 <tr class="even">
 <td align="left">Property Template</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer<br/>3. <code>source</code> : integer</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : int<br/>3. <code>value</code> : string producer</td>
 </tr>
 <tr class="odd">
-<td align="left">Connection Template</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : integer</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+<td align="left">Subject Template</td>
+<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>slug</code> : string producer</td>
 </tr>
 <tr class="even">
 <td align="left">Tag Template</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : (set of ints) producer<br/>2. <code>source</code> : integer</td>
-<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : (set of ints) producer</td>
 </tr>
 </tbody>
 </table>
@@ -425,98 +455,6 @@ th{border-bottom:1px solid black;}
 <li>be ≥ 0</li>
 <li>be &lt; <em>n</em> + the the index of the containing Node Template the containing Expectation's <code>consequent</code></li>
 </ul>
-<p>All nodes that could be instantiated from a Node Template (see <a href="#instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</a>) MUST satisfy any constraints that apply to other nodes of that type. Implementations SHOULD enforce these constraints during Node Template construction but MAY delay enforcement until Inference construction instead.</p>
-<h3 id="outline-and-discussion">Outline and Discussion</h3>
-<p>Reasoning is a set of nodes. Node types are expressed in the following hierarchy:</p>
-<ul>
-<li><p>Node</p>
-<ul>
-<li><p>Claim</p>
-<ul>
-<li><p>Subject</p>
-<p>A tuple <code>(slug, source)</code>, where</p>
-<ul>
-<li><code>slug</code> is a datum used to uniquely identify a single subject discussed by a source.</li>
-<li><code>source</code> is a reference to a Source</li>
-</ul></li>
-<li><p>Property</p>
-<p>A tuple <code>(key, of, value, source)</code>, where</p>
-<ul>
-<li><code>key</code> is a string</li>
-<li><code>of</code> is a reference to a Node</li>
-<li><code>value</code> is a datum</li>
-<li><code>source</code> is a reference to a Source</li>
-</ul></li>
-<li><p>Connection</p>
-<p>A tuple <code>(key, of, value, source)</code>, where</p>
-<ul>
-<li><code>key</code> is a string</li>
-<li><code>of</code> is a reference to a Node</li>
-<li><code>value</code> is a reference to a Node</li>
-<li><code>source</code> is a reference to a Source</li>
-</ul></li>
-<li><p>Tag</p>
-<p>A tuple <code>(key, of, source)</code>, where</p>
-<ul>
-<li><code>key</code> is a string</li>
-<li><code>of</code> is a nonempty set of references to Nodes</li>
-<li><code>source</code> is a reference to a Source</li>
-</ul>
-<p>Some <code>key</code>s impose restrictions on the <code>of</code> set:</p>
-<ul>
-<li><code>key</code>s &quot;same&quot; and &quot;distinct&quot; require sets of cardinality ≥ 2.</li>
-<li><code>key</code> &quot;misinterpreted&quot; requires a set of cardinality = 1 and that the node referenced in the set be a Claim.</li>
-<li><code>key</code> &quot;wrong&quot; may neither reference a Subject nor another &quot;wrong&quot; Tag in the <code>of</code>, unless also including the <code>source</code> of that Claim.</li>
-<li>if <code>key</code> &quot;wrong&quot; references another &quot;wrong&quot; Tag, it may not also reference anything referenced by that referenced &quot;wrong&quot; Tag.</li>
-<li><code>key</code> &quot;wrong&quot; may not reference an Aggregated Subject or an OutRef.</li>
-</ul></li>
-</ul></li>
-<li><p>Aggregated Subject</p>
-<p>A singleton tuple <code>(parts)</code>, where</p>
-<ul>
-<li><code>parts</code> is a references to a Tag node with <code>key</code> &quot;same&quot; and only Subject and/or Aggregated Subject nodes referenced by its <code>of</code>.</li>
-</ul></li>
-<li><p>Source</p>
-<ul>
-<li><p>OutRef</p>
-<p>A tuple <code>(partOf, details)</code>, where</p>
-<ul>
-<li><code>parents</code> is a (possibly empty) set of string ↦ references to OutRef pairs</li>
-<li><code>details</code> is a set of string ↦ datum pairs</li>
-</ul></li>
-<li><p>Derivation</p>
-<p>A tuple <code>(support, reason)</code>, where</p>
-<ul>
-<li><code>support</code> is a non-empty set of references to Claims</li>
-<li><code>reason</code> is a string</li>
-</ul></li>
-<li><p>Inference</p>
-<p>A tuple <code>(support, reason)</code>, where</p>
-<ul>
-<li><code>support</code> is an list of references to nodes</li>
-<li><code>reason</code> is a reference to an Expectation</li>
-</ul>
-<p>It must be the case that the <code>support</code> matches the <code>antecedent</code> of the <code>reason</code>.</p></li>
-</ul></li>
-<li><p>Expectation</p>
-<p>A tuple <code>(antecedent, consequent)</code>, where</p>
-<ul>
-<li><code>antecedent</code> is an list of Node Queries</li>
-<li><code>consequent</code> is an list of Node Templates</li>
-</ul>
-<p>A Node Query may be any Node except that</p>
-<ul>
-<li><p>In place of any value of non-reference type <em>X</em>, the Node Query has an <em>X</em> predicate.</p></li>
-<li><p>In place of any value of reference type <em>X</em>, the Node Query must have either the special value <code>-1</code> or a non-negative integer <em>i</em> such that the <em>i</em>th node in the <code>antecedent</code> is of a type that may be referenced by <em>X</em> and <em>i</em> is strictly smaller than the index of the Node Query that contains it.</p></li>
-</ul>
-<p>A Node Template may be any Claim except that</p>
-<ul>
-<li><p>It has the special value <code>-1</code> as its <code>source</code></p></li>
-<li><p>In place of any value of non-reference type <em>X</em>, the Node Template has an <em>X</em> producer.</p></li>
-<li><p>In place of any value of reference type <em>X</em>, the Node Query must have a non-negative integer <em>i</em> such that both (1) the <em>i</em>th node in the list created by concatenating <code>antecedent</code> and <code>consequent</code> is of a type that may be referenced by <em>X</em> and (2) <em>i</em> is strictly smaller than the index of the Node Template that contains it in that concatenate list.</p></li>
-</ul></li>
-</ul></li>
-</ul>
 <h2 id="definitions-and-constraints">Definitions and Constraints</h2>
 <p>A set of nodes is called a <strong>dataset</strong>. This specification only discusses complete datasets, where all node references are to other nodes within the dataset. Communication protocols that communicate via partial datasets are neither forbidden by this specification nor discussed by it.</p>
 <h3 id="dependencies-and-cycles">Dependencies and Cycles</h3>
@@ -525,7 +463,7 @@ th{border-bottom:1px solid black;}
 <h3 id="equality">Equality</h3>
 <p>Node and value <strong>equality</strong> is defined as follows:</p>
 <ul>
-<li><p>Two nodes are equal if and only if both (1) they are the same type of node and (2) each field of one node is equal to the corresponding field of the other node.</p></li>
+<li><p>Two nodes are equal if and only if both (1) they are the same type of node (or one is an Expectation Query and the other an Expectation), and (2) each field of one node is equal to the corresponding field of the other node.</p></li>
 <li><p>Two references are equal if and only if they refer to nodes that are equal.</p></li>
 <li><p>Two sets are equal if and only if each element in each set has an equal element in the other set.</p></li>
 <li><p>Two lists are equal if and only if both (1) they have the same length and (2) for each valid index for the lists, the elements in both lists at that index are equal.</p></li>
@@ -543,13 +481,13 @@ th{border-bottom:1px solid black;}
 <li><p>A predicate and a value match if all of the following are true:</p>
 <ol>
 <li>the matching is occurring within the context of matching a list of Node Queries and a list of node references</li>
-<li>the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section <a href="#producers">Producers</a></li>
+<li>the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section <a href="#predicates">Predicates</a></li>
 <li>evaluating the predicate with the value and the list of tuples yields the value <code>true</code></li>
 </ol>
-<p>Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., <em>s</em> is not referenced in the table in section <a href="#producers">Producers</a>) then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.</p></li>
-<li><p>The integer value <code>-1</code> matches any node reference.</p></li>
+<p>Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., <em>s</em> is not referenced in the table in section <a href="#predicates">Predicates</a>) then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.</p></li>
+<li><p>The integer value <code>-1</code> matches every node reference.</p></li>
 <li><p>A set of integers matches a set of node references if each integer in the set of integers matches some node reference in the set of node references. Note that it is <em>not</em> necessary for every node reference to match some integer.</p></li>
-<li><p>A set of string ↦ integer pairs <em>q</em> matches a set of string ↦ node reference pairs <em>s</em> if for each (<em>k1</em> ↦ <em>i</em>) in <em>q</em>, there is a (<em>k2</em> ↦ <em>r</em>) pair in <em>s</em> such that <em>k1</em> equals <em>k2</em> and <em>i</em> matches <em>r</em></p></li>
+<li><p>A set of string ↦ integer pairs <em>q</em> matches a set of string ↦ node reference pairs <em>s</em> if for each (<em>k1</em> ↦ <em>i</em>) in <em>q</em>, there is a (<em>k2</em> ↦ <em>r</em>) pair in <em>s</em> such that <em>k1</em> equals <em>k2</em> and <em>i</em> matches <em>r</em>.</p></li>
 <li><p>A non-negative integer <em>i</em> matches a node reference <em>r</em> if and only if all of the following are true:</p>
 <ol>
 <li>there is a list of node references that was used to initiate the matching process</li>
@@ -557,17 +495,24 @@ th{border-bottom:1px solid black;}
 <li>the node referenced by the element at the index <em>i</em> is a constituent of <em>r</em>.</li>
 </ol></li>
 <li><p>A list of node references matches a list of Node Queries if and only if both (1) they have the same length and (2) for each valid list index for the lists, the elements in the list of node reference at that index matches the element in the list of Node Queries at that index.</p></li>
-<li><p>A Node Query matches a node reference if and only if both (1) the referenced node and the Node Query are of the same node type and (2) each field in the Node Query matches the corresponding field in the referenced node.</p></li>
-<li><p>A string matches a regex if and only if the algorithm outlined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10.6.3">ECMA 262 section 15.10.6.3</a> would return <code>true</code>.</p></li>
+<li><p>A Subject Query matches a reference to a Subject if the Subject Query's <code>from</code> matches the Subject's <code>source</code>.</p></li>
+<li><p>A Subject Query matches a reference to an Aggregated Subject if the Subject Query's <code>from</code> matches the <code>parts</code> or <code>source</code> of any element of the Aggregated Subject's constituents.</p></li>
+<li><p>An Expectation Query matches a reference to an Expectation if the two are equal.</p>
+<p>No predicates or additional flexibility with regard to Expectation Queries are included in this specification in part to keep the type hierarchy of bounded depth (i.e., to avoid <em>X</em> predicate predicate … predicate types).</p>
+<p>It is possible to define semantics-preserving reordering and re-indexing operations on Expectation's fields. This specification does not currently consider same-semantics different-order Expectations and Expecation Queries to match.</p></li>
+<li><p>A Node Query other than a Subject Query or Expectation Query matches a node reference if and only if both (1) the referenced node and the Node Query are of the same node type and (2) each field in the Node Query matches the corresponding field in the referenced node.</p></li>
 </ul>
 <h3 id="instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</h3>
 <p>The <strong>instantiated node list</strong> of an Inference is defined to be a list of Nodes having the same length as the <code>consequent</code> of the <code>reason</code> of the Inference such that the Node at index <em>i</em> of the instantiated node list is created from the Node Template at index <em>i</em> of the <code>consequent</code> by doing all of the following (in any order)</p>
 <ul>
 <li><p>replacing any producer values with the result of applying that function using a list of tuples created by dereferencing the elements of the <code>antecedent</code> of the Inference as the function's argument.</p></li>
 <li><p>replacing the <code>source</code> value (which is <code>-1</code> in Node Templates) with a reference to the Inference.</p></li>
-<li><p>replacing any non-negative integers with the node reference in the <code>support</code> list at the integer's index if the integer is smaller than the length of the <code>support</code> list; otherwise with a reference to the node at index <em>i</em>−<em>x</em> of the instantiated node list being constructed, where <em>x</em> is the length of the <code>support</code> list.</p></li>
+<li><p>replacing any non-negative integers with the node reference in the <code>support</code> list at the integer's index if the integer is smaller than the length of the <code>support</code> list; otherwise with a reference to the node at index <em>i</em> − <em>n</em> of the instantiated node list being constructed, where <em>n</em> is the length of the <code>support</code> list.</p></li>
 </ul>
 <p>A Claim SHOULD NOT reference an Inference in its <code>source</code> field UNLESS it is an element of the instantiated node list of that Inference.</p>
+<h1 id="known-string-and-datum-values">Known string and datum values</h1>
+<p>This section and its subsections will be added at a later time. It will include a set of Tag <code>key</code>s of known semantics as well as a suggested ontology for other node types to use.</p>
+<p>This section is included here in this draft in order to both (1) indicate that known values will be included eventually and (2) reserve a section number in the flow of the document.</p>
 <h1 id="partial-implementation-and-extension">Partial Implementation and Extension</h1>
 <p>For various reasons, implementers should expect to interact with other software that has adopted only portions of this specification and that have extended this specification in various ways. This section discusses appropriate ways to interact with partial implementations and extensions.</p>
 <h2 id="policies-and-suggestions">Policies and Suggestions</h2>
@@ -608,24 +553,27 @@ th{border-bottom:1px solid black;}
 <p>Node identity is determined only <a href="#equality">equality</a>. There is no notion of durable URI, UUID, GUID, DOI, PURL, ARK, or any other form of unique, durable identifier for a node in this specification, nor should one be introduced unless that identifier can be uniquely determined from the contents of the node alone, as for example a hash-based UUID. Equality does require access to the dependencies of a node, but because dependencies are acyclic that is always a finite set.</p>
 <p>Because node contents determine node identity, there is no intrinsic notion of versions of a node, nor of updating or editing a node's contents. The concept that one node is an update of another should be expressed using a Connection with <code>key</code> &quot;update&quot;.</p>
 <p>Because node identity is determined only by content, omitting nodes does not impede collaboration; the non-omitted nodes can still be linked to new research and shared between clients.</p>
-<p>The some of the practices for removing information outlined in <a href="#partial-implementations-and-data-reductions">Partial implementations and data reductions</a> can &quot;replace&quot; nodes or introduce new nodes containing information that is redundant with previous data. Replacement doesn't actually modify or destroy any existing nodes, instead creating new, similar nodes. When the recipient sends these new nodes back to the sender the sender will now have nodes expressing redundant information. Keeping these redundant nodes around does not impede research provided that the user interface prevents redundant information from distracting the user, as (for example) displaying only one copy of a set of Properties that differ only in <code>source</code>. New nodes containing no new information could also be omitted upon receipt, assuming that the recipient can identify those nodes as redundant.</p>
+<p>Some of the practices for removing information outlined in <a href="#partial-implementations-and-data-reductions">Partial implementations and data reductions</a> can &quot;replace&quot; nodes or introduce new nodes containing information that is redundant with previous data. Replacement doesn't actually modify or destroy any existing nodes, instead creating new, similar nodes. When the recipient sends these new nodes back to the sender the sender will now have nodes expressing redundant information. Retaining these redundant nodes in the dataset does not impede research provided that the user interface prevents redundant information from distracting the user, as (for example) displaying only one copy of a set of Properties that differ only in <code>source</code>. New nodes containing no new information could also be omitted upon receipt, assuming that the recipient can identify those nodes as redundant.</p>
 <h2 id="term-normalisation">Term Normalisation</h2>
 <p>When extracting the contents of an external source as a set of Claim nodes citing the OutRef of the external source, there is a quality-of-use expectation that the <code>slug</code> of each Subject be a description (in any language) of some specific part of the source that references the Subject in question; and that the various Properties and Connections reflect, as closely as possible, the language of the source (e.g., using a Connection with key <code>Papa</code> if that is the wording used to describe the relationship in the source).</p>
 <p>Term normalisation should then happen by introducing new, normalised-term properties and connections <code>source</code>d to Inference or Derivation nodes that use the non-normalised terms as (part of) their <code>support</code>. In many cases, the <code>support</code> should also include the contextual information used in normalisation such as the date, location, and/or language of the underlying document.</p>
 <h2 id="inferences-vs.-derivations-and-the-creation-of-expectations">Inferences vs. Derivations, and the creation of Expectations</h2>
-<p>Inferences and Derivations are both intended to fulfil the same objective: to represent the fact that some claims were constructed using other pieces of information. Either can be used to model any reasoning that is based on a finite set of other nodes. They differ primarily in that Inferences are more complicated to implement but are more language-independent and machine-understandable than Derivations.</p>
+<p>Inferences and Derivations are both intended to fulfil the same objective: to represent the fact that some claims were constructed using reasoning supported by other pieces of information within the dataset. Either Source type can be used to model any reasoning that is based on a finite set of other nodes. They differ primarily in that Inferences are more complicated to implement but are more language-independent and machine-understandable than Derivations.</p>
 <p>The Derivation node does not require the use of Expectations and their associated Node Queries, Node Templates, matches, predicates, and producers. However, they leave the <code>reason</code> in machine-opaque human-language text, meaning that they are not readily analysed by the computer, are language-dependent, may lack necessary detail to communicate the reasoning process, may contain text not in keeping with their support, etc.</p>
-<p>The Inference node is a purely machine-understandable representation of reasoning. However, Inferences require the creation of Expectation nodes, with the corresponding complexities of Node Queries, Node Templates, matches, predicates, and producers.</p>
+<p>The Inference node is a machine-understandable representation of reasoning. However, Inferences require the creation of Expectation nodes, with the corresponding complexities of Node Queries, Node Templates, matches, predicates, and producers.</p>
 <p>It is anticipated that some users of tools supporting Inference nodes will not be comfortable creating their own Expectations manually and will not be willing to limit themselves to a set of pre-built Expectations. The following set of steps is provided as a suggested way of assisting users in creating nontrivial Expectation nodes without needing to understand their underlying structure.</p>
 <ol>
 <li><p>Have the user specify the nodes they intend to infer and select the nodes they recognise as the support for their inference.</p>
-<p>If creating Derivations, ask the user to type up their <code>reason</code> and stop. The remaining steps are for constructing an Expectation and Inference.</p></li>
-<li><p>Build a set of candidate antecedents from the nodes they identified as support augmented with any nodes referenced by the nodes the user identified as being inferred that are not already in the <code>antecedent</code> or inferred collections.</p></li>
-<li><p>For each field of each candidate antecedent (except <code>details</code> in an OutRef; see below), ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or predicate <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a predicate <em>Lit</em> (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
+<p>(This step would also be present in creating Derivations, and would be followed by asking the user to type a free-text explanation.)</p></li>
+<li><p>Build a set of candidate antecedents from the nodes identified as support, augmented with any nodes referenced by the nodes identified as being inferred that are not already in the antecedent or inferred collections.</p></li>
+<li><p>For each field of each candidate antecedent (except the fields of an OutRef; see below), ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or predicate <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a predicate <em>Lit</em> (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
 <p>For the <code>details</code> field of an OutRef, instead ask this question of each pair in the set and, if the answer is &quot;no&quot;, remove the pair completely to create a predicate <em>MapHas</em>.</p>
+<p>For the <code>parents</code> field of an OutRef, instead ask this question of each pair in the set and, if the answer is &quot;no&quot;, remove the pair completely; if it the answer is &quot;yes&quot;, add the referenced OutRef to the candidate antecedent set.</p>
 <p>You could optionally ask additional questions to build more advanced predicates; for example, to create a <em>Same</em> predicate you could ask something like &quot;we notice that these two nodes both have the same <code>value</code>; is that same-value characteristic important?&quot;</p></li>
-<li><p>Order the candidate antecedents such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are antecedents then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>antecedent</code> list and to replace node references with integers.</p></li>
-<li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p></li>
+<li><p>Order the candidate antecedents such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are antecedents then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>antecedent</code> list and to replace node references with integers.</p>
+<p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
+<li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p>
+<p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
 </ol>
 </body>
 </html>

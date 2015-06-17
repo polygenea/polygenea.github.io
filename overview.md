@@ -1,19 +1,23 @@
 <style type="text/css">
-body{font-family:sans-serif;}
+body{font-family:sans-serif; counter-reset:h1;}
 code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
 table{border-collapse:collapse;}
 tr:nth-child(2n){background-color:#ddd;}
 td,th{padding:0.25ex 1ex;}
 th{border-bottom:1px solid black;}
+h1:before { content: counter(h1) ". "; counter-increment: h1; }
+h1 {counter-reset:h2;}
+h2:before { content: counter(h1) "." counter(h2) ". "; counter-increment: h2; }
+h2 {counter-reset: h3;}
+h3:before { content: counter(h1) "." counter(h2) "." counter(h3) ". "; counter-increment: h3; }
+h3 {counter-reset: h4;}
+h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
+h4 {counter-reset: h5;}
 </style>
 
 
-This is a work-in-progress overview of polygenea, a model for representing family history and genealogical research.
+This is an alpha version of a specification of a model for representing family history and genealogical research.
 
-An important missing component of this specification is a discussion of standard values
-for the various string and datum fields.
-This draft does discuss "same", "wrong", "distinct", and "misinterpreted" Tag `key`s
-but the discussion is incomplete and the names of those keys may change in future drafts.
 
 
 Specification of Reasoning
@@ -140,7 +144,7 @@ MapHas | REQUIRED | set of string ↦ datum pairs | _x_, a set of string ↦ (da
 Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
 Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_, _s_) is `true` for any _e_ in _v_
 SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_, _s_) is `true`
-Cmp | OPTIONAL | either datum with a media type that has defined order<br/>or string | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
+Cmp | OPTIONAL | either string or datum with a media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
 ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
 Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
 Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
@@ -168,7 +172,7 @@ and any node references inside tuples inside _s_ are treated as opaque types
 
 name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
-Lit | REQUIRED | any | _x_, a value | _x_
+Lit | REQUIRED | any | _x_, a value of the same type as the producer | _x_
 Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_
 Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
 Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence
@@ -183,38 +187,81 @@ Implementations supporting the `Script` predicate type SHOULD ensure that all sc
 The Nine Node Types
 -------------------
 
-### Tabular Summary
+This specification defines several concrete types.
+These form a type hierarchy:
 
-This specification defines the following concrete types:
+-   Node
+    -   Claim
+        -   Subject: identifying a single (subject of discussion, source discussing it) pair
+        -   Property: a single piece of information about a node
+        -   Connection: a directed connection between two nodes
+        -   Tag: metaknowledge about a set of nodes
+    -   Source
+        -   OutRef: identifying some information source external to this specification
+        -   Derivation: a free-text description of a step in the reasoning processes 
+        -   Inference: a structured description of a step in the reasoning processes 
+    -   Aggregated Subject: a single subject inferred to be discussed by many source
+    -   Expectation: structured descriptions of trends, inference rules, and external knowledge
 
-#### Nodes
+For each Node type there is a Node Query type, with the exception that Subject and Aggregated Subject nodes share a single Node Query type.
+Node Queries are used to structure the preconditions or antecedents of an Expectation and contain [predicates](#predicates).
 
-| Node subtype | is a | Properties<br/>index. name : type | Constraints |
-|--------------------|-----------------------------------|-------------|
-| Subject | Claim | 0. `slug` : string <br/>1. `source` : reference to a Source | |
-| Property | Claim | 0. `key` : string <br/>1. `of` : reference to a Node<br/>2. `value` : datum<br/>3. `source` : reference to a Source | |
-| Connection | Claim | 0. `key` : string <br/>1. `of` : reference to a Node<br/>2. `value` : int<br/>3. `source` : reference to a Source | |
-| Tag | Claim | 0. `key` : string <br/>1. `of` : set of references to Nodes<br/>2. `source` : reference to a Source | some `key`s make constraints on `of` |
+For each Claim type there is a Node Template type.
+Node Templates are used to structure the postconditions or consequent of an Expectation and contain [producers](#producers).
+
+Each type is described in terms of its constituent fields;
+each field is given both an index and a name.
+Indices are used to create tuples from nodes and streamline the presentation of [Predicate and Producer Datatypes](#predicate-and-producer-datatypes).
+Names are used in most other places in this specification because they are more suggestive of the purpose of the various fields.
+
+By design, each field name corresponds to the same index everywhere it appears.
+To achieve that end, each Node Template has a dummy `source` field (index 0, always value `-1`).
+
+
+### Nodes
+
+| Node subtype | is a | Properties (index. name : type) | Constraints |
+|--------------|------|-----------------------------------|-------------|
 | Aggregated Subject | | 0. `parts` : reference to a Tag | `parts`'s `key` MUST be "same" <br/> Each node referenced in `parts`'s `key`'s `of` MUST be either a Subject or and Aggregated Subject |
-| OutRef | Source | 0. `parents` : set of (string ↦ reference to OutRef) pairs<br/>1. `details` : set of (string ↦ datum) pairs | |
+| Connection | Claim | 0. `source` : reference to a Source<br/>1. `key` : string <br/>2. `of` : reference to a Node<br/>3. `value` : int | some `key`s make constraints on `of` and/or `value` |
 | Derivation | Source | 0. `support` : set of references to Nodes<br/>1. `reason` : string | |
-| Inference | Source | 0. `support` : list of references to Nodes<br/>1. `reason` : reference to Expectation | `reason`'s `antecedent` SHOULD match `support` |
 | Expectation | | 0. `antecedent` : list of Node Queries<br/>1. `consequent` : list of Node Templates | _See below_ |
+| Inference | Source | 0. `support` : list of references to Nodes<br/>1. `reason` : reference to an Expectation | `reason`'s `antecedent` SHOULD [match](#matching) `support`<br/>_See below_ |
+| OutRef | Source | 0. `parents` : set of (string ↦ reference to an OutRef) pairs<br/>1. `details` : set of (string ↦ datum) pairs | some string values make constraints on their corresponding reference or datum values |
+| Property | Claim | 0. `source` : reference to a Source<br/>1. `key` : string <br/>2. `of` : reference to a Node<br/>3. `value` : datum | some `key`s make constraints on `of` and/or `value` |
+| Subject | Claim | 0. `source` : reference to a Source<br/>1. `slug` : string | `slug` SHOULD identify a single subject within the source |
+| Tag | Claim | 0. `source` : reference to a Source<br/>1. `key` : string <br/>2. `of` : set of references to Nodes | some `key`s make constraints on `of` |
 
-#### Node Queries
+All references MUST be acyclic and MUST refer to another node in the same dataset.
+If some user insists some Claim has no source, it is RECOMMENDED that the `source` reference an OutRef
+with `details` including ("type" ↦ "user assertion") and ("user" ↦ however the user is identified).
 
-| Node Query subtype | is a | Properties<br/>index. name : type | Constraints |
-|--------------------|-----------------------------------|-------------|
-| Subject Query | 0. `slug` : string predicate <br/>1. `source` : integer | `slug`'s value MUST be _Top_ |
-| Property Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : datum predicate<br/>3. `source` : integer | |
-| Connection Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : integer | |
-| Tag Query | 0. `key` : string predicate <br/>1. `of` : set of ints<br/>2. `source` : integer | |
-| OutRef Query | 0. `parents` : set of (string ↦ int) pairs<br/>1. `details` : set of (string ↦ datum predicate) pairs | |
-| Derivation Query | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
-| Inference Query | 0. `support` : list of ints<br/>1. `reason` : integer | |
-| Expectation Query | _exactly the same an Expectation_ | |
+A Claim SHOULD NOT reference an Inference in its `source` field 
+UNLESS it is an element of the [instantiated node list](#instantiating-nodes-from-inferences) of that Inference.
 
-__FIXME__ decide if we need a separate Aggregated Subject Query and/or how Subject and Aggregated Subject queries should be merged
+Some constraints on Node Queries and Node Templates involve their containing Expectation,
+and can be seen as constraints on Expectations.
+
+All nodes that could be [instantiated from an Inference](#instantiating-nodes-from-inferences)
+MUST satisfy any constraints that apply to other nodes of that type.
+Implementations SHOULD enforce these constraints during Expectation and Node Template construction,
+but MAY delay enforcement until Inference construction instead.
+
+
+### Node Queries
+
+| Node Query subtype | Properties (index. name : type) |
+|--------------------|-----------------------------------|
+| Connection Query | 0. `source` : integer<br/>1. `key` : string predicate <br/>2. `of` : int<br/>3. `value` : int |
+| Derivation Query | 0. `support` : set of ints<br/>1. `reason` : string predicate |
+| Expectation Query | _exactly the same an Expectation_ |
+| Inference Query | 0. `support` : list of ints<br/>1. `reason` : integer |
+| OutRef Query | 0. `parents` : set of (string ↦ int) pairs<br/>1. `details` : set of (string ↦ datum predicate) pairs |
+| Property Query | 0. `source` : integer<br/>1. `key` : string predicate <br/>2. `of` : int<br/>3. `value` : datum predicate |
+| Subject Query | 0. `from` : integer |
+| Tag Query | 0. `source` : integer<br/>1. `key` : string predicate <br/>2. `of` : set of ints |
+
+The Subject Query matches both Subjects and Aggregated Subjects; there is not a separate Aggregated Subject Query.
 
 Each integer value in a Node Query MUST either be `-1` or satisfy all of the following constraints:
 
@@ -226,14 +273,14 @@ If an int value treated as an index into the containing list does not index a no
 that the same field in the corresponding Node could reference then the Node Query will never match any Node.
 Node Queries containing "mistyped" integers of like this probably indicate user error, but are not forbidden by this specification.
 
-#### Node Templates
+### Node Templates
 
-| Node Template subtype | Properties<br/>index. name : type | Constraints |
-|-----------------------|-----------------------------------|--------------|
-| Subject Template | 0. `slug` : string producer<br/>1. `source` : integer | `source`'s value MUST be `-1` |
-| Property Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer<br/>3. `source` : integer | `source`'s value MUST be `-1` |
-| Connection Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : integer | `source`'s value MUST be `-1` |
-| Tag Template | 0. `key` : string producer <br/>1. `of` : (set of ints) producer<br/>2. `source` : integer | `source`'s value MUST be `-1` |
+| Node Template subtype | Properties (index. name : type or value) |
+|-----------------------|-----------------------------------|
+| Connection Template | 0. `source` : the integer value `-1`<br/>1. `key` : string producer <br/>2. `of` : int<br/>3. `value` : int |
+| Property Template | 0. `source` : the integer value `-1`<br/>1. `key` : string producer <br/>2. `of` : int<br/>3. `value` : string producer |
+| Subject Template | 0. `source` : the integer value `-1`<br/>1. `slug` : string producer |
+| Tag Template | 0. `source` : the integer value `-1`<br/>1. `key` : string producer <br/>2. `of` : (set of ints) producer |
 
 Each integer value in a Node Template MUST either be `-1` or satisfy all of the following constraints:
 
@@ -241,131 +288,6 @@ Each integer value in a Node Template MUST either be `-1` or satisfy all of the 
 -   be ≥ 0
 -   be < _n_ + the the index of the containing Node Template the containing Expectation's `consequent`
 
-All nodes that could be instantiated from a Node Template (see [Instantiating Nodes from Inferences](#instantiating-nodes-from-inferences))
-MUST satisfy any constraints that apply to other nodes of that type.
-Implementations SHOULD enforce these constraints during Node Template construction
-but MAY delay enforcement until Inference construction instead.
-
-
-### Outline and Discussion
-
-Reasoning is a set of nodes.  Node types are expressed in the following hierarchy:
-
--   Node
-    
-    -   Claim
-        
-        -   Subject
-            
-            A tuple `(slug, source)`, where
-            
-            -   `slug` is a datum used to uniquely identify a single subject discussed by a source.
-            -   `source` is a reference to a Source
-        
-        -   Property
-        
-            A tuple `(key, of, value, source)`, where
-            
-            -   `key` is a string
-            -   `of` is a reference to a Node
-            -   `value` is a datum
-            -   `source` is a reference to a Source
-        
-        -   Connection
-
-            A tuple `(key, of, value, source)`, where
-            
-            -   `key` is a string
-            -   `of` is a reference to a Node
-            -   `value` is a reference to a Node
-            -   `source` is a reference to a Source
-        
-        -   Tag
-        
-            A tuple `(key, of, source)`, where
-            
-            -   `key` is a string
-            -   `of` is a nonempty set of references to Nodes
-            -   `source` is a reference to a Source
-            
-            Some `key`s impose restrictions on the `of` set:
-            
-            -   `key`s "same" and "distinct" require sets of cardinality ≥ 2.
-            -   `key` "misinterpreted" requires a set of cardinality = 1 
-                and that the node referenced in the set be a Claim.
-            -   `key` "wrong" may neither reference a Subject nor another "wrong" Tag
-                in the `of`,
-                unless also including the `source` of that Claim.
-            -   if `key` "wrong" references another "wrong" Tag,
-                it may not also reference anything referenced by that referenced "wrong" 
-                Tag.
-            -   `key` "wrong" may not reference an Aggregated Subject or an OutRef.
-    
-    -   Aggregated Subject
-        
-        A singleton tuple `(parts)`, where
-        
-        -   `parts` is a references to a Tag node with `key` "same" 
-            and only Subject and/or Aggregated Subject nodes referenced by its `of`.
-    
-    -   Source
-        
-        -   OutRef
-            
-            A tuple `(partOf, details)`, where
-            
-            -   `parents` is a (possibly empty) set of string ↦ references to OutRef pairs
-            -   `details` is a set of string ↦ datum pairs
-        
-        -   Derivation
-            
-            A tuple `(support, reason)`, where
-            
-            -   `support` is a non-empty set of references to Claims
-            -   `reason` is a string
-        
-        -   Inference
-            
-            A tuple `(support, reason)`, where
-            
-            -   `support` is an list of references to nodes
-            -   `reason` is a reference to an Expectation
-            
-            It must be the case that the `support` matches the `antecedent` of 
-            the `reason`.
-    
-    -   Expectation
-        
-        A tuple `(antecedent, consequent)`, where
-        
-        -   `antecedent` is an list of Node Queries
-        -   `consequent` is an list of Node Templates
-        
-        A Node Query may be any Node except that
-        
-        -   In place of any value of non-reference type _X_,
-            the Node Query has an _X_ predicate.
-        
-        -   In place of any value of reference type _X_, the Node Query must 
-            have either the special value `-1` or a non-negative integer _i_ 
-            such that the _i_th node in the `antecedent` is of a type that may 
-            be referenced by _X_ and _i_ is strictly smaller than the index of 
-            the Node Query that contains it.
-
-
-        
-        A Node Template may be any Claim except that
-        
-        -   It has the special value `-1` as its `source`
-        
-        -   In place of any value of non-reference type _X_, 
-            the Node Template has an _X_ producer.
-
-        -   In place of any value of reference type _X_,
-            the Node Query must have a non-negative integer _i_ 
-            such that both (1) the _i_th node in the list created by concatenating `antecedent` and `consequent` 
-            is of a type that may be referenced by _X_
-            and (2) _i_ is strictly smaller than the index of the Node Template that contains it in that concatenate list.
 
 
 Definitions and Constraints
@@ -391,7 +313,7 @@ included in its own dependencies.
 Node and value __equality__ is defined as follows:
 
 -   Two nodes are equal if and only if
-    both (1) they are the same type of node 
+    both (1) they are the same type of node (or one is an Expectation Query and the other an Expectation),
     and (2) each field of one node is equal to the corresponding field of the other node.
 
 -   Two references are equal if and only if they refer to nodes that are equal.
@@ -435,13 +357,13 @@ Node and value __matching__ is defined as follows:
 -   A predicate and a value match if all of the following are true:
     
     1.  the matching is occurring within the context of matching a list of Node Queries and a list of node references
-    2.  the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section [Producers](#producers)
+    2.  the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section [Predicates](#predicates)
     3.  evaluating the predicate with the value and the list of tuples yields the value `true`
     
-    Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., _s_ is not referenced in the table in section [Producers](#producers))
+    Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., _s_ is not referenced in the table in section [Predicates](#predicates))
     then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.
     
--   The integer value `-1` matches any node reference.
+-   The integer value `-1` matches every node reference.
 
 -   A set of integers matches a set of node references if
     each integer in the set of integers
@@ -449,7 +371,7 @@ Node and value __matching__ is defined as follows:
     Note that it is *not* necessary for every node reference to match some integer.
 
 -   A set of  string ↦ integer pairs _q_ matches a set of string ↦ node reference pairs _s_
-    if for each (_k1_ ↦ _i_) in _q_, there is a (_k2_ ↦ _r_) pair in _s_ such that _k1_ equals _k2_ and _i_ matches _r_
+    if for each (_k1_ ↦ _i_) in _q_, there is a (_k2_ ↦ _r_) pair in _s_ such that _k1_ equals _k2_ and _i_ matches _r_.
 
 -   A non-negative integer _i_ matches a node reference _r_ if and only if all of the following are true:
     
@@ -463,13 +385,24 @@ Node and value __matching__ is defined as follows:
     the elements in the list of node reference at that index
     matches the element in the list of Node Queries at that index.
 
--   A Node Query matches a node reference if and only if
+-   A Subject Query matches a reference to a Subject
+    if the Subject Query's `from` matches the Subject's `source`.
+
+-   A Subject Query matches a reference to an Aggregated Subject
+    if the Subject Query's `from` matches the `parts` or `source` of any element of the Aggregated Subject's constituents.
+
+-   An Expectation Query matches a reference to an Expectation
+    if the two are equal.
+    
+    No predicates or additional flexibility with regard to Expectation Queries are included in this specification
+    in part to keep the type hierarchy of bounded depth (i.e., to avoid _X_ predicate predicate … predicate types).
+    
+    It is possible to define semantics-preserving reordering and re-indexing operations on Expectation's fields.
+    This specification does not currently consider same-semantics different-order Expectations and Expecation Queries to match.
+
+-   A Node Query other than a Subject Query or Expectation Query matches a node reference if and only if
 	both (1) the referenced node and the Node Query are of the same node type
 	and (2) each field in the Node Query matches the corresponding field in the referenced node.
-
--   A string matches a regex if and only if the algorithm outlined
-    in [ECMA 262 section 15.10.6.3](http://www.ecma-international.org/ecma-262/5.1/#sec-15.10.6.3)
-    would return `true`.
 
 
 ### Instantiating Nodes from Inferences
@@ -491,12 +424,23 @@ by doing all of the following (in any order)
 -   replacing any non-negative integers
     with the node reference in the `support` list at the integer's index 
     if the integer is smaller than the length of the `support` list;
-    otherwise with a reference to the node at index _i_−_x_ 
+    otherwise with a reference to the node at index _i_ − _n_ 
     of the instantiated node list being constructed,
-    where _x_ is the length of the `support` list.
+    where _n_ is the length of the `support` list.
 
 A Claim SHOULD NOT reference an Inference in its `source` field 
 UNLESS it is an element of the instantiated node list of that Inference.
+
+Known string and datum values
+=============================
+
+This section and its subsections will be added at a later time.
+It will include a set of Tag `key`s of known semantics
+as well as a suggested ontology for other node types to use.
+
+This section is included here in this draft in order to 
+both (1) indicate that known values will be included eventually
+and (2) reserve a section number in the flow of the document.
 
 
 Partial Implementation and Extension
@@ -624,7 +568,7 @@ Because node identity is determined only by content,
 omitting nodes does not impede collaboration;
 the non-omitted nodes can still be linked to new research and shared between clients.
 
-The some of the practices for removing information
+Some of the practices for removing information
 outlined in [Partial implementations and data reductions](#partial-implementations-and-data-reductions)
 can "replace" nodes
 or introduce new nodes containing information that is redundant with previous data.
@@ -632,7 +576,7 @@ Replacement doesn't actually modify or destroy any existing nodes,
 instead creating new, similar nodes.
 When the recipient sends these new nodes back to the sender
 the sender will now have nodes expressing redundant information.
-Keeping these redundant nodes around does not impede research
+Retaining these redundant nodes in the dataset does not impede research
 provided that the user interface prevents redundant information from distracting the user,
 as (for example) displaying only one copy of a set of Properties that differ only in `source`.
 New nodes containing no new information could also be omitted upon receipt, assuming that the recipient can identify those nodes as redundant.
@@ -659,8 +603,8 @@ Inferences vs. Derivations, and the creation of Expectations
 ------------------------------------------------------------
 
 Inferences and Derivations are both intended to fulfil the same objective:
-to represent the fact that some claims were constructed using other pieces of information.
-Either can be used to model any reasoning that is based on a finite set of other nodes.
+to represent the fact that some claims were constructed using reasoning supported by other pieces of information within the dataset.
+Either Source type can be used to model any reasoning that is based on a finite set of other nodes.
 They differ primarily in that Inferences are more complicated to implement
 but are more language-independent and machine-understandable than Derivations.
 
@@ -673,7 +617,7 @@ may lack necessary detail to communicate the reasoning process,
 may contain text not in keeping with their support,
 etc.
 
-The Inference node is a purely machine-understandable representation of reasoning.
+The Inference node is a machine-understandable representation of reasoning.
 However, Inferences require the creation of Expectation nodes,
 with the corresponding complexities of Node Queries, Node Templates, matches, predicates, and producers.
 
@@ -686,14 +630,13 @@ in creating nontrivial Expectation nodes without needing to understand their und
 1.  Have the user specify the nodes they intend to infer
     and select the nodes they recognise as the support for their inference.
     
-    If creating Derivations, ask the user to type up their `reason` and stop.
-    The remaining steps are for constructing an Expectation and Inference.
+    (This step would also be present in creating Derivations, and would be followed by asking the user to type a free-text explanation.)
 
 2.  Build a set of candidate antecedents
-    from the nodes they identified as support 
-    augmented with any nodes referenced by the nodes the user identified as being inferred that are not already in the `antecedent` or inferred collections.
+    from the nodes identified as support, 
+    augmented with any nodes referenced by the nodes identified as being inferred that are not already in the antecedent or inferred collections.
 
-3.  For each field of each candidate antecedent (except `details` in an OutRef; see below),
+3.  For each field of each candidate antecedent (except the fields of an OutRef; see below),
     ask the user "is this field important to your reasoning?"
     If the answer is "no", replace the field with `-1` (if a node reference) or predicate _Top_ (otherwise).
     If the answer is "yes", add the referenced node to the candidate antecedent set (if a node reference) or replace it with a predicate _Lit_ (otherwise).
@@ -703,6 +646,11 @@ in creating nontrivial Expectation nodes without needing to understand their und
     instead ask this question of each pair in the set
     and, if the answer is "no", remove the pair completely
     to create a predicate _MapHas_.
+
+    For the `parents` field of an OutRef,
+    instead ask this question of each pair in the set
+    and, if the answer is "no", remove the pair completely;
+    if it the answer is "yes", add the referenced OutRef to the candidate antecedent set.
     
     You could optionally ask additional questions to build more advanced predicates;
     for example, to create a _Same_ predicate you could ask something like 
@@ -713,6 +661,9 @@ in creating nontrivial Expectation nodes without needing to understand their und
     such that, if node _A_ is in node _B_'s dependencies and both are antecedents
     then _A_ appears before _B_.
     Use this ordering to populate the `antecedent` list and to replace node references with integers.
+    
+    There may be many orderings that satisfy this requirement.
+    Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.
 
 5.  Organise the inferred nodes
     such that, if node _A_ is in node _B_'s dependencies and both are being inferred
@@ -720,4 +671,6 @@ in creating nontrivial Expectation nodes without needing to understand their und
     Use this ordering to populate the `consequent` list and to replace node references with integers.
     Additionally, replace all inferred node `source` values with `-1`, as required by the definition of Node Template.
 
+    There may be many orderings that satisfy this requirement.
+    Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.
 
