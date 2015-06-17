@@ -452,7 +452,7 @@ prepend it with the URI or IRI of this specification concatenated with "/Tag/key
 | distinct | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | no two elements of `of` refers to the same real-world subject or contain equivalent information |
 | same | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | the elements of `of` are fully equivalent: the same real-world subject, alternative presentations of the same information, etc. |
 | unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` and `reason` do not justify this Inference or Derivation  | 
-| wrong | `of` cannot include<ul><li>both a "wrong" Tag and any element of that Tag's `of`</li><li>A Subject or Aggregated Subject</li></ul> | the indicated node asserts a falsehood | 
+| wrong | `of` cannot include both a "wrong" Tag and any element of that Tag's `of`<br/>`of` cannot include a Subject or Aggregated Subject | the indicated node asserts a falsehood | 
 
 Partial Implementation and Extension
 ====================================
