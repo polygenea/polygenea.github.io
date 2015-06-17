@@ -457,9 +457,9 @@ prepend it with the URI or IRI of this specification concatenated with "/Propert
 
 | `key` | constraints | meaning |
 |-------|-------------|---------|
-| type | value is an enumerated type value<br/>`of` is a Subject or Aggregated Subject | what type of entity this subject refers to |
+| type | `value` is an enumerated type value<br/>`of` is a Subject or Aggregated Subject | what type of entity this subject refers to |
 
-### Enumerated Type Values
+### Known Enumerated Type Values
 
 To convert a value in this section to a URI or IRI,
 prepend it with the URI or IRI of this specification concatenated with "/Subject/type/"
