@@ -274,7 +274,7 @@ h4 {counter-reset: h5;}
 </tbody>
 </table>
 <p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
-<h2 id="the-nine-node-types">The Nine Node Types</h2>
+<h2 id="the-eight-node-types">The Eight Node Types</h2>
 <p>This specification defines several concrete types. These form a type hierarchy:</p>
 <ul>
 <li>Node
@@ -284,7 +284,6 @@ h4 {counter-reset: h5;}
 <li>Subject: identifying a single (subject of discussion, source discussing it) pair</li>
 <li>Property: a single piece of information about a node</li>
 <li>Connection: a directed connection between two nodes</li>
-<li>Tag: metaknowledge about a set of nodes</li>
 </ul></li>
 <li>Source
 <ul>
@@ -513,6 +512,39 @@ h4 {counter-reset: h5;}
 <h1 id="known-string-and-datum-values">Known string and datum values</h1>
 <p>This section and its subsections will be added at a later time. It will include a set of Tag <code>key</code>s of known semantics as well as a suggested ontology for other node types to use.</p>
 <p>This section is included here in this draft in order to both (1) indicate that known values will be included eventually and (2) reserve a section number in the flow of the document.</p>
+<h2 id="known-tag-keys">Known Tag <code>key</code>s</h2>
+<p>To convert a known Tag <code>key</code> in this section to a URI or IRI, prepend it with the URI or IRI of this specification concatenated with &quot;/Tag/key#&quot;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>key</code></th>
+<th align="left">constraints</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">distinct</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
+<td align="left">no two elements of <code>of</code> refers to the same real-world subject or contain equivalent information</td>
+</tr>
+<tr class="even">
+<td align="left">same</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
+<td align="left">the elements of <code>of</code> are fully equivalent: the same real-world subject, alternative presentations of the same information, etc.</td>
+</tr>
+<tr class="odd">
+<td align="left">unsupported</td>
+<td align="left"><code>of</code> contains a single reference to a Claim, Inference, or Derivation</td>
+<td align="left">the <code>source</code> does not make this Claim or the <code>support</code> and <code>reason</code> do not justify this Inference or Derivation</td>
+</tr>
+<tr class="even">
+<td align="left">wrong</td>
+<td align="left"><code>of</code> cannot include<ul><li>both a &quot;wrong&quot; Tag and any element of that Tag's <code>of</code></li><li>A Subject or Aggregated Subject</li></ul></td>
+<td align="left">the indicated node asserts a falsehood</td>
+</tr>
+</tbody>
+</table>
 <h1 id="partial-implementation-and-extension">Partial Implementation and Extension</h1>
 <p>For various reasons, implementers should expect to interact with other software that has adopted only portions of this specification and that have extended this specification in various ways. This section discusses appropriate ways to interact with partial implementations and extensions.</p>
 <h2 id="policies-and-suggestions">Policies and Suggestions</h2>

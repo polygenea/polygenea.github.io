@@ -184,8 +184,8 @@ Script | OPTIONAL | any | _x_, a datum defining a single function in some progra
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.
 
 
-The Nine Node Types
--------------------
+The Eight Node Types
+--------------------
 
 This specification defines several concrete types.
 These form a type hierarchy:
@@ -195,7 +195,6 @@ These form a type hierarchy:
         -   Subject: identifying a single (subject of discussion, source discussing it) pair
         -   Property: a single piece of information about a node
         -   Connection: a directed connection between two nodes
-        -   Tag: metaknowledge about a set of nodes
     -   Source
         -   OutRef: identifying some information source external to this specification
         -   Derivation: a free-text description of a step in the reasoning processes 
@@ -442,6 +441,18 @@ This section is included here in this draft in order to
 both (1) indicate that known values will be included eventually
 and (2) reserve a section number in the flow of the document.
 
+Known Tag `key`s
+----------------
+
+To convert a known Tag `key` in this section to a URI or IRI,
+prepend it with the URI or IRI of this specification concatenated with "/Tag/key#"
+
+| `key` | constraints | meaning |
+|-------|-------------|---------|
+| distinct | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | no two elements of `of` refers to the same real-world subject or contain equivalent information |
+| same | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | the elements of `of` are fully equivalent: the same real-world subject, alternative presentations of the same information, etc. |
+| unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` and `reason` do not justify this Inference or Derivation  | 
+| wrong | `of` cannot include<ul><li>both a "wrong" Tag and any element of that Tag's `of`</li><li>A Subject or Aggregated Subject</li></ul> | the indicated node asserts a falsehood | 
 
 Partial Implementation and Extension
 ====================================
