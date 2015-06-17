@@ -248,7 +248,7 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             
             A tuple `(partOf, details)`, where
             
-            -   `partOf` is a (possibly empty) set of references to OutRefs
+            -   `parents` is a (possibly empty) set of string ↦ references to OutRef pairs
             -   `details` is a set of string ↦ datum pairs
         
         -   Derivation
@@ -285,6 +285,19 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             such that the _i_th node in the `antecedent` is of a type that may 
             be referenced by _X_ and _i_ is strictly smaller than the index of 
             the Node Query that contains it.
+
+        | Node Query subtype | Properties<br/>index. name : type | Constraints |
+        |--------------------|-----------------------------------|-------------|
+        | Subject Query | 0. `slug` : string predicate <br/>1. `source` : int | `slug`'s value MUST be _Top_ |
+        | Property Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : datum predicate<br/>3. `source` : int | |
+        | Connection Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | |
+        | Tag Query | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `source` : int | |
+        | OutRef Query | 0. `parents` : set of (string ↦ int) pairs<br/>1. `details` : set of (string ↦ datum predicate) pairs | |
+        | Derivation Query | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
+        | Expectation Query | _exactly the same a Expectation_ | |
+        | Inference Query | 0. `support` : set of ints<br/>1. `reason` : int | |
+
+
         
         A Node Template may be any Claim except that
         
@@ -299,6 +312,12 @@ Reasoning is a set of nodes.  Node types are expressed in the following hierarch
             is of a type that may be referenced by _X_
             and (2) _i_ is strictly smaller than the index of the Node Template that contains it in that concatenate list.
 
+        | Node Template subtype | Properties<br/>index. name : type | Constraints |
+        |-----------------------|-----------------------------------|--------------|
+        | Subject Template | 0. `slug` : string producer<br/>1. `source` : int | `source`'s value MUST be `-1` |
+        | Property Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer<br/>3. `source` : int | `source`'s value MUST be `-1` |
+        | Connection Template | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | `source`'s value MUST be `-1` |
+        | Tag Template | 0. `key` : string producers <br/>1. `of` : int<br/>2. `source` : int | `source`'s value MUST be `-1` |
 
 
 Definitions and Constraints
@@ -380,6 +399,9 @@ Node and value __matching__ is defined as follows:
     each integer in the set of integers
     matches some node reference in the set of node references.
     Note that it is *not* necessary for every node reference to match some integer.
+
+-   A set of  string ↦ integer pairs _q_ matches a set of string ↦ node reference pairs _s_
+    if for each (_k1_ ↦ _i_) in _q_, there is a (_k2_ ↦ _r_) pair in _s_ such that _k1_ equals _k2_ and _i_ matches _r_
 
 -   A non-negative integer _i_ matches a node reference _r_ if and only if all of the following are true:
     

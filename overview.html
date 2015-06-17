@@ -322,7 +322,7 @@ th{border-bottom:1px solid black;}
 <li><p>OutRef</p>
 <p>A tuple <code>(partOf, details)</code>, where</p>
 <ul>
-<li><code>partOf</code> is a (possibly empty) set of references to OutRefs</li>
+<li><code>parents</code> is a (possibly empty) set of string ↦ references to OutRef pairs</li>
 <li><code>details</code> is a set of string ↦ datum pairs</li>
 </ul></li>
 <li><p>Derivation</p>
@@ -350,12 +350,94 @@ th{border-bottom:1px solid black;}
 <li><p>In place of any value of non-reference type <em>X</em>, the Node Query has an <em>X</em> predicate.</p></li>
 <li><p>In place of any value of reference type <em>X</em>, the Node Query must have either the special value <code>-1</code> or a non-negative integer <em>i</em> such that the <em>i</em>th node in the <code>antecedent</code> is of a type that may be referenced by <em>X</em> and <em>i</em> is strictly smaller than the index of the Node Query that contains it.</p></li>
 </ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Node Query subtype</th>
+<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Subject Query</td>
+<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : int</td>
+<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
+</tr>
+<tr class="even">
+<td align="left">Property Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : datum predicate<br/>3. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Connection Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Tag Query</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">OutRef Query</td>
+<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Derivation Query</td>
+<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Expectation Query</td>
+<td align="left"><em>exactly the same a Expectation</em></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Inference Query</td>
+<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : int</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
 <p>A Node Template may be any Claim except that</p>
 <ul>
 <li><p>It has the special value <code>-1</code> as its <code>source</code></p></li>
 <li><p>In place of any value of non-reference type <em>X</em>, the Node Template has an <em>X</em> producer.</p></li>
 <li><p>In place of any value of reference type <em>X</em>, the Node Query must have a non-negative integer <em>i</em> such that both (1) the <em>i</em>th node in the list created by concatenating <code>antecedent</code> and <code>consequent</code> is of a type that may be referenced by <em>X</em> and (2) <em>i</em> is strictly smaller than the index of the Node Template that contains it in that concatenate list.</p></li>
-</ul></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Node Template subtype</th>
+<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Subject Template</td>
+<td align="left">0. <code>slug</code> : string producer<br/>1. <code>source</code> : int</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="even">
+<td align="left">Property Template</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer<br/>3. <code>source</code> : int</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Connection Template</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+<tr class="even">
+<td align="left">Tag Template</td>
+<td align="left">0. <code>key</code> : string producers <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
+<td align="left"><code>source</code>'s value MUST be <code>-1</code></td>
+</tr>
+</tbody>
+</table></li>
 </ul></li>
 </ul>
 <h2 id="definitions-and-constraints">Definitions and Constraints</h2>
@@ -390,6 +472,7 @@ th{border-bottom:1px solid black;}
 <p>Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., <em>s</em> is not referenced in the table in section <a href="#producers">Producers</a>) then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.</p></li>
 <li><p>The integer value <code>-1</code> matches any node reference.</p></li>
 <li><p>A set of integers matches a set of node references if each integer in the set of integers matches some node reference in the set of node references. Note that it is <em>not</em> necessary for every node reference to match some integer.</p></li>
+<li><p>A set of string ↦ integer pairs <em>q</em> matches a set of string ↦ node reference pairs <em>s</em> if for each (<em>k1</em> ↦ <em>i</em>) in <em>q</em>, there is a (<em>k2</em> ↦ <em>r</em>) pair in <em>s</em> such that <em>k1</em> equals <em>k2</em> and <em>i</em> matches <em>r</em></p></li>
 <li><p>A non-negative integer <em>i</em> matches a node reference <em>r</em> if and only if all of the following are true:</p>
 <ol>
 <li>there is a list of node references that was used to initiate the matching process</li>

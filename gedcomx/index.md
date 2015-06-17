@@ -7,7 +7,7 @@ __add to 1.3.3__
 > A "set" is defined as an unordered collection of data instances containing no duplicate data instances.
 > When a property is defined in terms of a "set", the data type of the data instances in the set is also provided
 >
-> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval \[−1, 32767)
+> An "int" is defined as an integer value; its storage is not specified, but must be able to store at least all integers between −1 and 32766, inclusive
 
 ----
 
@@ -42,6 +42,10 @@ inferences | Structured descriptions of reasoning processes | Set of [`http://ge
 expectations | Structured descriptions of trends, inference rules, and other guidelines about what a researcher expects to be true | Set of [`http://gedcomx.polygenea.org/v1/Expectation`](#expectation). | OPTIONAL.
 attribution | The attribution of this reasoning. | `http://gedcomx.org/Attribution` | OPTIONAL. If not provided, the attribution of the containing data set (e.g., file) of the `Reasoning` is assumed.
 
+### constraints
+
+A single data set SHOULD NOT contain more than a single `Reasoning` element.
+If it contains more than one, the `id` property of the various `ReasoningNode`s inside each must be unique.
 
 ----
 
@@ -49,8 +53,8 @@ __Modify section 3.10, subsection "properties", adding the following row to the 
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-supportingClaims | The list of references to the reasoning elements that support this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). OPTIONAL.
-refutingClaims | The list of references to the reasoning elements that contradict this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). | OPTIONAL.
+support | The list of references to the reasoning elements that support this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). | OPTIONAL.
+contradiction | The list of references to the reasoning elements that contradict this conclusion. | Set of [`http://gedcomx.polygenea.org/v1/ClaimReference`](#claim-reference). | OPTIONAL.
 
 
 ----
@@ -78,8 +82,8 @@ name  | description | data type | constraints
 id | An internal identifier for the data structure holding the reasoning data. | string | REQUIRED.  The id is to be used as a "fragment identifier" as defined by [RFC 3986, Section 3.5](http://tools.ietf.org/html/rfc3986#section-3.5). As such, the constraints of the id are provided in the definition of the media type (e.g. XML, JSON) of the data structure.
 attribution | The attribution of this subject. | `http://gedcomx.org/Attribution` | OPTIONAL. If not provided, the attribution of the containing data set (i.e., `Reasoning`) of the `ReasoningNode` is assumed.
 
-It is RECOMMENDED that the `id` of each `ReasoningNode` be the (upper-case) initial letter of the name of the `ReasoningNode`s element type (which will be one of {"A", "C", "D", "E", "I", "P", "S", "T"}),  followed by the (non-padded) decimal string representation of 0-based index of the `ReasoningNode` within its containing element.
-
+It is RECOMMENDED that the `id` of each `ReasoningNode` be the (lower-case) initial letter of the name of the `ReasoningNode`s element type (which will be one of {"a", "c", "d", "e", "i", "p", "s", "t"}),  followed by the (non-padded) decimal string representation of 0-based index of the `ReasoningNode` within its containing element.
+For example, the second `Inference` node inside a `Reasoning` element's `inference` property would have an `id` of "i1".
 
 <a name="claim"/>
 
@@ -123,7 +127,7 @@ The identifier for the "ClaimReference" data type is:
 name  | description | data type | constraints
 ------|-------------|-----------|------------
 claim  | Reference to a `Claim`. | [URI](#uri) | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/Claim`](#claim).
-attribution | The attribution of this source reference. | `http://gedcomx.org/Attribution` | OPTIONAL. If not provided, the attribution of the containing resource of the claim reference is assumed.
+attribution | The attribution of this claim reference. | `http://gedcomx.org/Attribution` | OPTIONAL. If not provided, the attribution of the containing resource of the claim reference is assumed.
 
 
 <a name="subject-node"/>
@@ -376,6 +380,16 @@ Nodes that extend `NodeTemplate` MUST use type `int` instead of type `URI` anywh
 Nodes that extend `NodeTemplate` MAY use a function type as the value of a string or 
 __FIXME__: _as will be described later_
 
+
+| `NodeTemplate` subtype | Properties<br/>index. name : type | Constraints |
+|---------------------|-----------------------------------|-------------|
+| SubjectTemplate | 0. `slug` : string producer |
+| PropertyQuery | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer |
+| ConnectionQuery | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int |
+| TagQuery | 0. `key` : string producers <br/>1. `of` : int |
+
+
+
 <a name="node-query"/>
 
 ## 3.34 The "NodeQuery" Data Type
@@ -400,3 +414,16 @@ Nodes that extend `NodeQuery` MUST use type `int` instead of type `URI` anywhere
 
 Nodes that extend `NodeQuery` MAY use a predicate type
 __FIXME__: _as will be described later_
+
+
+| `NodeQuery` subtype | Properties<br/>index. name : type | Constraints |
+|---------------------|-----------------------------------|-------------|
+| SubjectQuery | 0. `slug` : string predicate <br/>1. `source` : int | `slug`'s value MUST be _Top_ |
+| PropertyQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : string predicate<br/>3. `source` : int | |
+| ConnectionQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | |
+| TagQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `source` : int | |
+| OutRefQuery | 0. `parents` : set of (string, int) pairs<br/>1. `details` : set of (string, string predicate) pairs | |
+| DerivationQuery | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
+| ExpectationQuery | _exactly the same a Expectation_ | |
+| InferenceQuery | 0. `support` : set of ints<br/>1. `reason` : int | |
+

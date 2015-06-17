@@ -13,7 +13,7 @@
 <p><strong>add to 1.3.3</strong></p>
 <blockquote>
 <p>A &quot;set&quot; is defined as an unordered collection of data instances containing no duplicate data instances. When a property is defined in terms of a &quot;set&quot;, the data type of the data instances in the set is also provided</p>
-<p>An &quot;int&quot; is defined as an integer value; its storage is not specified, but must be able to store at least all integers in the interval [−1, 32767)</p>
+<p>An &quot;int&quot; is defined as an integer value; its storage is not specified, but must be able to store at least all integers between −1 and 32766, inclusive</p>
 </blockquote>
 <hr />
 <p><strong>add to 2. a new subsection 2.8, as follows</strong></p>
@@ -90,6 +90,8 @@
 </tr>
 </tbody>
 </table>
+<h3 id="constraints">constraints</h3>
+<p>A single data set SHOULD NOT contain more than a single <code>Reasoning</code> element. If it contains more than one, the <code>id</code> property of the various <code>ReasoningNode</code>s inside each must be unique.</p>
 <hr />
 <p><strong>Modify section 3.10, subsection &quot;properties&quot;, adding the following row to the table:</strong></p>
 <table>
@@ -103,12 +105,13 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">supportingClaims</td>
+<td align="left">support</td>
 <td align="left">The list of references to the reasoning elements that support this conclusion.</td>
-<td align="left">Set of <a href="#claim-reference"><code>http://gedcomx.polygenea.org/v1/ClaimReference</code></a>. OPTIONAL.</td>
+<td align="left">Set of <a href="#claim-reference"><code>http://gedcomx.polygenea.org/v1/ClaimReference</code></a>.</td>
+<td align="left">OPTIONAL.</td>
 </tr>
 <tr class="even">
-<td align="left">refutingClaims</td>
+<td align="left">contradiction</td>
 <td align="left">The list of references to the reasoning elements that contradict this conclusion.</td>
 <td align="left">Set of <a href="#claim-reference"><code>http://gedcomx.polygenea.org/v1/ClaimReference</code></a>.</td>
 <td align="left">OPTIONAL.</td>
@@ -148,7 +151,7 @@
 </tr>
 </tbody>
 </table>
-<p>It is RECOMMENDED that the <code>id</code> of each <code>ReasoningNode</code> be the (upper-case) initial letter of the name of the <code>ReasoningNode</code>s element type (which will be one of {&quot;A&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;I&quot;, &quot;P&quot;, &quot;S&quot;, &quot;T&quot;}), followed by the (non-padded) decimal string representation of 0-based index of the <code>ReasoningNode</code> within its containing element.</p>
+<p>It is RECOMMENDED that the <code>id</code> of each <code>ReasoningNode</code> be the (lower-case) initial letter of the name of the <code>ReasoningNode</code>s element type (which will be one of {&quot;a&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;, &quot;i&quot;, &quot;p&quot;, &quot;s&quot;, &quot;t&quot;}), followed by the (non-padded) decimal string representation of 0-based index of the <code>ReasoningNode</code> within its containing element. For example, the second <code>Inference</code> node inside a <code>Reasoning</code> element's <code>inference</code> property would have an <code>id</code> of &quot;i1&quot;.</p>
 <p><a name="claim"/></p>
 <h2 id="the-claim-data-type">3.23 The &quot;Claim&quot; Data Type</h2>
 <p>The <code>Claim</code> data type defines the abstract concept of a research <em>claim</em>, either made by a source or derived by a researcher.</p>
@@ -202,7 +205,7 @@
 </tr>
 <tr class="even">
 <td align="left">attribution</td>
-<td align="left">The attribution of this source reference.</td>
+<td align="left">The attribution of this claim reference.</td>
 <td align="left"><code>http://gedcomx.org/Attribution</code></td>
 <td align="left">OPTIONAL. If not provided, the attribution of the containing resource of the claim reference is assumed.</td>
 </tr>
@@ -499,6 +502,33 @@
 <p>None; in particular, <code>NodeTemplate</code> (and hence its extension nodes) does not have either an <code>attribution</code> nor a <code>source</code> property.</p>
 <p>Nodes that extend <code>NodeTemplate</code> MUST use type <code>int</code> instead of type <code>URI</code> anywhere type <code>URI</code> is required for the corresponding type that extends <code>Claim</code>. The integer values MUST be strictly smaller than the index of the <code>NodeTemplate</code> in its containing <code>Expectation</code> and MUST be greater than or equal to 0.</p>
 <p>Nodes that extend <code>NodeTemplate</code> MAY use a function type as the value of a string or <strong>FIXME</strong>: <em>as will be described later</em></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>NodeTemplate</code> subtype</th>
+<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SubjectTemplate</td>
+<td align="left">0. <code>slug</code> : string producer</td>
+</tr>
+<tr class="even">
+<td align="left">PropertyQuery</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer</td>
+</tr>
+<tr class="odd">
+<td align="left">ConnectionQuery</td>
+<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int</td>
+</tr>
+<tr class="even">
+<td align="left">TagQuery</td>
+<td align="left">0. <code>key</code> : string producers <br/>1. <code>of</code> : int</td>
+</tr>
+</tbody>
+</table>
 <p><a name="node-query"/></p>
 <h2 id="the-nodequery-data-type">3.34 The &quot;NodeQuery&quot; Data Type</h2>
 <p>The <code>NodeQuery</code> data type describes an acceptable set of nodes.</p>
@@ -511,5 +541,56 @@
 <p>As per <code>ResearchNode</code> and its subtypes, except as noted below.</p>
 <p>Nodes that extend <code>NodeQuery</code> MUST use type <code>int</code> instead of type <code>URI</code> anywhere type <code>URI</code> is required for the corresponding type that extends <code>Claim</code>. The integer values MUST be strictly smaller than the index of the <code>NodeQuery</code> in its containing <code>Expectation</code> and must be greater than or equal to −1.</p>
 <p>Nodes that extend <code>NodeQuery</code> MAY use a predicate type <strong>FIXME</strong>: <em>as will be described later</em></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>NodeQuery</code> subtype</th>
+<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SubjectQuery</td>
+<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : int</td>
+<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
+</tr>
+<tr class="even">
+<td align="left">PropertyQuery</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string predicate<br/>3. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">ConnectionQuery</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">TagQuery</td>
+<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">OutRefQuery</td>
+<td align="left">0. <code>parents</code> : set of (string, int) pairs<br/>1. <code>details</code> : set of (string, string predicate) pairs</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">DerivationQuery</td>
+<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">ExpectationQuery</td>
+<td align="left"><em>exactly the same a Expectation</em></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">InferenceQuery</td>
+<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : int</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
 </body>
 </html>
