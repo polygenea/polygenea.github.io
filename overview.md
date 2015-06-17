@@ -433,13 +433,8 @@ UNLESS it is an element of the instantiated node list of that Inference.
 Known string and datum values
 =============================
 
-This section and its subsections will be added at a later time.
-It will include a set of Tag `key`s of known semantics
-as well as a suggested ontology for other node types to use.
-
-This section is included here in this draft in order to 
-both (1) indicate that known values will be included eventually
-and (2) reserve a section number in the flow of the document.
+The bulk of this section and its subsections will be added at a later time.
+What is present here is just an initial draft of a few example specifications.
 
 Known Tag `key`s
 ----------------
@@ -451,7 +446,7 @@ prepend it with the URI or IRI of this specification concatenated with "/Tag/key
 |-------|-------------|---------|
 | distinct | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | no two elements of `of` refers to the same real-world subject or contain equivalent information |
 | same | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | the elements of `of` are fully equivalent: the same real-world subject, alternative presentations of the same information, etc. |
-| unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` and `reason` do not justify this Inference or Derivation  | 
+| unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` does not justify this Inference or Derivation  | 
 | wrong | `of` cannot include both a "wrong" Tag and any element of that Tag's `of`<br/>`of` cannot include a Subject or Aggregated Subject | the indicated node asserts a falsehood | 
 
 Partial Implementation and Extension
