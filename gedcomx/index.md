@@ -118,7 +118,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-source | The attribution of this subject. | URI | REQUIRED. MUST resolve to an instance of one of the following types: `http://gedcomx.org/v1/SourceDescription`, [`http://gedcomx.polygenea.org/v1/Inference`](#inference), or [`http://gedcomx.polygenea.org/v1/Derivation`](#derivation).
+source | The attribution of this subject. | URI | REQUIRED. MUST resolve to an instance of one of the following types: [`http://gedcomx.polygenea.org/v1/OutRef`](#outref), [`http://gedcomx.polygenea.org/v1/Inference`](#inference), or [`http://gedcomx.polygenea.org/v1/Derivation`](#derivation).
 
 
 <a name="claim-reference"/>
@@ -195,8 +195,8 @@ This data type extends the following data type:
 name  | description | data type | constraints
 ------|-------------|-----------|------------
 key | Enumerated value identifying the type of property | Enumerated Value | REQUIRED. MUST identify a property type, and use of a [known property type](#known-property-types) is RECOMMENDED.
-of | A reference to the `ReasoningNode` to which this property applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node).
-value | The value of the property. | string | REQUIRED.
+of | A reference to the `ReasoningNode` to which this property applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
+value | The value of the property. | string | REQUIRED. Some `key`s may impose additional constraints.
 
 
 <a name="connection"/>
@@ -224,8 +224,8 @@ This data type extends the following data type:
 name  | description | data type | constraints
 ------|-------------|-----------|------------
 key | Enumerated value identifying the type of connection | Enumerated Value | REQUIRED. MUST identify a connection type, and use of a [known connection type](#known-connection-types) is RECOMMENDED.
-of | A reference to the `ReasoningNode` to which this connection applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node).
-value | The value of the the connection | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node).
+of | A reference to the `ReasoningNode` to which this connection applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
+value | The value of the the connection | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 
 
 <a name="tag"/>
@@ -252,8 +252,8 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-type | Enumerated value identifying the type of connection | Enumerated Value | REQUIRED. MUST identify a connection type, and use of a [known tag type](#known-tag-types) is RECOMMENDED.
-of | A list of references to jointly-tagged `ReasoningNode`s | List of URI.  Order is not preserved | REQUIRED. Each URI MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node).  Additional constraints may be added for particular tag `type`s.
+key | Enumerated value identifying the type of connection | Enumerated Value | REQUIRED. MUST identify a tag type, and use of a [known tag type](#known-tag-types) is RECOMMENDED.
+of | A list of references to jointly-tagged `ReasoningNode`s | List of URI.  Order is not preserved | REQUIRED. Each URI MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node).  Some `key`s may impose additional constraints.
 
 
 <a name="aggregated-subject"/>
@@ -280,7 +280,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-basis | A references to `Tag` with `key` "same" | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/Tag`](#tag) that has `type` `http://gedcomx.polygenea.org/v1/Tag/same`.
+basis | A references to `Tag` with `key` "same" | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/Tag`](#tag) that has `key` `http://gedcomx.polygenea.org/v1/Tag/same`.
 
 
 
@@ -306,7 +306,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-support | A set of references to the antecedents of this derivation | List of URI. Order is not preserved. | REQUIRED. Each URI MUST resolve to an instance of either [`http://gedcomx.polygenea.org/v1/ResearchNode`](#research-node) or `http://gedcomx.org/v1/SourceDescription`.
+support | A set of references to the antecedents of this derivation | List of URI. Order is not preserved. | REQUIRED. Each URI MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ResearchNode`](#research-node).
 reason | The user's explanation of why this derivation works | `http://gedcomx.org/TextValue` | OPTIONAL.  If not provided, the reason is assumed to be {"lang":"en", "value":"(undocumented)"}.
 
 
@@ -332,7 +332,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-support | A list of references to the antecedents of this derivation | List of URI. Order is preserved. | REQUIRED. Each URI MUST resolve to an instance of either [`http://gedcomx.polygenea.org/v1/ResearchNode`](#research-node) or `http://gedcomx.org/v1/SourceDescription`.
+support | A list of references to the antecedents of this derivation | List of URI. Order is preserved. | REQUIRED. Each URI MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ResearchNode`](#research-node).
 reason | A reference to the `Expectation` that led to this inference | URI | REQUIRED. MUST resolve to an instance of `http://gedcomx.polygenea.org/Expectation`.  `support` SHOULD [match](#inference-matching-algorithm) the referenced `Expectation`.
 
 
@@ -469,7 +469,7 @@ value | an `OutRef`s having this relationship | integer | REQUIRED. MUST either 
 
 ## 3.37 The "KeyPredicate" Data Type
 
-The `KeyPreducate` data type stores a generic key:value pair where the value is a `StringPredicate`.
+The `KeyPreducate` data type stores a generic key:value pair where the value is a `Predicate`.
 They are used in place of `KeyVal` values in `OutRefQuery` elements.
 
 ### identifier
@@ -483,24 +483,12 @@ The identifier for the `KeyPredicate` data type is:
 name  | description | data type | constraints
 ------|-------------|-----------|------------
 key | the topic of this attribute | Enumerated Value | REQUIRED. MUST identify a source detail type, and use of a [known source detail type](#known-source-relationship-types) is RECOMMENDED.
-value | the value of this attribute | `StringPredicate` | REQUIRED.
-
-
-
-
-
------
-
-
-
-
-
-
+value | the value of this attribute | `Predicate` | REQUIRED.
 
 
 
 <a name="predicate"/>
-## 3.22 The "Predicate" Data Type and Subtypes
+## 3.38 The "Predicate" Data Type and Subtypes
 
 The `Predicate` data type defines the abstract concept of a function that accepts some inputs and rejects others.
 
@@ -519,59 +507,77 @@ There are many subtypes of `Predicate`, collectively listed in the following tab
 
 name | description | properties | constraints
 `Top` | always true |  | 
-`LitString` | true for a single value only | `x`, a string | 
-MapHas | REQUIRED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_ ↦ _b_) in _x_, there is a (_c_ ↦ _d_) pair in _v_ such that _a_ equals _c_ and _b_(_d_) is `true`
-Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
-Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_, _s_) is `true` for any _e_ in _v_
-SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_, _s_) is `true`
-Cmp | OPTIONAL | either string or datum with a media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
-ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
-Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
-Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
-And | OPTIONAL | any (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for all _f_ in _x_
-Or | OPTIONAL | any (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for at least one _f_ in _x_
-Not | OPTIONAL | any (call it _X_) | _f_, an _X_ predicate | _f_(_v_, _s_) is `false`
-Script | OPTIONAL | any | _x_, a datum defining a single function in some programming language | evaluating the function in _x_ with arguments _v_ and _s_ returns `true`
+`Lit` | true for a single value only | `x`, a string | 
+`MapHas` | peeks inside an `OutRef`'s `details` | `x`, a set of `KeyPredicate`s | 
+`Same` | two nodes have the same contents | `i`, an integer<br/>`j`, a string | `i` is ≥ 0 and less than the index of the containing `NodeQuery`<br/>`j` is the name of a property of the `NodeQuery` at index `i`<br/>the type of the `j` property is either string or Enumerated Value
+`Cmp` | compares a value with a constant | `op`, which is one of "<", "<=", "==", "!=", ">=", ">"<br/>`x`, a string | 
+`ICmp` | compares two values | | `op`, which is one of "<", "<=", "==", "!=", ">=", ">"<br/>`i`, an integer<br/>`j`, an integer | `i` and `j` have the same constraints as for `Same` in this table
+`Regex` | regular expression matching | `r`, a string | the contents of `r` must be either a _RegularExpressionLiteral_ or a _RegularExpressionBody_ as defined in [ECMA 262 section 7.8.5](http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5).
+`And` | combines two or more predicates | `parts`, a set of `Predicate`s | The set of predicates is not empty
+`Or` | combines two or more predicates | `parts`, a set of `Predicate`s | The set of predicates is not empty
+`Not` | inverts a predicate | `x`, a Predicate |
+`Script` | arbitrary code | `src`, a string<br/>`type`, a string | `lang` identifies a scripting language<br/>`src` is a program in that language<br/>`src` contains a single function accepting two parameters: a string and a list of `ResearchNode`s; and returning a Boolean value
 
 
-<a name="producer"/>
-## 3.23 The "Producer" Data Type and Subtypes
+<a name="string-producer"/>
+## 3.39 The "StringProducer" Data Type and Subtypes
 
-The `Predicate` data type defines the abstract concept of a function that produces a value of a particular type.
+The `StringProducer` data type defines the abstract concept of a function that produces a string value.
 
 ### identifier
 
-The identifier for the `Producers` data type is:
+The identifier for the `StringProducer` data type is:
 
-`http://gedcomx.polygenea.org/v1/Producer`
+`http://gedcomx.polygenea.org/v1/StringProducer`
 
-In the table of producer subtypes, the "name" column defines a suffix to the `Producer` identifier;
-the full identifier for a subtype can be constructed as `http://gedcomx.polygenea.org/v1/Producer/` concatenated with the value in the "name" column.
+In the table of producer subtypes, the "name" column defines a suffix to the `StringProducer` identifier;
+the full identifier for a subtype can be constructed as `http://gedcomx.polygenea.org/v1/StringProducer/` concatenated with the value in the "name" column.
 
 ### subtypes
 
-There are many subtypes of `Producer`, collectively listed in the following table.
+There are many subtypes of `StringProducer`, collectively listed in the following table.
 
 name | description | properties | constraints
-Lit | REQUIRED | any | _x_, a value of the same type as the producer | _x_
-Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_ 
-Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence
-Cat | OPTIONAL | string or list | _x_, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of _x_ in order
-Union | OPTIONAL | set | _x_, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
-Intersect | OPTIONAL | set | _x_, a set of set producers | a set containing those values that are in every set produced by each element of _x_
-Script | OPTIONAL | any | _x_, a datum defining a single function in some programming language | the value returned when evaluating the function in _x_ with argument _s_
+`Lit` | a constant value | `x`, a string | 
+`Lookup` | a value copied from another node | `i`, an integer<br/>`j`, a string | `i` is ≥ 0 and less than the index of the containing `NodeTemplate`<br/>`j` is the name of a property of the `NodeQuery` or `NodeTemplate` at index `i`<br/>the type of the `j` property is either a string, an Enumerated Value, or a `StringProducer`
+`Match` | a regular expression match | `f`, a `StringProducer`<br/>`r`, a string<br/>`i`, an integer | the contents of `r` must be either a _RegularExpressionLiteral_ or a _RegularExpressionBody_ as defined in [ECMA 262 section 7.8.5](http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5)
+`Slice` | a substring | `f`, a `StringProducer`<br/>`i`, an integer<br/>`j`, an integer | 
+`Cat` | string concatentation | `parts`, a list of `StringProducer`s | 
+`Script` | arbitrary code | `src`, a string<br/>`type`, a string | `lang` identifies a scripting language<br/>`src` is a program in that language<br/>`src` contains a single function accepting one parameter: a list of `ResearchNode`s; and returning a string value
 
 
 
+<a name="set-producer"/>
+## 3.40 The "SetProducer" Data Type and Subtypes
 
+The `SetProducer` data type defines the abstract concept of a function that produces a string value.
+
+### identifier
+
+The identifier for the `SetProducer` data type is:
+
+`http://gedcomx.polygenea.org/v1/SetProducer`
+
+In the table of producer subtypes, the "name" column defines a suffix to the `SetProducer` identifier;
+the full identifier for a subtype can be constructed as `http://gedcomx.polygenea.org/v1/SetProducer/` concatenated with the value in the "name" column.
+
+### subtypes
+
+There are many subtypes of `SetProducer`, collectively listed in the following table.
+
+name | description | properties | constraints
+`Lit` | a constant value | `x`, a set of integer values | every element of `x` must be ≥ 0<br/>every element of `x` must be < the index of the containing `NodeTemplate`
+`Lookup` | a value copied from another node | `i`, an integer<br/>`j`, a string | `i` is ≥ 0 and less than the index of the containing `NodeTemplate`<br/>`j` is the name of a property of the `NodeQuery` or `NodeTemplate` at index `i`<br/>the type of the `j` property is either a set of integers or a `SetProducer`
+`Union` | the union of other sets | `parts`, a set of `SetProducer`s |
+`Intersect` | the common elements of other sets | `parts`, a set of `SetProducer`s |
 
 
 <a name="node-template"/>
 
-## 3.33 The "NodeTemplate" Data Type
+## 3.41 The "NodeTemplate" Data Type and Subtypes
 
 The `NodeTemplate` data type describes how to construct a node given some context.
+It has a subtype corresponding to each subtype of `Claim`
 
 ### identifier
 
@@ -583,22 +589,12 @@ The identifier for the `NodeTemplate` data type is:
 
 For every concrete node type named _X_ extending `Claim`, there is a concrete node type named _X_`Template` extending `NodeTemplate`.
 
-### properties
-
-None; in particular, `NodeTemplate` (and hence its extension nodes) does not have either an `attribution` nor a `source` property.
-
-Nodes that extend `NodeTemplate` MUST use type `int` instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeTemplate` in its containing `Expectation` and MUST be greater than or equal to 0.
-
-Nodes that extend `NodeTemplate` MAY use a function type as the value of a string or 
-__FIXME__: _as will be described later_
-
-
-| `NodeTemplate` subtype | Properties<br/>index. name : type | Constraints |
-|---------------------|-----------------------------------|-------------|
-| SubjectTemplate | 0. `slug` : string producer |
-| PropertyQuery | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : string producer |
-| ConnectionQuery | 0. `key` : string producer <br/>1. `of` : int<br/>2. `value` : int |
-| TagQuery | 0. `key` : string producers <br/>1. `of` : int |
+| `NodeTemplate` subtype | Properties | Constraints |
+|------------------------|------------|-------------|
+| SubjectTemplate | `slug`, a `StringProducer` |
+| PropertyTemplate | `key`, a `StringProducer`<br/>`of`, an integer<br/>`value`, a `StringProducer` | `of` must be ≥ `-1` and < the index of this `PropertyTemplate`
+| ConnectionTemplate |`key`, a `StringProducer`<br/>`of`, an integer<br/>`value`, an integer | both `of` and `value` must be ≥ `-1` and < the index of this `ConnectionTemplate`
+| TagTemplate | `key`, a `StringProducer` <br/>`of`, a `SetProducer` |
 
 
 
@@ -607,6 +603,7 @@ __FIXME__: _as will be described later_
 ## 3.34 The "NodeQuery" Data Type
 
 The `NodeQuery` data type describes an acceptable set of nodes.
+It has a subtype corresponding to each subtype of `ResearchNode`
 
 ### identifier
 
@@ -616,26 +613,16 @@ The identifier for the `NodeQuery` data type is:
 
 ### extension
 
-For every node type named _X_ extending `ResearchNode`, there is a concrete node type named _X_`Template` extending `NodeQuery`.
+For every node type named _X_ extending `ResearchNode`, there is a concrete node type named _X_`Query` extending `NodeQuery`.
 
-### properties
-
-As per `ResearchNode` and its subtypes, except as noted below.
-
-Nodes that extend `NodeQuery` MUST use type `int` instead of type `URI` anywhere type `URI` is required for the corresponding type that extends `Claim`.  The integer values MUST be strictly smaller than the index of the `NodeQuery` in its containing `Expectation` and must be greater than or equal to −1.
-
-Nodes that extend `NodeQuery` MAY use a predicate type
-__FIXME__: _as will be described later_
-
-
-| `NodeQuery` subtype | Properties<br/>index. name : type | Constraints |
+| `NodeQuery` subtype | Properties | Constraints |
 |---------------------|-----------------------------------|-------------|
-| SubjectQuery | 0. `slug` : string predicate <br/>1. `source` : int | `slug`'s value MUST be _Top_ |
-| PropertyQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : string predicate<br/>3. `source` : int | |
-| ConnectionQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `value` : int<br/>3. `source` : int | |
-| TagQuery | 0. `key` : string predicate <br/>1. `of` : int<br/>2. `source` : int | |
-| OutRefQuery | 0. `parents` : set of (string, int) pairs<br/>1. `details` : set of (string, string predicate) pairs | |
-| DerivationQuery | 0. `support` : set of ints<br/>1. `reason` : string predicate | |
+| SubjectQuery | `from`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
+| PropertyQuery | `key`, a `StringPredicate` <br/>`of`, an integer<br/>`value`, a `StringPredicate`<br/>`source`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
+| ConnectionQuery | `key`, a `StringPredicate` <br/>`of`, an integer<br/>`value`, an integer<br/>`source`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
+| TagQuery | `key`, a `StringPredicate` <br/>`of`, a set of integers<br/>`source`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
+| OutRefQuery | `parents`, a set of `KeyInt`s<br/>`details`, a set of `KeyPredicate`s | |
+| DerivationQuery | `support`, a set of integers<br/>`reason`, a `StringPredicate` | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
 | ExpectationQuery | _exactly the same a Expectation_ | |
-| InferenceQuery | 0. `support` : set of ints<br/>1. `reason` : int | |
+| InferenceQuery | `support`, a list of integers<br/>`reason`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
 

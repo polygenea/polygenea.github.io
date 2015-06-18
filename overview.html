@@ -90,6 +90,7 @@ h4 {counter-reset: h5;}
 <p>and returns either <code>true</code> or <code>false</code>.</p>
 <p>In this specification, predicates are only evaluated when matching a list of Node Queries against a list of node references; the value of <em>s</em> is created by taking the prefix of that list of node references, up to and including the node reference being matched against the Node Query containing the predicate, and dereferencing each.</p>
 <p>Inside a predicate, neither <em>s</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
+<p>Because predicates are not used for Expectation nodes, only string and datum predicates exist.</p>
 <table>
 <thead>
 <tr class="header">
@@ -104,98 +105,70 @@ h4 {counter-reset: h5;}
 <tr class="odd">
 <td align="left">Top</td>
 <td align="left">REQUIRED</td>
-<td align="left">any</td>
+<td align="left">either</td>
 <td align="left">(nothing)</td>
 <td align="left">always</td>
 </tr>
 <tr class="even">
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
-<td align="left">any</td>
+<td align="left">either</td>
 <td align="left"><em>x</em>, a value of the same type as the predicate</td>
 <td align="left"><em>v</em> equals <em>x</em></td>
 </tr>
 <tr class="odd">
-<td align="left">MapHas</td>
-<td align="left">REQUIRED</td>
-<td align="left">set of string ↦ datum pairs</td>
-<td align="left"><em>x</em>, a set of string ↦ (datum predicate) pairs</td>
-<td align="left">for each (<em>a</em> ↦ <em>b</em>) in <em>x</em>, there is a (<em>c</em> ↦ <em>d</em>) pair in <em>v</em> such that <em>a</em> equals <em>c</em> and <em>b</em>(<em>d</em>) is <code>true</code></td>
-</tr>
-<tr class="even">
 <td align="left">Same</td>
 <td align="left">RECOMMENDED</td>
-<td align="left">any</td>
+<td align="left">either</td>
 <td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
 </tr>
-<tr class="odd">
-<td align="left">Has</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set or list of <em>X</em></td>
-<td align="left"><em>f</em>, an <em>X</em> predicate</td>
-<td align="left"><em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
-</tr>
 <tr class="even">
-<td align="left">SetHas</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set of <em>X</em></td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code></td>
-</tr>
-<tr class="odd">
 <td align="left">Cmp</td>
 <td align="left">OPTIONAL</td>
-<td align="left">either string or datum with a media type that has defined order</td>
+<td align="left">string, or datum whose media type has a defined order</td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
 <td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">ICmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
 <td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
 <td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Regex</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
 <td align="left"><em>r</em>, a regex</td>
 <td align="left"><em>r</em> matches <em>v</em></td>
 </tr>
-<tr class="even">
-<td align="left">Len</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set or list</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
-<td align="left">((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code></td>
-</tr>
 <tr class="odd">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
+<td align="left">either (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
+<td align="left">either (call it <em>X</em>)</td>
 <td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
+<td align="left">either (call it <em>X</em>)</td>
 <td align="left"><em>f</em>, an <em>X</em> predicate</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
 </tr>
 <tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
-<td align="left">any</td>
+<td align="left">either</td>
 <td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
 <td align="left">evaluating the function in <em>x</em> with arguments <em>v</em> and <em>s</em> returns <code>true</code></td>
 </tr>
@@ -206,6 +179,7 @@ h4 {counter-reset: h5;}
 <p>This specification uses the term &quot;<em>X</em> producer&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameter a list of node tuples (called <em>s</em> in the table below) and returns a value of type <em>X</em>.</p>
 <p>In this specification, producers are only evaluated when evaluating a Node Template in the context of a list of node references; the value of <em>s</em> is created by dereferencing each element of that list.</p>
 <p>Inside a producer, <em>s</em> may not be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
+<p>The set of Node Template types suggests three predicate types: string, datum, and set of integer</p>
 <table>
 <thead>
 <tr class="header">
@@ -241,16 +215,16 @@ h4 {counter-reset: h5;}
 <tr class="even">
 <td align="left">Slice</td>
 <td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence</td>
+<td align="left">string</td>
+<td align="left"><em>f</em>, a string producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
+<td align="left">the zero-indexed substring of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the string added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width substrings return the empty string</td>
 </tr>
 <tr class="odd">
 <td align="left">Cat</td>
 <td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>x</em>, a list of string or list producers</td>
-<td align="left">the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order</td>
+<td align="left">string</td>
+<td align="left"><em>x</em>, a list of string producers</td>
+<td align="left">the string produced by concatenating the string returned by each element of <em>x</em> in order</td>
 </tr>
 <tr class="even">
 <td align="left">Union</td>
@@ -316,7 +290,7 @@ h4 {counter-reset: h5;}
 <td align="left">Aggregated Subject</td>
 <td align="left"></td>
 <td align="left">0. <code>parts</code> : reference to a Tag</td>
-<td align="left"><code>parts</code>'s <code>key</code> MUST be &quot;same&quot; <br/> Each node referenced in <code>parts</code>'s <code>key</code>'s <code>of</code> MUST be either a Subject or and Aggregated Subject</td>
+<td align="left"><code>parts</code>'s <code>key</code> MUST be &quot;same&quot;</td>
 </tr>
 <tr class="even">
 <td align="left">Connection</td>
@@ -526,20 +500,25 @@ h4 {counter-reset: h5;}
 <tbody>
 <tr class="odd">
 <td align="left">distinct</td>
-<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
-<td align="left">no two elements of <code>of</code> refers to the same real-world subject or contain equivalent information</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">no two elements of <code>of</code> refers to the same real-world subject</td>
 </tr>
 <tr class="even">
-<td align="left">same</td>
-<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
-<td align="left">the elements of <code>of</code> are fully equivalent: the same real-world subject, alternative presentations of the same information, etc.</td>
+<td align="left">equivalent</td>
+<td align="left">≥ 2 elements in <code>of</code></td>
+<td align="left">the elements in <code>of</code> contain equivalent information (a hint that only one element needs to be displayed)</td>
 </tr>
 <tr class="odd">
+<td align="left">same</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">all of the elements of <code>of</code> refer to the same real-world subject</td>
+</tr>
+<tr class="even">
 <td align="left">unsupported</td>
 <td align="left"><code>of</code> contains a single reference to a Claim, Inference, or Derivation</td>
 <td align="left">the <code>source</code> does not make this Claim or the <code>support</code> does not justify this Inference or Derivation</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">wrong</td>
 <td align="left"><code>of</code> cannot include both a &quot;wrong&quot; Tag and any element of that Tag's <code>of</code><br/><code>of</code> cannot include a Subject or Aggregated Subject</td>
 <td align="left">the indicated node asserts a falsehood</td>
@@ -641,7 +620,7 @@ h4 {counter-reset: h5;}
 </ul>
 <p>General datasets may be reduced to a belief snapshot via the following process:</p>
 <ol>
-<li>Create a Subject for each group of Subjects and Aggregated Subjects linked by &quot;same&quot; Tags. The new Subject's <code>source</code> should be a Derivation whose <code>support</code> is the set of all OutRef nodes in any of the original nodes' dependencies.</li>
+<li>Create a Subject for each group of Nodes linked by &quot;same&quot; Tags. The new Subject's <code>source</code> should be a Derivation whose <code>support</code> is the set of all OutRef nodes in any of the original nodes' dependencies.</li>
 <li>Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node. The new Properties' and Connections' <code>source</code>s should be Derivations whose <code>support</code>s are the sets of all OutRef nodes in any of the original nodes' dependencies.</li>
 <li>Replacing any set of Properties or Connections that differ only in <code>source</code> with a single node having as its <code>source</code> a Derivation with the union of the original claims' <code>source</code>s' <code>support</code> as the new Derivation's <code>support</code>.</li>
 </ol>

@@ -193,7 +193,7 @@ th{border-bottom:1px solid black;}
 <td align="left">source</td>
 <td align="left">The attribution of this subject.</td>
 <td align="left">URI</td>
-<td align="left">REQUIRED. MUST resolve to an instance of one of the following types: <code>http://gedcomx.org/v1/SourceDescription</code>, <a href="#inference"><code>http://gedcomx.polygenea.org/v1/Inference</code></a>, or <a href="#derivation"><code>http://gedcomx.polygenea.org/v1/Derivation</code></a>.</td>
+<td align="left">REQUIRED. MUST resolve to an instance of one of the following types: <a href="#outref"><code>http://gedcomx.polygenea.org/v1/OutRef</code></a>, <a href="#inference"><code>http://gedcomx.polygenea.org/v1/Inference</code></a>, or <a href="#derivation"><code>http://gedcomx.polygenea.org/v1/Derivation</code></a>.</td>
 </tr>
 </tbody>
 </table>
@@ -288,13 +288,13 @@ th{border-bottom:1px solid black;}
 <td align="left">of</td>
 <td align="left">A reference to the <code>ReasoningNode</code> to which this property applies</td>
 <td align="left">URI</td>
-<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>.</td>
+<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>. Some <code>key</code>s may impose additional constraints.</td>
 </tr>
 <tr class="odd">
 <td align="left">value</td>
 <td align="left">The value of the property.</td>
 <td align="left">string</td>
-<td align="left">REQUIRED.</td>
+<td align="left">REQUIRED. Some <code>key</code>s may impose additional constraints.</td>
 </tr>
 </tbody>
 </table>
@@ -329,13 +329,13 @@ th{border-bottom:1px solid black;}
 <td align="left">of</td>
 <td align="left">A reference to the <code>ReasoningNode</code> to which this connection applies</td>
 <td align="left">URI</td>
-<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>.</td>
+<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>. Some <code>key</code>s may impose additional constraints.</td>
 </tr>
 <tr class="odd">
 <td align="left">value</td>
 <td align="left">The value of the the connection</td>
 <td align="left">URI</td>
-<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>.</td>
+<td align="left">REQUIRED. MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>. Some <code>key</code>s may impose additional constraints.</td>
 </tr>
 </tbody>
 </table>
@@ -361,16 +361,16 @@ th{border-bottom:1px solid black;}
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">type</td>
+<td align="left">key</td>
 <td align="left">Enumerated value identifying the type of connection</td>
 <td align="left">Enumerated Value</td>
-<td align="left">REQUIRED. MUST identify a connection type, and use of a <a href="#known-tag-types">known tag type</a> is RECOMMENDED.</td>
+<td align="left">REQUIRED. MUST identify a tag type, and use of a <a href="#known-tag-types">known tag type</a> is RECOMMENDED.</td>
 </tr>
 <tr class="even">
 <td align="left">of</td>
 <td align="left">A list of references to jointly-tagged <code>ReasoningNode</code>s</td>
 <td align="left">List of URI. Order is not preserved</td>
-<td align="left">REQUIRED. Each URI MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>. Additional constraints may be added for particular tag <code>type</code>s.</td>
+<td align="left">REQUIRED. Each URI MUST resolve to an instance of <a href="#reasoning-node"><code>http://gedcomx.polygenea.org/v1/ReasoningNode</code></a>. Some <code>key</code>s may impose additional constraints.</td>
 </tr>
 </tbody>
 </table>
@@ -399,7 +399,7 @@ th{border-bottom:1px solid black;}
 <td align="left">basis</td>
 <td align="left">A references to <code>Tag</code> with <code>key</code> &quot;same&quot;</td>
 <td align="left">URI</td>
-<td align="left">REQUIRED. MUST resolve to an instance of <a href="#tag"><code>http://gedcomx.polygenea.org/v1/Tag</code></a> that has <code>type</code> <code>http://gedcomx.polygenea.org/v1/Tag/same</code>.</td>
+<td align="left">REQUIRED. MUST resolve to an instance of <a href="#tag"><code>http://gedcomx.polygenea.org/v1/Tag</code></a> that has <code>key</code> <code>http://gedcomx.polygenea.org/v1/Tag/same</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -427,7 +427,7 @@ th{border-bottom:1px solid black;}
 <td align="left">support</td>
 <td align="left">A set of references to the antecedents of this derivation</td>
 <td align="left">List of URI. Order is not preserved.</td>
-<td align="left">REQUIRED. Each URI MUST resolve to an instance of either <a href="#research-node"><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></a> or <code>http://gedcomx.org/v1/SourceDescription</code>.</td>
+<td align="left">REQUIRED. Each URI MUST resolve to an instance of <a href="#research-node"><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></a>.</td>
 </tr>
 <tr class="even">
 <td align="left">reason</td>
@@ -461,7 +461,7 @@ th{border-bottom:1px solid black;}
 <td align="left">support</td>
 <td align="left">A list of references to the antecedents of this derivation</td>
 <td align="left">List of URI. Order is preserved.</td>
-<td align="left">REQUIRED. Each URI MUST resolve to an instance of either <a href="#research-node"><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></a> or <code>http://gedcomx.org/v1/SourceDescription</code>.</td>
+<td align="left">REQUIRED. Each URI MUST resolve to an instance of <a href="#research-node"><code>http://gedcomx.polygenea.org/v1/ResearchNode</code></a>.</td>
 </tr>
 <tr class="even">
 <td align="left">reason</td>
@@ -636,7 +636,7 @@ th{border-bottom:1px solid black;}
 </table>
 <p><a name="key-predicate"/></p>
 <h2 id="the-keypredicate-data-type">3.37 The &quot;KeyPredicate&quot; Data Type</h2>
-<p>The <code>KeyPreducate</code> data type stores a generic key:value pair where the value is a <code>StringPredicate</code>. They are used in place of <code>KeyVal</code> values in <code>OutRefQuery</code> elements.</p>
+<p>The <code>KeyPreducate</code> data type stores a generic key:value pair where the value is a <code>Predicate</code>. They are used in place of <code>KeyVal</code> values in <code>OutRefQuery</code> elements.</p>
 <h3 id="identifier-16">identifier</h3>
 <p>The identifier for the <code>KeyPredicate</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/KeyPredicate</code></p>
@@ -660,14 +660,13 @@ th{border-bottom:1px solid black;}
 <tr class="even">
 <td align="left">value</td>
 <td align="left">the value of this attribute</td>
-<td align="left"><code>StringPredicate</code></td>
+<td align="left"><code>Predicate</code></td>
 <td align="left">REQUIRED.</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <p><a name="predicate"/></p>
-<h2 id="the-predicate-data-type-and-subtypes">3.22 The &quot;Predicate&quot; Data Type and Subtypes</h2>
+<h2 id="the-predicate-data-type-and-subtypes">3.38 The &quot;Predicate&quot; Data Type and Subtypes</h2>
 <p>The <code>Predicate</code> data type defines the abstract concept of a function that accepts some inputs and rejects others.</p>
 <h3 id="identifier-17">identifier</h3>
 <p>The identifier for the <code>Predicate</code> data type is:</p>
@@ -675,106 +674,110 @@ th{border-bottom:1px solid black;}
 <p>In the table of predicate subtypes, the &quot;name&quot; column defines a suffix to the <code>Predicate</code> identifier; the full identifier for a subtype can be constructed as <code>http://gedcomx.polygenea.org/v1/Predicate/</code> concatenated with the value in the &quot;name&quot; column.</p>
 <h3 id="subtypes">subtypes</h3>
 <p>There are many subtypes of <code>Predicate</code>, collectively listed in the following table.</p>
-<p>name | description | properties | constraints <code>Top</code> | always true | | <code>LitString</code> | true for a single value only | <code>x</code>, a string | MapHas | REQUIRED | set of string ↦ datum pairs | <em>x</em>, a set of string ↦ (datum predicate) pairs | for each (<em>a</em> ↦ <em>b</em>) in <em>x</em>, there is a (<em>c</em> ↦ <em>d</em>) pair in <em>v</em> such that <em>a</em> equals <em>c</em> and <em>b</em>(<em>d</em>) is <code>true</code> Same | RECOMMENDED | any | <em>i</em>, an integer<br/><em>j</em>, an integer | <em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> Has | RECOMMENDED | set or list of <em>X</em> | <em>f</em>, an <em>X</em> predicate | <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em> SetHas | RECOMMENDED | set of <em>X</em> | <em>x</em>, a set of <em>X</em> predicates | for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> Cmp | OPTIONAL | either string or datum with a media type that has defined order | <em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate | for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering ICmp | OPTIONAL | as <code>Cmp</code> | <em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer | as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em> Regex | OPTIONAL | string | <em>r</em>, a regex | <em>r</em> matches <em>v</em> Len | OPTIONAL | set or list | <em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer | ((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code> And | OPTIONAL | any (call it <em>X</em>) | <em>x</em>, a set of <em>X</em> predicates | <em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em> Or | OPTIONAL | any (call it <em>X</em>) | <em>x</em>, a set of <em>X</em> predicates | <em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em> Not | OPTIONAL | any (call it <em>X</em>) | <em>f</em>, an <em>X</em> predicate | <em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code> Script | OPTIONAL | any | <em>x</em>, a datum defining a single function in some programming language | evaluating the function in <em>x</em> with arguments <em>v</em> and <em>s</em> returns <code>true</code></p>
-<p><a name="producer"/></p>
-<h2 id="the-producer-data-type-and-subtypes">3.23 The &quot;Producer&quot; Data Type and Subtypes</h2>
-<p>The <code>Predicate</code> data type defines the abstract concept of a function that produces a value of a particular type.</p>
+<p>name | description | properties | constraints <code>Top</code> | always true | | <code>Lit</code> | true for a single value only | <code>x</code>, a string | <code>MapHas</code> | peeks inside an <code>OutRef</code>'s <code>details</code> | <code>x</code>, a set of <code>KeyPredicate</code>s | <code>Same</code> | two nodes have the same contents | <code>i</code>, an integer<br/><code>j</code>, a string | <code>i</code> is ≥ 0 and less than the index of the containing <code>NodeQuery</code><br/><code>j</code> is the name of a property of the <code>NodeQuery</code> at index <code>i</code><br/>the type of the <code>j</code> property is either string or Enumerated Value <code>Cmp</code> | compares a value with a constant | <code>op</code>, which is one of &quot;&lt;&quot;, &quot;&lt;=&quot;, &quot;==&quot;, &quot;!=&quot;, &quot;&gt;=&quot;, &quot;&gt;&quot;<br/><code>x</code>, a string | <code>ICmp</code> | compares two values | | <code>op</code>, which is one of &quot;&lt;&quot;, &quot;&lt;=&quot;, &quot;==&quot;, &quot;!=&quot;, &quot;&gt;=&quot;, &quot;&gt;&quot;<br/><code>i</code>, an integer<br/><code>j</code>, an integer | <code>i</code> and <code>j</code> have the same constraints as for <code>Same</code> in this table <code>Regex</code> | regular expression matching | <code>r</code>, a string | the contents of <code>r</code> must be either a <em>RegularExpressionLiteral</em> or a <em>RegularExpressionBody</em> as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a>. <code>And</code> | combines two or more predicates | <code>parts</code>, a set of <code>Predicate</code>s | The set of predicates is not empty <code>Or</code> | combines two or more predicates | <code>parts</code>, a set of <code>Predicate</code>s | The set of predicates is not empty <code>Not</code> | inverts a predicate | <code>x</code>, a Predicate | <code>Script</code> | arbitrary code | <code>src</code>, a string<br/><code>type</code>, a string | <code>lang</code> identifies a scripting language<br/><code>src</code> is a program in that language<br/><code>src</code> contains a single function accepting two parameters: a string and a list of <code>ResearchNode</code>s; and returning a Boolean value</p>
+<p><a name="string-producer"/></p>
+<h2 id="the-stringproducer-data-type-and-subtypes">3.39 The &quot;StringProducer&quot; Data Type and Subtypes</h2>
+<p>The <code>StringProducer</code> data type defines the abstract concept of a function that produces a string value.</p>
 <h3 id="identifier-18">identifier</h3>
-<p>The identifier for the <code>Producers</code> data type is:</p>
-<p><code>http://gedcomx.polygenea.org/v1/Producer</code></p>
-<p>In the table of producer subtypes, the &quot;name&quot; column defines a suffix to the <code>Producer</code> identifier; the full identifier for a subtype can be constructed as <code>http://gedcomx.polygenea.org/v1/Producer/</code> concatenated with the value in the &quot;name&quot; column.</p>
+<p>The identifier for the <code>StringProducer</code> data type is:</p>
+<p><code>http://gedcomx.polygenea.org/v1/StringProducer</code></p>
+<p>In the table of producer subtypes, the &quot;name&quot; column defines a suffix to the <code>StringProducer</code> identifier; the full identifier for a subtype can be constructed as <code>http://gedcomx.polygenea.org/v1/StringProducer/</code> concatenated with the value in the &quot;name&quot; column.</p>
 <h3 id="subtypes-1">subtypes</h3>
-<p>There are many subtypes of <code>Producer</code>, collectively listed in the following table.</p>
-<p>name | description | properties | constraints Lit | REQUIRED | any | <em>x</em>, a value of the same type as the producer | <em>x</em> Lookup | RECOMMENDED | any | <em>i</em>, an integer<br/><em>j</em>, an integer | the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> Match | OPTIONAL | string | <em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer | the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group Slice | OPTIONAL | string or list | <em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer | the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence Cat | OPTIONAL | string or list | <em>x</em>, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order Union | OPTIONAL | set | <em>x</em>, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of <em>x</em> Intersect | OPTIONAL | set | <em>x</em>, a set of set producers | a set containing those values that are in every set produced by each element of <em>x</em> Script | OPTIONAL | any | <em>x</em>, a datum defining a single function in some programming language | the value returned when evaluating the function in <em>x</em> with argument <em>s</em></p>
-<p><a name="node-template"/></p>
-<h2 id="the-nodetemplate-data-type">3.33 The &quot;NodeTemplate&quot; Data Type</h2>
-<p>The <code>NodeTemplate</code> data type describes how to construct a node given some context.</p>
+<p>There are many subtypes of <code>StringProducer</code>, collectively listed in the following table.</p>
+<p>name | description | properties | constraints <code>Lit</code> | a constant value | <code>x</code>, a string | <code>Lookup</code> | a value copied from another node | <code>i</code>, an integer<br/><code>j</code>, a string | <code>i</code> is ≥ 0 and less than the index of the containing <code>NodeTemplate</code><br/><code>j</code> is the name of a property of the <code>NodeQuery</code> or <code>NodeTemplate</code> at index <code>i</code><br/>the type of the <code>j</code> property is either a string, an Enumerated Value, or a <code>StringProducer</code> <code>Match</code> | a regular expression match | <code>f</code>, a <code>StringProducer</code><br/><code>r</code>, a string<br/><code>i</code>, an integer | the contents of <code>r</code> must be either a <em>RegularExpressionLiteral</em> or a <em>RegularExpressionBody</em> as defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a> <code>Slice</code> | a substring | <code>f</code>, a <code>StringProducer</code><br/><code>i</code>, an integer<br/><code>j</code>, an integer | <code>Cat</code> | string concatentation | <code>parts</code>, a list of <code>StringProducer</code>s | <code>Script</code> | arbitrary code | <code>src</code>, a string<br/><code>type</code>, a string | <code>lang</code> identifies a scripting language<br/><code>src</code> is a program in that language<br/><code>src</code> contains a single function accepting one parameter: a list of <code>ResearchNode</code>s; and returning a string value</p>
+<p><a name="set-producer"/></p>
+<h2 id="the-setproducer-data-type-and-subtypes">3.40 The &quot;SetProducer&quot; Data Type and Subtypes</h2>
+<p>The <code>SetProducer</code> data type defines the abstract concept of a function that produces a string value.</p>
 <h3 id="identifier-19">identifier</h3>
+<p>The identifier for the <code>SetProducer</code> data type is:</p>
+<p><code>http://gedcomx.polygenea.org/v1/SetProducer</code></p>
+<p>In the table of producer subtypes, the &quot;name&quot; column defines a suffix to the <code>SetProducer</code> identifier; the full identifier for a subtype can be constructed as <code>http://gedcomx.polygenea.org/v1/SetProducer/</code> concatenated with the value in the &quot;name&quot; column.</p>
+<h3 id="subtypes-2">subtypes</h3>
+<p>There are many subtypes of <code>SetProducer</code>, collectively listed in the following table.</p>
+<p>name | description | properties | constraints <code>Lit</code> | a constant value | <code>x</code>, a set of integer values | every element of <code>x</code> must be ≥ 0<br/>every element of <code>x</code> must be &lt; the index of the containing <code>NodeTemplate</code> <code>Lookup</code> | a value copied from another node | <code>i</code>, an integer<br/><code>j</code>, a string | <code>i</code> is ≥ 0 and less than the index of the containing <code>NodeTemplate</code><br/><code>j</code> is the name of a property of the <code>NodeQuery</code> or <code>NodeTemplate</code> at index <code>i</code><br/>the type of the <code>j</code> property is either a set of integers or a <code>SetProducer</code> <code>Union</code> | the union of other sets | <code>parts</code>, a set of <code>SetProducer</code>s | <code>Intersect</code> | the common elements of other sets | <code>parts</code>, a set of <code>SetProducer</code>s |</p>
+<p><a name="node-template"/></p>
+<h2 id="the-nodetemplate-data-type-and-subtypes">3.41 The &quot;NodeTemplate&quot; Data Type and Subtypes</h2>
+<p>The <code>NodeTemplate</code> data type describes how to construct a node given some context. It has a subtype corresponding to each subtype of <code>Claim</code></p>
+<h3 id="identifier-20">identifier</h3>
 <p>The identifier for the <code>NodeTemplate</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/NodeTemplate</code></p>
 <h3 id="extension-10">extension</h3>
 <p>For every concrete node type named <em>X</em> extending <code>Claim</code>, there is a concrete node type named <em>X</em><code>Template</code> extending <code>NodeTemplate</code>.</p>
-<h3 id="properties-17">properties</h3>
-<p>None; in particular, <code>NodeTemplate</code> (and hence its extension nodes) does not have either an <code>attribution</code> nor a <code>source</code> property.</p>
-<p>Nodes that extend <code>NodeTemplate</code> MUST use type <code>int</code> instead of type <code>URI</code> anywhere type <code>URI</code> is required for the corresponding type that extends <code>Claim</code>. The integer values MUST be strictly smaller than the index of the <code>NodeTemplate</code> in its containing <code>Expectation</code> and MUST be greater than or equal to 0.</p>
-<p>Nodes that extend <code>NodeTemplate</code> MAY use a function type as the value of a string or <strong>FIXME</strong>: <em>as will be described later</em></p>
 <table>
 <thead>
 <tr class="header">
 <th align="left"><code>NodeTemplate</code> subtype</th>
-<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Properties</th>
 <th align="left">Constraints</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">SubjectTemplate</td>
-<td align="left">0. <code>slug</code> : string producer</td>
+<td align="left"><code>slug</code>, a <code>StringProducer</code></td>
 </tr>
 <tr class="even">
-<td align="left">PropertyQuery</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string producer</td>
+<td align="left">PropertyTemplate</td>
+<td align="left"><code>key</code>, a <code>StringProducer</code><br/><code>of</code>, an integer<br/><code>value</code>, a <code>StringProducer</code></td>
+<td align="left"><code>of</code> must be ≥ <code>-1</code> and &lt; the index of this <code>PropertyTemplate</code></td>
 </tr>
 <tr class="odd">
-<td align="left">ConnectionQuery</td>
-<td align="left">0. <code>key</code> : string producer <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int</td>
+<td align="left">ConnectionTemplate</td>
+<td align="left"><code>key</code>, a <code>StringProducer</code><br/><code>of</code>, an integer<br/><code>value</code>, an integer</td>
+<td align="left">both <code>of</code> and <code>value</code> must be ≥ <code>-1</code> and &lt; the index of this <code>ConnectionTemplate</code></td>
 </tr>
 <tr class="even">
-<td align="left">TagQuery</td>
-<td align="left">0. <code>key</code> : string producers <br/>1. <code>of</code> : int</td>
+<td align="left">TagTemplate</td>
+<td align="left"><code>key</code>, a <code>StringProducer</code> <br/><code>of</code>, a <code>SetProducer</code></td>
 </tr>
 </tbody>
 </table>
 <p><a name="node-query"/></p>
 <h2 id="the-nodequery-data-type">3.34 The &quot;NodeQuery&quot; Data Type</h2>
-<p>The <code>NodeQuery</code> data type describes an acceptable set of nodes.</p>
-<h3 id="identifier-20">identifier</h3>
+<p>The <code>NodeQuery</code> data type describes an acceptable set of nodes. It has a subtype corresponding to each subtype of <code>ResearchNode</code></p>
+<h3 id="identifier-21">identifier</h3>
 <p>The identifier for the <code>NodeQuery</code> data type is:</p>
 <p><code>http://gedcomx.polygenea.org/v1/NodeQuery</code></p>
 <h3 id="extension-11">extension</h3>
-<p>For every node type named <em>X</em> extending <code>ResearchNode</code>, there is a concrete node type named <em>X</em><code>Template</code> extending <code>NodeQuery</code>.</p>
-<h3 id="properties-18">properties</h3>
-<p>As per <code>ResearchNode</code> and its subtypes, except as noted below.</p>
-<p>Nodes that extend <code>NodeQuery</code> MUST use type <code>int</code> instead of type <code>URI</code> anywhere type <code>URI</code> is required for the corresponding type that extends <code>Claim</code>. The integer values MUST be strictly smaller than the index of the <code>NodeQuery</code> in its containing <code>Expectation</code> and must be greater than or equal to −1.</p>
-<p>Nodes that extend <code>NodeQuery</code> MAY use a predicate type <strong>FIXME</strong>: <em>as will be described later</em></p>
+<p>For every node type named <em>X</em> extending <code>ResearchNode</code>, there is a concrete node type named <em>X</em><code>Query</code> extending <code>NodeQuery</code>.</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left"><code>NodeQuery</code> subtype</th>
-<th align="left">Properties<br/>index. name : type</th>
+<th align="left">Properties</th>
 <th align="left">Constraints</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">SubjectQuery</td>
-<td align="left">0. <code>slug</code> : string predicate <br/>1. <code>source</code> : int</td>
-<td align="left"><code>slug</code>'s value MUST be <em>Top</em></td>
+<td align="left"><code>from</code>, an integer</td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 <tr class="even">
 <td align="left">PropertyQuery</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : string predicate<br/>3. <code>source</code> : int</td>
-<td align="left"></td>
+<td align="left"><code>key</code>, a <code>StringPredicate</code> <br/><code>of</code>, an integer<br/><code>value</code>, a <code>StringPredicate</code><br/><code>source</code>, an integer</td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 <tr class="odd">
 <td align="left">ConnectionQuery</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>value</code> : int<br/>3. <code>source</code> : int</td>
-<td align="left"></td>
+<td align="left"><code>key</code>, a <code>StringPredicate</code> <br/><code>of</code>, an integer<br/><code>value</code>, an integer<br/><code>source</code>, an integer</td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 <tr class="even">
 <td align="left">TagQuery</td>
-<td align="left">0. <code>key</code> : string predicate <br/>1. <code>of</code> : int<br/>2. <code>source</code> : int</td>
-<td align="left"></td>
+<td align="left"><code>key</code>, a <code>StringPredicate</code> <br/><code>of</code>, a set of integers<br/><code>source</code>, an integer</td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 <tr class="odd">
 <td align="left">OutRefQuery</td>
-<td align="left">0. <code>parents</code> : set of (string, int) pairs<br/>1. <code>details</code> : set of (string, string predicate) pairs</td>
+<td align="left"><code>parents</code>, a set of <code>KeyInt</code>s<br/><code>details</code>, a set of <code>KeyPredicate</code>s</td>
 <td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left">DerivationQuery</td>
-<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
-<td align="left"></td>
+<td align="left"><code>support</code>, a set of integers<br/><code>reason</code>, a <code>StringPredicate</code></td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 <tr class="odd">
 <td align="left">ExpectationQuery</td>
@@ -783,8 +786,8 @@ th{border-bottom:1px solid black;}
 </tr>
 <tr class="even">
 <td align="left">InferenceQuery</td>
-<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : int</td>
-<td align="left"></td>
+<td align="left"><code>support</code>, a list of integers<br/><code>reason</code>, an integer</td>
+<td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
 </tr>
 </tbody>
 </table>

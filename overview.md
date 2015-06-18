@@ -149,22 +149,20 @@ Inside a predicate, neither _s_ nor _v_ may be modified
 and any node references inside tuples inside _s_ are treated as opaque types 
 (i.e., they may not be dereferenced).
 
+Because predicates are not used for Expectation nodes, only string and datum predicates exist.
+
 name | status | types | defined with | returns `true` when
 -----|--------|-------|--------------|--------------------
-Top | REQUIRED | any | (nothing) | always
-Lit | REQUIRED | any | _x_, a value of the same type as the predicate | _v_ equals _x_
-MapHas | REQUIRED | set of string ↦ datum pairs | _x_, a set of string ↦ (datum predicate) pairs | for each (_a_ ↦ _b_) in _x_, there is a (_c_ ↦ _d_) pair in _v_ such that _a_ equals _c_ and _b_(_d_) is `true`
-Same | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
-Has | RECOMMENDED | set or list of _X_ | _f_, an _X_ predicate | _f_(_e_, _s_) is `true` for any _e_ in _v_
-SetHas | RECOMMENDED | set of _X_ | _x_, a set of _X_ predicates | for each _f_ in _x_ there is a _e_ in _v_ such that _f_(_e_, _s_) is `true`
-Cmp | OPTIONAL | either string or datum with a media type that has defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
+Top | REQUIRED | either | (nothing) | always
+Lit | REQUIRED | either | _x_, a value of the same type as the predicate | _v_ equals _x_
+Same | RECOMMENDED | either | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
+Cmp | OPTIONAL | string, or datum whose media type has a defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
 ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
 Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
-Len | OPTIONAL | set or list | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, an integer | ((the number of elements in _v_) ∙ _x_) is `true`
-And | OPTIONAL | any (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for all _f_ in _x_
-Or | OPTIONAL | any (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for at least one _f_ in _x_
-Not | OPTIONAL | any (call it _X_) | _f_, an _X_ predicate | _f_(_v_, _s_) is `false`
-Script | OPTIONAL | any | _x_, a datum defining a single function in some programming language | evaluating the function in _x_ with arguments _v_ and _s_ returns `true`
+And | OPTIONAL | either (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for all _f_ in _x_
+Or | OPTIONAL | either (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for at least one _f_ in _x_
+Not | OPTIONAL | either (call it _X_) | _f_, an _X_ predicate | _f_(_v_, _s_) is `false`
+Script | OPTIONAL | either | _x_, a datum defining a single function in some programming language | evaluating the function in _x_ with arguments _v_ and _s_ returns `true`
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
 
@@ -183,13 +181,15 @@ Inside a producer, _s_ may not be modified
 and any node references inside tuples inside _s_ are treated as opaque types 
 (i.e., they may not be dereferenced).
 
+The set of Node Template types suggests three predicate types: string, datum, and set of integer
+
 name | status | types | defined with | returns
 -----|--------|-------|--------------|--------
 Lit | REQUIRED | any | _x_, a value of the same type as the producer | _x_
 Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_ 
 Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string or list | _f_, a string or list producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed subsequence of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence
-Cat | OPTIONAL | string or list | _x_, a list of string or list producers | the sequence produced by concatenating the sequenced returned by each elements of _x_ in order
+Slice | OPTIONAL | string | _f_, a string producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed substring of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the string added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width substrings return the empty string
+Cat | OPTIONAL | string | _x_, a list of string producers | the string produced by concatenating the string returned by each element of _x_ in order
 Union | OPTIONAL | set | _x_, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
 Intersect | OPTIONAL | set | _x_, a set of set producers | a set containing those values that are in every set produced by each element of _x_
 Script | OPTIONAL | any | _x_, a datum defining a single function in some programming language | the value returned when evaluating the function in _x_ with argument _s_
@@ -234,7 +234,7 @@ To achieve that end, each Node Template has a dummy `source` field (index 0, alw
 
 | Node subtype | is a | Properties (index. name : type) | Constraints |
 |--------------|------|-----------------------------------|-------------|
-| Aggregated Subject | | 0. `parts` : reference to a Tag | `parts`'s `key` MUST be "same" <br/> Each node referenced in `parts`'s `key`'s `of` MUST be either a Subject or and Aggregated Subject |
+| Aggregated Subject | | 0. `parts` : reference to a Tag | `parts`'s `key` MUST be "same" |
 | Connection | Claim | 0. `source` : reference to a Source<br/>1. `key` : string <br/>2. `of` : reference to a Node<br/>3. `value` : int | some `key`s make constraints on `of` and/or `value` |
 | Derivation | Source | 0. `support` : set of references to Nodes<br/>1. `reason` : string | |
 | Expectation | | 0. `antecedent` : list of Node Queries<br/>1. `consequent` : list of Node Templates | _See below_ |
@@ -457,8 +457,9 @@ prepend it with the URI or IRI of this specification concatenated with "/Tag/key
 
 | `key` | constraints | meaning |
 |-------|-------------|---------|
-| distinct | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | no two elements of `of` refers to the same real-world subject or contain equivalent information |
-| same | ≥ 2 elements in `of`<br/>all elements referenced in `of` have same Node subtype (except may mix Subject and Aggregated Subject) | the elements of `of` are fully equivalent: the same real-world subject, alternative presentations of the same information, etc. |
+| distinct | ≥ 2 elements in `of`<br/>each elements referenced in `of` either a Subject or and Aggregated Subject | no two elements of `of` refers to the same real-world subject |
+| equivalent | ≥ 2 elements in `of` | the elements in `of` contain equivalent information (a hint that only one element needs to be displayed) |
+| same | ≥ 2 elements in `of`<br/>each elements referenced in `of` either a Subject or and Aggregated Subject | all of the elements of `of` refer to the same real-world subject |
 | unsupported | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` does not justify this Inference or Derivation  | 
 | wrong | `of` cannot include both a "wrong" Tag and any element of that Tag's `of`<br/>`of` cannot include a Subject or Aggregated Subject | the indicated node asserts a falsehood | 
 
@@ -544,7 +545,7 @@ Belief snapshots are datasets that satisfy the following constraints:
 
 General datasets may be reduced to a belief snapshot via the following process:
 
-1.  Create a Subject for each group of Subjects and Aggregated Subjects linked by "same" Tags.
+1.  Create a Subject for each group of Nodes linked by "same" Tags.
 	The new Subject's `source` should be
 	a Derivation whose `support` is the set of all OutRef nodes in any of the original nodes' dependencies.
 2.  Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node.
