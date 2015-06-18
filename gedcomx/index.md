@@ -194,7 +194,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-key | Enumerated value identifying the type of property | Enumerated Value | REQUIRED. MUST identify a property type, and use of a [known property type](#known-property-types) is RECOMMENDED.
+key | Enumerated value identifying the type of property | Enumerated Value | REQUIRED. REQUIRED. RECOMMENDED to be an Enumerated Value; use of a [known property type](#known-property-types) is RECOMMENDED.
 of | A reference to the `ReasoningNode` to which this property applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 value | The value of the property. | string | REQUIRED. Some `key`s may impose additional constraints.
 
@@ -223,7 +223,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-key | Enumerated value identifying the type of connection | Enumerated Value | REQUIRED. MUST identify a connection type, and use of a [known connection type](#known-connection-types) is RECOMMENDED.
+key | Enumerated value identifying the type of connection | string | REQUIRED. RECOMMENDED to be an Enumerated Value; use of a [known connection type](#known-connection-types) is RECOMMENDED.
 of | A reference to the `ReasoningNode` to which this connection applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 value | The value of the the connection | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 
