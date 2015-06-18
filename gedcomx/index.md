@@ -1,3 +1,13 @@
+<style type="text/css">
+body{font-family:sans-serif; counter-reset:h1;}
+code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
+table{border-collapse:collapse;}
+tr:nth-child(2n){background-color:#ddd;}
+td,th{padding:0.25ex 1ex;}
+th{border-bottom:1px solid black;}
+</style>
+
+
 __To `conceptual-model-specification` make the following changes:__
 
 ----
