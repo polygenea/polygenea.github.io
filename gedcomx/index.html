@@ -282,7 +282,7 @@ th{border-bottom:1px solid black;}
 <td align="left">key</td>
 <td align="left">Enumerated value identifying the type of property</td>
 <td align="left">Enumerated Value</td>
-<td align="left">REQUIRED. REQUIRED. RECOMMENDED to be an Enumerated Value; use of a <a href="#known-property-types">known property type</a> is RECOMMENDED.</td>
+<td align="left">REQUIRED. If an Enumerated Value, use of a <a href="#known-property-types">known property type</a> is RECOMMENDED.</td>
 </tr>
 <tr class="even">
 <td align="left">of</td>
@@ -323,7 +323,7 @@ th{border-bottom:1px solid black;}
 <td align="left">key</td>
 <td align="left">Enumerated value identifying the type of connection</td>
 <td align="left">string</td>
-<td align="left">REQUIRED. RECOMMENDED to be an Enumerated Value; use of a <a href="#known-connection-types">known connection type</a> is RECOMMENDED.</td>
+<td align="left">REQUIRED. If an Enumerated Value, use of a <a href="#known-connection-types">known connection type</a> is RECOMMENDED.</td>
 </tr>
 <tr class="even">
 <td align="left">of</td>
@@ -593,7 +593,7 @@ th{border-bottom:1px solid black;}
 <td align="left">key</td>
 <td align="left">the topic of this attribute</td>
 <td align="left">Enumerated Value</td>
-<td align="left">REQUIRED. MUST identify a source detail type, and use of a <a href="#known-source-relationship-types">known source detail type</a> is RECOMMENDED.</td>
+<td align="left">REQUIRED. MUST identify a source detail type, and use of a <a href="#known-source-detail-types">known source detail type</a> is RECOMMENDED.</td>
 </tr>
 <tr class="even">
 <td align="left">value</td>
@@ -788,6 +788,173 @@ th{border-bottom:1px solid black;}
 <td align="left">InferenceQuery</td>
 <td align="left"><code>support</code>, a list of integers<br/><code>reason</code>, an integer</td>
 <td align="left">all integer values must be ≥ <code>-1</code> and &lt; the index of this <code>NodeQuery</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>add the following sections</strong></p>
+<h1 id="know-enumerated-types-for-reasoning">6. Know Enumerated Types for Reasoning</h1>
+<p><em>this section and its subsections are far from complete</em></p>
+<p><a name="known-connection-types"/></p>
+<h2 id="known-connection-types">6.1 Known Connection Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">constraints</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Connection/update</code></td>
+<td align="left"><code>of</code> and <code>value</code> have same node type</td>
+<td align="left">an error or inaccuracy in <code>of</code> has been corrected in <code>value</code></td>
+</tr>
+</tbody>
+</table>
+<p>Any <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-roles">Known Role Types</a> is also considered to be a Known Connection Type.</p>
+<p><a name="known-property-types"/></p>
+<h2 id="known-property-types">6.2 Known Property Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">constraints</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/type</code></td>
+<td align="left"><code>value</code> is an Enumerated Value; use of a <a href="#known-subject-types">known subject type</a> is RECOMMENDED<br/><code>of</code> is a Subject or Aggregated Subject</td>
+<td align="left">what type of entity this subject refers to</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/date</code></td>
+<td align="left"></td>
+<td align="left">the date associated with the described node</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/date#formal</code></td>
+<td align="left"><code>value</code> is a <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/date-format-specification.md"><code>http://gedcomx.org/date/v1</code></a></td>
+<td align="left">the date associated with the described node</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/date#original</code></td>
+<td align="left"></td>
+<td align="left">the date associated with the described node</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/name</code></td>
+<td align="left"></td>
+<td align="left">a name</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Property/gender</code></td>
+<td align="left">using a <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-gender-types">Known Gender Type</a> for <code>value</code> is RECOMMENDED</td>
+<td align="left">the biological or social gender identity</td>
+</tr>
+</tbody>
+</table>
+<p>Any <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-name-types">Known Name Types</a> or <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-fact-qualifier">Known Fact Qualifiers</a> is also considered to be a Known Property Type.</p>
+<p><a name="known-subject-types"/></p>
+<h2 id="known-subject-types">6.2.1 Known Subject Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">subtype of</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Subject/person</code></td>
+<td align="left">a human or putative human</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Subject/event</code></td>
+<td align="left">a distinct and recognisable (time period, location) pair or set thereof effecting or attempting to effect a common end</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Subject/place</code></td>
+<td align="left">a location or region defined politically, geographically, socially, etc.</td>
+</tr>
+</tbody>
+</table>
+<p>Any <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-event-types">Known Event Type</a> or <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/event-types-specification.md">additional Known Event Type</a> or <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-fact-types">Known Fact Type</a> is also considered to be a Known Subject Type. Many <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/fact-types-specification.md">additional Known Fact Type</a> values also describe event types.</p>
+<p><a name="known-source-detail-types"/></p>
+<h2 id="known-source-detail-types">6.3 Known Source Detail Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">constraints</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/OutRef/accessed</code></td>
+<td align="left">a <a href="https://github.com/FamilySearch/gedcomx/blob/master/specifications/date-format-specification.md"><code>http://gedcomx.org/date/v1</code></a>, optionally followed by a SEMICOLON <code>;</code> and an identifier of who performed the access</td>
+<td align="left">when the external resource described by this <code>OutRef</code> was accessed by the identified access, or by the creator of this <code>OutRef</code> if no identifier is included</td>
+</tr>
+</tbody>
+</table>
+<p><a name="known-source-relationship-types"/></p>
+<h2 id="known-source-relationship-types">6.4 Known Source Relationship Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">constraints</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/OutRef/extends</code></td>
+<td align="left"></td>
+<td align="left">this <code>OutRef</code> is a subpart of the indicated <code>OutRef</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="known-tag-types"/></p>
+<h2 id="known-tag-types">6.5 Known Tag Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">URI</th>
+<th align="left">constraints</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Tag/distinct</code></td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">no two elements of <code>of</code> refers to the same real-world subject</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Tag/equivalent</code></td>
+<td align="left">≥ 2 elements in <code>of</code></td>
+<td align="left">the elements in <code>of</code> contain equivalent information (a hint that only one element needs to be displayed)</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Tag/same</code></td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">all of the elements of <code>of</code> refer to the same real-world subject</td>
+</tr>
+<tr class="even">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Tag/unsupported</code></td>
+<td align="left"><code>of</code> contains a single reference to a Claim, Inference, or Derivation</td>
+<td align="left">the <code>source</code> does not make this Claim or the <code>support</code> does not justify this Inference or Derivation</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>http://gedcomx.polygenea.org/v1/Tag/wrong</code></td>
+<td align="left"><code>of</code> cannot include both a &quot;wrong&quot; Tag and any element of that Tag's <code>of</code><br/><code>of</code> cannot include a Subject or Aggregated Subject</td>
+<td align="left">the indicated node asserts a falsehood</td>
 </tr>
 </tbody>
 </table>

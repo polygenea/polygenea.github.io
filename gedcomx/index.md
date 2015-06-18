@@ -194,7 +194,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-key | Enumerated value identifying the type of property | Enumerated Value | REQUIRED. REQUIRED. RECOMMENDED to be an Enumerated Value; use of a [known property type](#known-property-types) is RECOMMENDED.
+key | Enumerated value identifying the type of property | Enumerated Value | REQUIRED. If an Enumerated Value, use of a [known property type](#known-property-types) is RECOMMENDED.
 of | A reference to the `ReasoningNode` to which this property applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 value | The value of the property. | string | REQUIRED. Some `key`s may impose additional constraints.
 
@@ -223,7 +223,7 @@ This data type extends the following data type:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-key | Enumerated value identifying the type of connection | string | REQUIRED. RECOMMENDED to be an Enumerated Value; use of a [known connection type](#known-connection-types) is RECOMMENDED.
+key | Enumerated value identifying the type of connection | string | REQUIRED. If an Enumerated Value, use of a [known connection type](#known-connection-types) is RECOMMENDED.
 of | A reference to the `ReasoningNode` to which this connection applies | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 value | The value of the the connection | URI | REQUIRED. MUST resolve to an instance of [`http://gedcomx.polygenea.org/v1/ReasoningNode`](#reasoning-node). Some `key`s may impose additional constraints.
 
@@ -434,7 +434,7 @@ The identifier for the `KeyVal` data type is:
 
 name  | description | data type | constraints
 ------|-------------|-----------|------------
-key | the topic of this attribute | Enumerated Value | REQUIRED. MUST identify a source detail type, and use of a [known source detail type](#known-source-relationship-types) is RECOMMENDED.
+key | the topic of this attribute | Enumerated Value | REQUIRED. MUST identify a source detail type, and use of a [known source detail type](#known-source-detail-types) is RECOMMENDED.
 value | the value of this attribute | string | REQUIRED.  Constraints on values may be added for particular `key`s.
 
 
@@ -625,4 +625,90 @@ For every node type named _X_ extending `ResearchNode`, there is a concrete node
 | DerivationQuery | `support`, a set of integers<br/>`reason`, a `StringPredicate` | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
 | ExpectationQuery | _exactly the same a Expectation_ | |
 | InferenceQuery | `support`, a list of integers<br/>`reason`, an integer | all integer values must be ≥ `-1` and < the index of this `NodeQuery` |
+
+
+-----
+
+__add the following sections__
+
+# 6. Know Enumerated Types for Reasoning
+
+_this section and its subsections are far from complete_
+
+<a name="known-connection-types"/>
+
+## 6.1 Known Connection Types
+
+| URI | constraints | description |
+|-----|-------------|-------------|
+| `http://gedcomx.polygenea.org/v1/Connection/update` | `of` and `value` have same node type | an error or inaccuracy in `of` has been corrected in `value` |
+
+Any [Known Role Types](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-roles)
+is also considered to be a Known Connection Type.
+
+<a name="known-property-types"/>
+
+## 6.2 Known Property Types
+
+| URI | constraints | description |
+|-----|-------------|-------------|
+| `http://gedcomx.polygenea.org/v1/Property/type` | `value` is an Enumerated Value; use of a [known subject type](#known-subject-types) is RECOMMENDED<br/>`of` is a Subject or Aggregated Subject | what type of entity this subject refers to |
+| `http://gedcomx.polygenea.org/v1/Property/date` | | the date associated with the described node |
+| `http://gedcomx.polygenea.org/v1/Property/date#formal` | `value` is a [`http://gedcomx.org/date/v1`](https://github.com/FamilySearch/gedcomx/blob/master/specifications/date-format-specification.md) | the date associated with the described node |
+| `http://gedcomx.polygenea.org/v1/Property/date#original` | | the date associated with the described node |
+| `http://gedcomx.polygenea.org/v1/Property/name` | | a name
+| `http://gedcomx.polygenea.org/v1/Property/gender` | using a [Known Gender Type](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-gender-types) for `value` is RECOMMENDED | the biological or social gender identity
+
+Any [Known Name Types](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-name-types)
+or [Known Fact Qualifiers](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-fact-qualifier)
+is also considered to be a Known Property Type.
+
+
+<a name="known-subject-types"/>
+
+## 6.2.1 Known Subject Types
+
+| URI | subtype of | description |
+|-----|------------|-------------|
+| `http://gedcomx.polygenea.org/v1/Subject/person` | a human or putative human |
+| `http://gedcomx.polygenea.org/v1/Subject/event` | a distinct and recognisable (time period, location) pair or set thereof effecting or attempting to effect a common end |
+| `http://gedcomx.polygenea.org/v1/Subject/place` | a location or region defined politically, geographically, socially, etc. |
+
+Any [Known Event Type](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-event-types)
+or [additional Known Event Type](https://github.com/FamilySearch/gedcomx/blob/master/specifications/event-types-specification.md)
+or [Known Fact Type](https://github.com/FamilySearch/gedcomx/blob/master/specifications/conceptual-model-specification.md#known-fact-types)
+is also considered to be a Known Subject Type.
+Many [additional Known Fact Type](https://github.com/FamilySearch/gedcomx/blob/master/specifications/fact-types-specification.md) values also describe event types.
+
+
+<a name="known-source-detail-types"/>
+
+## 6.3 Known Source Detail Types
+
+| URI | constraints | description |
+|-----|-------------|-------------|
+| `http://gedcomx.polygenea.org/v1/OutRef/accessed` | a [`http://gedcomx.org/date/v1`](https://github.com/FamilySearch/gedcomx/blob/master/specifications/date-format-specification.md), optionally followed by a SEMICOLON `;` and an identifier of who performed the access | when the external resource described by this `OutRef` was accessed by the identified access, or by the creator of this `OutRef` if no identifier is included | 
+
+
+<a name="known-source-relationship-types"/>
+
+## 6.4 Known Source Relationship Types
+
+| URI | constraints | description |
+|-----|-------------|-------------|
+| `http://gedcomx.polygenea.org/v1/OutRef/extends` | | this `OutRef` is a subpart of the indicated `OutRef` | 
+
+<a name="known-tag-types"/>
+
+## 6.5 Known Tag Types
+
+| URI | constraints | description |
+|-----|-------------|-------------|
+| `http://gedcomx.polygenea.org/v1/Tag/distinct` | ≥ 2 elements in `of`<br/>each elements referenced in `of` either a Subject or and Aggregated Subject | no two elements of `of` refers to the same real-world subject |
+| `http://gedcomx.polygenea.org/v1/Tag/equivalent` | ≥ 2 elements in `of` | the elements in `of` contain equivalent information (a hint that only one element needs to be displayed) |
+| `http://gedcomx.polygenea.org/v1/Tag/same` | ≥ 2 elements in `of`<br/>each elements referenced in `of` either a Subject or and Aggregated Subject | all of the elements of `of` refer to the same real-world subject |
+| `http://gedcomx.polygenea.org/v1/Tag/unsupported` | `of` contains a single reference to a Claim, Inference, or Derivation | the `source` does not make this Claim or the `support` does not justify this Inference or Derivation  | 
+| `http://gedcomx.polygenea.org/v1/Tag/wrong` | `of` cannot include both a "wrong" Tag and any element of that Tag's `of`<br/>`of` cannot include a Subject or Aggregated Subject | the indicated node asserts a falsehood | 
+
+
 
