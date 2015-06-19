@@ -63,8 +63,8 @@ Note here I've chosen to add a birth event instead of a birthdate; I could norma
 
     E2. Expectation(antecedent=[
             SubjectQuery(from=-1),
-            PropertyQuery(source=-1, key=Lit("type"), of=0, value=Lit("http://gedcomx.org/Birth"))
-            PropertyQuery(source=-1, key=Lit("date"), of=0, value=Top)
+            PropertyQuery(source=-1, key=Lit("type"), of=0, value=Lit("http://gedcomx.org/Birth")),
+            PropertyQuery(source=-1, key=Lit("date"), of=0, value=Top),
             SubjectQuery(from=-1),
             ConnectionQuery(source=-1, key=lit("child"), of=0, value=3)
         ], consequent=[

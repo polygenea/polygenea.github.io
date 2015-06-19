@@ -733,8 +733,8 @@ P11. Property(source=D1, key=&quot;date&quot;, of=S4, value=&quot;A+1882-06-07/1
 <p>Note here I've chosen to add a birth event instead of a birthdate; I could normalise that too:</p>
 <pre><code>E2. Expectation(antecedent=[
         SubjectQuery(from=-1),
-        PropertyQuery(source=-1, key=Lit(&quot;type&quot;), of=0, value=Lit(&quot;http://gedcomx.org/Birth&quot;))
-        PropertyQuery(source=-1, key=Lit(&quot;date&quot;), of=0, value=Top)
+        PropertyQuery(source=-1, key=Lit(&quot;type&quot;), of=0, value=Lit(&quot;http://gedcomx.org/Birth&quot;)),
+        PropertyQuery(source=-1, key=Lit(&quot;date&quot;), of=0, value=Top),
         SubjectQuery(from=-1),
         ConnectionQuery(source=-1, key=lit(&quot;child&quot;), of=0, value=3)
     ], consequent=[
