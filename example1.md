@@ -3,7 +3,7 @@ Example 1: ad-hoc notation, working with a single source document
 
 This is a hasty example utilizing ad-hoc notation, including fairly arbitrary mixing of strings from various ontologies and strings of my own creation, displaying (type,language,value) triples as strings, and so on.  Its goal is simply to present one possible use for this model.
 
-As suggested by Rob Hoare, the basis for this example is https://familysearch.org/ark:/61903/1:1:MS79-1S8
+As suggested by Rob Hoare, the basis for this example is [https://familysearch.org/ark:/61903/1:1:MS79-1S8](https://familysearch.org/ark:/61903/1:1:MS79-1S8)
 
 ----
 
