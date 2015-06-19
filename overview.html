@@ -97,7 +97,7 @@ h4 {counter-reset: h5;}
 <th align="left">name</th>
 <th align="left">status</th>
 <th align="left">types</th>
-<th align="left">defined with</th>
+<th align="left">defined with (index. name : type)</th>
 <th align="left">returns <code>true</code> when</th>
 </tr>
 </thead>
@@ -113,63 +113,63 @@ h4 {counter-reset: h5;}
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
 <td align="left">either</td>
-<td align="left"><em>x</em>, a value of the same type as the predicate</td>
+<td align="left">0. <em>x</em> : same type as <em>v</em></td>
 <td align="left"><em>v</em> equals <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Same</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">either</td>
-<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
+<td align="left">0. <em>i</em> : integer<br/>1. <em>j</em> : integer</td>
 <td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
 </tr>
 <tr class="even">
 <td align="left">Cmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string, or datum whose media type has a defined order</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
+<td align="left">0. <em>∙</em> : one of {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/>1. <em>x</em> : same type as <em>v</em></td>
 <td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
 </tr>
 <tr class="odd">
 <td align="left">ICmp</td>
 <td align="left">OPTIONAL</td>
 <td align="left">as <code>Cmp</code></td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
+<td align="left">0. <em>∙</em> : one of {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/>1. <em>i</em> : integer<br/>2. <em>j</em> : integer</td>
 <td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
 </tr>
 <tr class="even">
 <td align="left">Regex</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left"><em>r</em>, a regex</td>
+<td align="left">0. <em>r</em> : regex</td>
 <td align="left"><em>r</em> matches <em>v</em></td>
 </tr>
 <tr class="odd">
 <td align="left">And</td>
 <td align="left">OPTIONAL</td>
 <td align="left">either (call it <em>X</em>)</td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
+<td align="left">0. <em>x</em> : set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Or</td>
 <td align="left">OPTIONAL</td>
 <td align="left">either (call it <em>X</em>)</td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
+<td align="left">0. <em>x</em> : set of <em>X</em> predicates</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Not</td>
 <td align="left">OPTIONAL</td>
 <td align="left">either (call it <em>X</em>)</td>
-<td align="left"><em>f</em>, an <em>X</em> predicate</td>
+<td align="left">0. <em>f</em> : <em>X</em> predicate</td>
 <td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
 </tr>
 <tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">either</td>
-<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
+<td align="left">0. <em>x</em> : datum defining a single function in some programming language</td>
 <td align="left">evaluating the function in <em>x</em> with arguments <em>v</em> and <em>s</em> returns <code>true</code></td>
 </tr>
 </tbody>
@@ -186,7 +186,7 @@ h4 {counter-reset: h5;}
 <th align="left">name</th>
 <th align="left">status</th>
 <th align="left">types</th>
-<th align="left">defined with</th>
+<th align="left">defined with (index. name : type)</th>
 <th align="left">returns</th>
 </tr>
 </thead>
@@ -195,56 +195,56 @@ h4 {counter-reset: h5;}
 <td align="left">Lit</td>
 <td align="left">REQUIRED</td>
 <td align="left">any</td>
-<td align="left"><em>x</em>, a value of the same type as the producer</td>
+<td align="left">0. <em>x</em> : same type as return</td>
 <td align="left"><em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Lookup</td>
 <td align="left">RECOMMENDED</td>
 <td align="left">any</td>
-<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
+<td align="left">0. <em>i</em> : integer<br/>1. <em>j</em> : integer</td>
 <td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Match</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left"><em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer</td>
+<td align="left">0. <em>f</em> : string producer<br/>1. <em>r</em> : regex<br/>2. <em>i</em> : integer</td>
 <td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
 </tr>
 <tr class="even">
 <td align="left">Slice</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left"><em>f</em>, a string producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
+<td align="left">0. <em>f</em> : string producer<br/>1. <em>i</em> : integer<br/>2. <em>j</em> : integer</td>
 <td align="left">the zero-indexed substring of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the string added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width substrings return the empty string</td>
 </tr>
 <tr class="odd">
 <td align="left">Cat</td>
 <td align="left">OPTIONAL</td>
 <td align="left">string</td>
-<td align="left"><em>x</em>, a list of string producers</td>
+<td align="left">0. <em>x</em> : list of string producers</td>
 <td align="left">the string produced by concatenating the string returned by each element of <em>x</em> in order</td>
 </tr>
 <tr class="even">
 <td align="left">Union</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
+<td align="left">0. <em>x</em> : set of set producers</td>
 <td align="left">a set containing every value contained in any of the sets produced by each of the elements of <em>x</em></td>
 </tr>
 <tr class="odd">
 <td align="left">Intersect</td>
 <td align="left">OPTIONAL</td>
 <td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
+<td align="left">0. <em>x</em> : set of set producers</td>
 <td align="left">a set containing those values that are in every set produced by each element of <em>x</em></td>
 </tr>
 <tr class="even">
 <td align="left">Script</td>
 <td align="left">OPTIONAL</td>
 <td align="left">any</td>
-<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
+<td align="left">0. <em>x</em> : datum defining a single function in some programming language</td>
 <td align="left">the value returned when evaluating the function in <em>x</em> with argument <em>s</em></td>
 </tr>
 </tbody>

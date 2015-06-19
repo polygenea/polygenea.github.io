@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<style type="text/css">
+body{font-family:sans-serif; counter-reset:h1;}
+code{font-family:monospace;font-size:100%;background-color:#eee;border:1px solid #aaa; padding:1px; border-radius:4px;}
+pre code{border:none;}
+pre{display:table; border:1px solid #aaa; padding:4px; border-radius:6px;}
+table{border-collapse:collapse;}
+tr:nth-child(2n){background-color:#ddd;}
+td,th{padding:0.25ex 1ex;}
+th{border-bottom:1px solid black;}
+h1:before { content: counter(h1) ". "; counter-increment: h1; }
+h1 {counter-reset:h2;}
+h2:before { content: counter(h1) "." counter(h2) ". "; counter-increment: h2; }
+h2 {counter-reset: h3;}
+h3:before { content: counter(h1) "." counter(h2) "." counter(h3) ". "; counter-increment: h3; }
+h3 {counter-reset: h4;}
+h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
+h4 {counter-reset: h5;}
+</style>
+
+
+<p>This document presents a simple UTF-8 serialisation of a dataset as defined in the accompanying <a href="overview.html">conceptual model</a>. The goal is to make a simple and compact textual representation, not to abide by any particular existing standard.</p>
+<h1 id="encoding">Encoding</h1>
+<p>This document describes outputing characters. This output stream SHALL be encoded in UTF-8 unless embedded in a data stream that unambiguously identified a different encoding.</p>
+<p>Some tokens MAY be preceded and/or followed by any number of whitespace characters (i.e., <code>[ \t\n\r]*</code>):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">If it says to output</th>
+<th align="left">may add preceding whitespace</th>
+<th align="left">may add following whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">&quot;a COMMA <code>,</code>&quot;</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">&quot;a COLON <code>:</code>&quot;</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">&quot;a LEFT PARENTHESES <code>(</code>&quot;</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">&quot;a RIGHT PARENTHESES <code>)</code>&quot;</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">&quot;a LEFT SQUARE BRACKET <code>[</code>&quot;</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">&quot;a RIGHT SQUARE BRACKET <code>]</code>&quot;</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">&quot;a LEFT CURLY BRACKET <code>{</code>&quot;</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">&quot;a RIGHT CURLY BRACKET <code>}</code>&quot;</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">Anything else</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+<p>Note if the specification does not explicitly name a character, whitespace padding is not allowed; thus for example when <a href="#encoding-a-string">encoding a string</a> says &quot;Output <em>c</em>&quot; no whitespace may be added even if <em>c</em> happens to refer to a COMMA or other character in the table above.</p>
+<p>A Dataset may be preceded and followed by arbitrary whitespace, regardless of its first and last characters.</p>
+<h2 id="encoding-a-dataset">Encoding a Dataset</h2>
+<p>Given a dataset,</p>
+<ol>
+<li>Create an empty string:string mapping called <em>abbreviations</em>.</li>
+<li>Populate and encode abbreviations by repeating the following steps zero or more times:
+<ol>
+<li>Identify a string prefix to be shortened. The prefix MUST NOT begin with a COLON ':' and MUST NOT already be either a key or a value in <em>abbreviations</em>.</li>
+<li>Select a shortened form, using a valid URI <code>&lt;scheme&gt;</code> as onlined in <a href="http://tools.ietf.org/html/rfc2396">RFC 2396</a>: that is, something matching the regular expression <code>[a-zA-Z][a-zA-Z0-9\+\-\.]*</code>.</li>
+<li>Output a LATIN CAPITAL LETTER N <code>N</code> and a LEFT PARENTHESES <code>(</code>.</li>
+<li>Encode the prefix.</li>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the shortened form.</li>
+<li>Output a RIGHT PARENTHESES <code>)</code>.</li>
+<li>Add (prefix : shortened form) to <em>abbreviations</em>.</li>
+</ol>
+<p>Example: <code>N(&quot;http://polygenea.org/&quot;,&quot;pg&quot;)</code> means this encoding will abbreviate strings beginning with <code>http://polygenea.org/</code> with the shortened prefix <code>pg:</code>.</p></li>
+<li>Initialise <em>index</em> as <code>0</code>.</li>
+<li>Create an empty (node reference : integer) mapping called <em>indexOf</em>.</li>
+<li>Repeat the following until every node is referenced as a key in <em>indexOf</em>:
+<ol>
+<li>Select a node to process such that both (1) a reference to that node is not a key in <em>indexOf</em> and (2) all of the nodes referenced within the candidate node also referenced as a key in <em>indexOf</em>. Call the selected node <em>n</em>.</li>
+<li>Encode <em>n</em>.</li>
+<li>Insert (reference to <em>n</em> : <em>index</em>) into <em>indexOf</em>.</li>
+<li>Increase <em>index</em> by 1.</li>
+</ol></li>
+</ol>
+<p>The letter <code>N</code> is selected because it is not a letter that could start any other type and suggests &quot;namespace&quot;, the name of the similar abbreviation scheme used in XML</p>
+<p>Because <em>abbreviations</em> is populated one entry at a time while it is being output, later abbreviations will be encoded using earlier ones. Thus, the following representation of a two-entry <em>abbreviations</em></p>
+<pre><code>N(&quot;http://polygenea.org/Tag&quot;,&quot;pgt&quot;)
+N(&quot;http://polygenea.org/&quot;,&quot;pg&quot;)</code></pre>
+<p>could be represented more compactly if the abbreviations where selected in a different order:</p>
+<pre><code>N(&quot;http://polygenea.org/&quot;,&quot;pg&quot;)
+N(&quot;pg:Tag&quot;,&quot;pgt&quot;)</code></pre>
+<h2 id="encoding-a-node-node-template-or-node-query">Encoding a Node, Node Template, or Node Query</h2>
+<p>Given an element <em>n</em> to encode,</p>
+<ol>
+<li>Output an upper-case version of the initial letter of <em>n</em>'s type (which will match the regular expression <code>[ACDEIOPST]</code>).</li>
+<li>Output a LEFT PARENTHESES <code>(</code>.</li>
+<li>Encode the value at tuple-index 0 of <em>n</em>.</li>
+<li>If <em>n</em> is of a type that has at least two elements in its tuple,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the value at tuple-index 1 of <em>n</em>.</li>
+</ol></li>
+<li>If <em>n</em> is of a type that has at least three elements in its tuple,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the value at tuple-index 2 of <em>n</em>.</li>
+</ol></li>
+<li>If <em>n</em> is of a type that has four elements in its tuple,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the value at tuple-index 3 of <em>n</em>.</li>
+</ol></li>
+<li>Output a RIGHT PARENTHESES <code>)</code>.</li>
+</ol>
+<h2 id="encoding-a-node-reference">Encoding a Node Reference</h2>
+<p>Given a node reference <em>r</em>, and read-access to a (node reference : integer) mapping called <em>indexOf</em>, and read-access to an integer <em>index</em>,</p>
+<ol>
+<li>Let <em>x</em> be the integer paired with <em>r</em> in <em>indexOf</em> (by construction, there will always be such an integer).</li>
+<li>Let <em>y</em> be the result of computing <em>index</em> − <em>x</em> (by construction, this will always be a positive number).</li>
+<li>Let <em>dx</em> be the result of computing log<sub>10</sub>(<em>x</em>), which is the number of decimal digits needed to represent <em>x</em>.</li>
+<li>Let <em>dy</em> be the result of computing 1 + log<sub>10</sub>(<em>y</em>), which is one more than the number of decimal digits needed to represent <em>y</em>.</li>
+<li>If <em>dy</em> &lt; <em>dx</em>,
+<ol>
+<li>Output a HYPHEN-MINUS <code>-</code></li>
+<li>Encode <em>y</em></li>
+</ol></li>
+<li>If <em>dx</em> ≤ <em>dy</em>,
+<ol>
+<li>Encode <em>x</em></li>
+</ol></li>
+</ol>
+<h2 id="encoding-a-string">Encoding a string</h2>
+<p>Given a string <em>s</em> and read-access to a (string : string) mapping called <em>abbreviations</em>,</p>
+<ol>
+<li>Output a QUOTATION MARK <code>&quot;</code></li>
+<li>If <em>s</em> begins with a COLON <code>:</code> or a value mapped to by <em>abbreviations</em>,
+<ol>
+<li>Output a COLON <code>:</code></li>
+<li>For each character <em>c</em> in <em>s</em>,
+<ol>
+<li>Output <em>c</em></li>
+<li>If <em>c</em> is a QUOTATION MARK <code>&quot;</code>, output <em>c</em> again</li>
+</ol></li>
+</ol></li>
+<li>If <em>s</em> begins with a key mapped from by <em>abbreviations</em>,
+<ol>
+<li>For each character <em>c</em> in the value associated with that key, output <em>c</em></li>
+<li>Output a COLON <code>:</code></li>
+<li>For each character <em>c</em> in <em>s</em> after the prefix,
+<ol>
+<li>Output <em>c</em></li>
+<li>If <em>c</em> is a QUOTATION MARK <code>&quot;</code>, output <em>c</em> again</li>
+</ol></li>
+</ol></li>
+<li>If <em>s</em> does not begin with a COLON <code>:</code> nor key nor value from by <em>abbreviations</em>,
+<ol>
+<li>For each character <em>c</em> in <em>s</em>,
+<ol>
+<li>Output <em>c</em></li>
+<li>If <em>c</em> is a QUOTATION MARK <code>&quot;</code>, output <em>c</em> again</li>
+</ol></li>
+</ol></li>
+<li>Output a QUOTATION MARK <code>&quot;</code></li>
+</ol>
+<p>The above performs minimal escaping:</p>
+<ul>
+<li>a preceding COLON <code>:</code> is used to mean &quot;no abbreviations here&quot;, and to escape itself in the first position of a string</li>
+<li>QUOTATION MARK <code>&quot;</code> is repeated twice to escape itself (similar to many CSV encodings)</li>
+</ul>
+<p>There does not need to be any text after an abbreviated prefix.</p>
+<p>If there are more than one possible prefixes that could be chosen in step 3, there is a quality-of-implementation expectation that the longest such prefix be used. Choosing a shorter prefix (or none at all, skipping to step 4) will still correctly represent the string, albeit not as concisely.</p>
+<h2 id="encoding-an-integer">Encoding an integer</h2>
+<p>Integer values are encoded using a standard base-10 representation with the ASCII decimal digits. They always match the regular expression <code>-?(0|[1-9][0-9]*)</code>.</p>
+<p>It is RECOMMENDED that the value −1 be encoded as the empty string, but implementations MAY use <code>-1</code> instead.</p>
+<h2 id="encoding-a-datum">Encoding a datum</h2>
+<p>Given a datum value <em>x</em>,</p>
+<ol>
+<li>Output a LEFT PARENTHESES <code>(</code></li>
+<li>If the first tuple element (the media type string) is not &quot;&quot;, encode it</li>
+<li>Output a COMMA <code>,</code></li>
+<li>If the second tuple element (the language string) is not &quot;&quot;, encode it</li>
+<li>Output a COMMA <code>,</code> and a REVERSE SOLIDUS <code>\</code></li>
+<li>Output the Base64 encoding of the third tuple element, as described in <a href="http://tools.ietf.org/html/rfc3548">RFC 3548</a>, section 3</li>
+<li>Output a RIGHT PARENTHESES <code>)</code></li>
+</ol>
+<h2 id="encoding-a-list">Encoding a list</h2>
+<p>Given a list value <em>x</em> containing <em>n</em> items indexed 0 through <em>n</em> − 1,</p>
+<ol>
+<li>Output a LEFT SQUARE BRACKET <code>[</code></li>
+<li>If <em>n</em> &gt; 0, encode the element at index 0 of <em>x</em></li>
+<li>If <em>n</em> &gt; 1,
+<ol>
+<li>For each integer <em>i</em> from 1 up to <em>n</em> — 1 in ascending order,
+<ol>
+<li>Output a COMMA <code>,</code></li>
+<li>Encode the element at index <em>i</em> of <em>x</em></li>
+</ol></li>
+</ol></li>
+<li>Output a RIGHT SQUARE BRACKET <code>]</code></li>
+</ol>
+<h2 id="encoding-a-set">Encoding a set</h2>
+<p>Given a set value <em>x</em>,</p>
+<ol>
+<li>Output a LEFT CURLY BRACKET <code>{</code></li>
+<li>If there are any elements in <em>x</em>,
+<ol>
+<li>Encode some element <em>s</em> from <em>x</em></li>
+<li>For each element <em>e</em> of <em>x</em> other than <em>s</em> without repetition
+<ol>
+<li>Output a COMMA <code>,</code></li>
+<li>Encode <em>e</em></li>
+</ol></li>
+</ol></li>
+<li>Output a RIGHT CURLY BRACKET <code>}</code></li>
+</ol>
+<p>If there is a comparison operator defined for the type of element stored in <em>x</em>, It is RECOMMENDED that <em>s</em> be the minimal element of <em>x</em> and that the remaining elements be visited in ascending order.</p>
+<h2 id="encoding-a-key-value-pair">Encoding a key ↦ value pair</h2>
+<p>Given a pair <em>k</em> ↦ <em>v</em>,</p>
+<ol>
+<li>Encode <em>k</em></li>
+<li>Output a COLON <code>:</code></li>
+<li>Encode <em>v</em></li>
+</ol>
+<h2 id="encoding-a-predicate">Encoding a predicate</h2>
+<p>Given a predicate of type <em>p</em> constructed with tuple <em>t</em> of <em>n</em> elements,</p>
+<ol>
+<li>If <em>p</em> is <em>Top</em>, there is nothing to do (encoded s zero characters)</li>
+<li>If <em>p</em> is <em>Lit</em>, encode the single item in <em>t</em></li>
+<li>If <em>p</em> is not <em>Top</em> or <em>Lit</em>,
+<ol>
+<li>Output a LATIN CAPITAL LETTER Q <code>Q</code></li>
+<li>Output the <code>name</code> of <em>p</em>, capitalised as given in <a href="overview.html">the specification</a> (e.g., <code>ICmp</code> is LATIN CAPITAL LETTER I, LATIN CAPITAL LETTER C, LATIN SMALL LETTER M, LATIN SMALL LETTER P)</li>
+<li>Output a LEFT PARENTHESES <code>(</code></li>
+<li>Encode the element at index 0 of <em>t</em></li>
+<li>If <em>n</em> ≥ 2,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the element at index 1 of <em>t</em></li>
+</ol></li>
+<li>If <em>n</em> = 3,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the element at index 2 of <em>t</em></li>
+</ol></li>
+<li>Output a RIGHT PARENTHESES <code>)</code></li>
+</ol></li>
+</ol>
+<p>The letter <code>Q</code> is selected because it is not a letter that could start any other type and suggests &quot;query&quot;, the class of nodes that contain predicates.</p>
+<h2 id="encoding-a-producer">Encoding a producer</h2>
+<p>Given a producer of type <em>p</em> constructed with tuple <em>t</em> of <em>n</em> elements,</p>
+<ol>
+<li>If <em>p</em> is <em>Lit</em>, encode the single item in <em>t</em></li>
+<li>If <em>p</em> is not <em>Top</em> or <em>Lit</em>,
+<ol>
+<li>Output a LATIN CAPITAL LETTER B <code>B</code></li>
+<li>Output the <code>name</code> of <em>p</em>, capitalised as given in <a href="overview.html">the specification</a> (e.g., <code>Cat</code> is LATIN CAPITAL LETTER C, LATIN SMALL LETTER A, LATIN SMALL LETTER T)</li>
+<li>Output a LEFT PARENTHESES <code>(</code></li>
+<li>Encode the element at index 0 of <em>t</em></li>
+<li>If <em>n</em> ≥ 2,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the element at index 1 of <em>t</em></li>
+</ol></li>
+<li>If <em>n</em> = 3,
+<ol>
+<li>Output a COMMA <code>,</code>.</li>
+<li>Encode the element at index 2 of <em>t</em></li>
+</ol></li>
+<li>Output a RIGHT PARENTHESES <code>)</code></li>
+</ol></li>
+</ol>
+<p>The letter <code>B</code> is selected because it is not a letter that could start any other type and suggests &quot;builder&quot;, an approximate synonym for &quot;producer&quot;</p>
+</body>
+</html>

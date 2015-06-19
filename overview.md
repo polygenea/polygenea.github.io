@@ -151,18 +151,18 @@ and any node references inside tuples inside _s_ are treated as opaque types
 
 Because predicates are not used for Expectation nodes, only string and datum predicates exist.
 
-name | status | types | defined with | returns `true` when
+name | status | types | defined with (index. name : type) | returns `true` when
 -----|--------|-------|--------------|--------------------
 Top | REQUIRED | either | (nothing) | always
-Lit | REQUIRED | either | _x_, a value of the same type as the predicate | _v_ equals _x_
-Same | RECOMMENDED | either | _i_, an integer<br/>_j_, an integer | _v_ equals the _j_th value of the _i_th tuple in _s_
-Cmp | OPTIONAL | string, or datum whose media type has a defined order | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_x_, a value of the same type as the predicate | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
-ICmp | OPTIONAL | as `Cmp` | _∙_, an operator from the set {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>_i_, an integer<br/>_j_, an integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
-Regex | OPTIONAL | string | _r_, a regex | _r_ matches _v_
-And | OPTIONAL | either (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for all _f_ in _x_
-Or | OPTIONAL | either (call it _X_) | _x_, a set of _X_ predicates | _f_(_v_, _s_) is `true` for at least one _f_ in _x_
-Not | OPTIONAL | either (call it _X_) | _f_, an _X_ predicate | _f_(_v_, _s_) is `false`
-Script | OPTIONAL | either | _x_, a datum defining a single function in some programming language | evaluating the function in _x_ with arguments _v_ and _s_ returns `true`
+Lit | REQUIRED | either | 0. _x_ : same type as _v_ | _v_ equals _x_
+Same | RECOMMENDED | either | 0. _i_ : integer<br/>1. _j_ : integer | _v_ equals the _j_th value of the _i_th tuple in _s_
+Cmp | OPTIONAL | string, or datum whose media type has a defined order | 0. _∙_ : one of {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>1. _x_ : same type as _v_ | for a datum: _v_ ∙ _x_ under the media type's defined ordering<br/>for a string: _v_ ∙ _x_ under a lexicographical ordering
+ICmp | OPTIONAL | as `Cmp` | 0. _∙_ : one of {`<`, `≤`, `=`, `≠`, `≥`, `>`}<br/>1. _i_ : integer<br/>2. _j_ : integer | as `Cmp`, but using the _j_th value of the _i_th tuple in _s_ instead of _v_
+Regex | OPTIONAL | string | 0. _r_ : regex | _r_ matches _v_
+And | OPTIONAL | either (call it _X_) | 0. _x_ : set of _X_ predicates | _f_(_v_, _s_) is `true` for all _f_ in _x_
+Or | OPTIONAL | either (call it _X_) | 0. _x_ : set of _X_ predicates | _f_(_v_, _s_) is `true` for at least one _f_ in _x_
+Not | OPTIONAL | either (call it _X_) | 0. _f_ : _X_ predicate | _f_(_v_, _s_) is `false`
+Script | OPTIONAL | either | 0. _x_ : datum defining a single function in some programming language | evaluating the function in _x_ with arguments _v_ and _s_ returns `true`
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.
 
@@ -183,16 +183,16 @@ and any node references inside tuples inside _s_ are treated as opaque types
 
 The set of Node Template types suggests three predicate types: string, datum, and set of integer
 
-name | status | types | defined with | returns
+name | status | types | defined with (index. name : type) | returns
 -----|--------|-------|--------------|--------
-Lit | REQUIRED | any | _x_, a value of the same type as the producer | _x_
-Lookup | RECOMMENDED | any | _i_, an integer<br/>_j_, an integer | the _j_th value of the _i_th tuple in _s_ 
-Match | OPTIONAL | string | _f_, a string producer<br/>_r_, a regex<br/>_i_, an integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
-Slice | OPTIONAL | string | _f_, a string producer<br/>_i_, an integer<br/>_j_, an integer | the zero-indexed substring of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the string added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width substrings return the empty string
-Cat | OPTIONAL | string | _x_, a list of string producers | the string produced by concatenating the string returned by each element of _x_ in order
-Union | OPTIONAL | set | _x_, a set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
-Intersect | OPTIONAL | set | _x_, a set of set producers | a set containing those values that are in every set produced by each element of _x_
-Script | OPTIONAL | any | _x_, a datum defining a single function in some programming language | the value returned when evaluating the function in _x_ with argument _s_
+Lit | REQUIRED | any | 0. _x_ : same type as return | _x_
+Lookup | RECOMMENDED | any | 0. _i_ : integer<br/>1. _j_ : integer | the _j_th value of the _i_th tuple in _s_ 
+Match | OPTIONAL | string | 0. _f_ : string producer<br/>1. _r_ : regex<br/>2. _i_ : integer | the contents of the _i_th matching group after matching _f_(_s_) with _r_, or the empty string if it does not match or the match has no such group
+Slice | OPTIONAL | string | 0. _f_ : string producer<br/>1. _i_ : integer<br/>2. _j_ : integer | the zero-indexed substring of _f_(_s_) from _i_ (inclusive) to _j_ (exclusive).<br/>Negative indices have the length of the string added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width substrings return the empty string
+Cat | OPTIONAL | string | 0. _x_ : list of string producers | the string produced by concatenating the string returned by each element of _x_ in order
+Union | OPTIONAL | set | 0. _x_ : set of set producers | a set containing every value contained in any of the sets produced by each of the elements of _x_
+Intersect | OPTIONAL | set | 0. _x_ : set of set producers | a set containing those values that are in every set produced by each element of _x_
+Script | OPTIONAL | any | 0. _x_ : datum defining a single function in some programming language | the value returned when evaluating the function in _x_ with argument _s_
 
 Implementations supporting the `Script` predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.
 
