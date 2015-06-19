@@ -683,5 +683,63 @@
 <li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p>
 <p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
 </ol>
+<h1 id="example-1-ad-hoc-notation-working-with-a-single-source-document">Example 1: ad-hoc notation, working with a single source document</h1>
+<p>This is a hasty example utilizing ad-hoc notation, including fairly arbitrary mixing of strings from various ontologies and strings of my own creation, displaying (type,language,value) triples as strings, and so on. Its goal is simply to present one possible use for this model.</p>
+<p>As suggested by Rob Hoare, the basis for this example is https://familysearch.org/ark:/61903/1:1:MS79-1S8</p>
+<hr />
+<p>First, I'd make an OutRef for the source. Let's make two, so we can see what the parents field is for, one for the 1900 census and one for the particular part of it in question:</p>
+<pre><code>O1. OutRef(parents={},
+      details={&quot;type&quot;:&quot;Census&quot;,&quot;country&quot;:&quot;United States&quot;,&quot;year&quot;:&quot;1900&quot;,...})
+O2. OutRef(parents={O2},
+      details={&quot;district&quot;:&quot;1006&quot;,&quot;sheet&quot;:&quot;9A&quot;,...}</code></pre>
+<p>Note that I expect this model to be replaced by the S&amp;CEG's work, but I needed a filler to make a self-contained example specification.</p>
+<p>Next, I'd document what that one source claims. Part of that would be</p>
+<pre><code>S1. Subject(slug=&quot;person of line 14&quot;)
+P1. Property(source=O2, key=&quot;family name&quot;, of=S1, value=&quot;Smith&quot;)
+P2. Property(source=O2, key=&quot;given name&quot;, of=S1, value=&quot;Magdoline&quot;)
+P3. Property(source=O2, key=&quot;DATE OF BIRTH&quot;, of=S1, value=&quot;Aug 1882&quot;)
+P4. Property(source=O2, key=&quot;Age at last birthday&quot;, of=S1, value=&quot;17&quot;)
+P5. Property(source=O2, key=&quot;Place of birth&quot;, of=S1, value=&quot;Illinois&quot;)
+
+S2. Subject(source=O2, slug=&quot;person of line 10&quot;)
+P6. Property(source=O2, key=&quot;family name&quot;, of=S2, value=&quot;Smith&quot;)
+P7. Property(source=O2, key=&quot;given name&quot;, of=S2, value=&quot;William&quot;)
+
+S3. Subject(source=O2, slug=&quot;household of lines 10-17&quot;)
+
+C1. Connection(source=O2, key=&quot;Head&quot;, of=S3, value=S2)
+C2. Connection(source=O2, key=&quot;member&quot;, of=S3, value=S1)
+C3. Connection(source=O2, key=&quot;Daughter&quot;, of=S2, value=S1)
+
+P8. Property(source=O2, key=&quot;enumerated date&quot;, of=O2, value=&quot;+1900-06-07&quot;)</code></pre>
+<p>So far this is essentially just RDF-like triples with identifiers and sources. Now for some reasoning. Let's start simple, just a term normalisation:</p>
+<pre><code>E1. Expectation(antecedent=[
+        SubjectQuery(from=-1),
+        PropertyQuery(source=-1, key=Regex(&quot;/place of birth/i&quot;, of=0, value=Top)
+    ], consequent=[
+        PropertyTemplate(key=&quot;http://schema.org/birthPlace&quot;, of=0, value=Lookup(1,3))
+    ])</code></pre>
+<p>That expressed the idea that any &quot;place of birth&quot; key, such as this census uses for its column header, can be converted into a particular standardised term. I'd apply it as</p>
+<pre><code>I1. Inference(support=[S1,P5], reason=E1)
+P9. Property(source=I1, key=&quot;http://schema.org/birthPlace&quot;, of=S1, value=&quot;Illinois&quot;)</code></pre>
+<p>I could also infer a birth date from the age; since my current list of producers does not include arithmetic, I'd either use a Script predicate or a Derivation such as</p>
+<pre><code>D1. Derivation(antecedents={P4,P8}, reason=&quot;Birth date can be derived from age&quot;)
+S4. Subject(source=D1, slug=&quot;inferred birth&quot;)
+C4. Connection(source=D1, key=&quot;child&quot;, of=S4, value=S1)
+P10. Property(source=D1, key=&quot;type&quot;, of=S4, value=&quot;http://gedcomx.org/Birth&quot;)
+P11. Property(source=D1, key=&quot;date&quot;, of=S4, value=&quot;A+1882-06-07/1983-06-07&quot;)</code></pre>
+<p>Note here I've chosen to add a birth event instead of a birthdate; I could normalise that too:</p>
+<pre><code>E2. Expectation(antecedent=[
+        SubjectQuery(from=-1),
+        PropertyQuery(source=-1, key=Lit(&quot;type&quot;), of=0, value=Lit(&quot;http://gedcomx.org/Birth&quot;))
+        PropertyQuery(source=-1, key=Lit(&quot;date&quot;), of=0, value=Top)
+        SubjectQuery(from=-1),
+        ConnectionQuery(source=-1, key=lit(&quot;child&quot;), of=0, value=3)
+    ], consequent=[
+        PropertyTemplate(source=-1, key=&quot;birthdate&quot;, of=3, value=Lookup(2,3))
+    ])
+I2. Inference(support=[S4,P10,P11,S1,C4], reason=E2)
+P12. Property(source=I2, key=&quot;birth&quot;, of=S1, value=&quot;A+1882-06-07/1883-06-07&quot;)</code></pre>
+<p>Fortunately, P12 and P3 agree.</p>
 </body>
 </html>
