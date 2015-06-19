@@ -46,6 +46,10 @@ So far this is essentially just RDF-like triples with identifiers and sources.  
             PropertyTemplate(key="http://schema.org/birthPlace", of=0, value=Lookup(1,3))
         ])
 
+A rough English translation of that expectation is
+
+>   Given something with a "place of birth" property, you can infer a `http://schema.org/birthPlace` property with the same value.
+
 That expressed the idea that any "place of birth" key, such as this census uses for its column header, can be converted into a particular standardised term.  I'd apply it as
 
     I1. Inference(support=[S1,P5], reason=E1)
@@ -71,9 +75,13 @@ Note here I've chosen to add a birth event instead of a birthdate; I could norma
             PropertyTemplate(source=-1, key="birthdate", of=3, value=Lookup(2,3))
         ])
     I2. Inference(support=[S4,P10,P11,S1,C4], reason=E2)
-    P12. Property(source=I2, key="birth", of=S1, value="A+1882-06-07/1883-06-07")
+    P12. Property(source=I2, key="birthdate", of=S1, value="A+1882-06-07/1883-06-07")
 
-Fortunately, P12 and P3 agree.
+A rough English translation of expectation E2 is
+
+>   Given a birth event with a date property and an entity participating in the birth as a child, you can infer the birthdate of the child to be the date of the event.
+
+P12 and P3 agree, with P3 more precise than P12, but I'd leave them both in the data since they are both claims supported by O2 and let the user interface handle displaying just one of the two.
 
 
 
