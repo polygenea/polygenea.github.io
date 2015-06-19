@@ -685,15 +685,16 @@
 <li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p>
 <p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
 </ol>
-<h1 id="example-1-ad-hoc-notation-working-with-a-single-source-document">Example 1: ad-hoc notation, working with a single source document</h1>
+<h1 id="examples">Examples</h1>
+<h2 id="example-1-ad-hoc-notation-working-with-a-single-source-document">Example 1: ad-hoc notation, working with a single source document</h2>
 <p>This is a hasty example utilizing ad-hoc notation, including fairly arbitrary mixing of strings from various ontologies and strings of my own creation, displaying (type,language,value) triples as strings, and so on. Its goal is simply to present one possible use for this model.</p>
-<p>As suggested by Rob Hoare, the basis for this example is <a href="https://familysearch.org/ark:/61903/1:1:MS79-1S8">https://familysearch.org/ark:/61903/1:1:MS79-1S8</a></p>
+<p>As suggested by Rob Hoare, the basis for this example is <a href="https://familysearch.org/ark:/61903/1:1:MS79-1S8" class="uri">https://familysearch.org/ark:/61903/1:1:MS79-1S8</a></p>
 <hr />
 <p>First, I'd make an OutRef for the source. Let's make two, so we can see what the parents field is for, one for the 1900 census and one for the particular part of it in question:</p>
 <pre><code>O1. OutRef(parents={},
-      details={&quot;type&quot;:&quot;Census&quot;, &quot;country&quot;:&quot;United States&quot;, &quot;year&quot;:&quot;1900&quot;, ...})
+      details={&quot;type&quot;:&quot;Census&quot;,&quot;country&quot;:&quot;United States&quot;,&quot;year&quot;:&quot;1900&quot;,...})
 O2. OutRef(parents={O2},
-      details={&quot;district&quot;:&quot;1006&quot;, &quot;sheet&quot;:&quot;9A&quot;, ...}</code></pre>
+      details={&quot;district&quot;:&quot;1006&quot;,&quot;sheet&quot;:&quot;9A&quot;,...}</code></pre>
 <p>Note that I expect this model to be replaced by the S&amp;CEG's work, but I needed a filler to make a self-contained example specification.</p>
 <p>Next, I'd document what that one source claims. Part of that would be</p>
 <pre><code>S1. Subject(slug=&quot;person of line 14&quot;)
@@ -721,6 +722,10 @@ P8. Property(source=O2, key=&quot;enumerated date&quot;, of=O2, value=&quot;+190
     ], consequent=[
         PropertyTemplate(key=&quot;http://schema.org/birthPlace&quot;, of=0, value=Lookup(1,3))
     ])</code></pre>
+<p>A rough English translation of that expectation is</p>
+<blockquote>
+<p>Given something with a &quot;place of birth&quot; property, you can infer a <code>http://schema.org/birthPlace</code> property with the same value.</p>
+</blockquote>
 <p>That expressed the idea that any &quot;place of birth&quot; key, such as this census uses for its column header, can be converted into a particular standardised term. I'd apply it as</p>
 <pre><code>I1. Inference(support=[S1,P5], reason=E1)
 P9. Property(source=I1, key=&quot;http://schema.org/birthPlace&quot;, of=S1, value=&quot;Illinois&quot;)</code></pre>
@@ -741,7 +746,11 @@ P11. Property(source=D1, key=&quot;date&quot;, of=S4, value=&quot;A+1882-06-07/1
         PropertyTemplate(source=-1, key=&quot;birthdate&quot;, of=3, value=Lookup(2,3))
     ])
 I2. Inference(support=[S4,P10,P11,S1,C4], reason=E2)
-P12. Property(source=I2, key=&quot;birth&quot;, of=S1, value=&quot;A+1882-06-07/1883-06-07&quot;)</code></pre>
-<p>Fortunately, P12 and P3 agree.</p>
+P12. Property(source=I2, key=&quot;birthdate&quot;, of=S1, value=&quot;A+1882-06-07/1883-06-07&quot;)</code></pre>
+<p>A rough English translation of expectation E2 is</p>
+<blockquote>
+<p>Given a birth event with a date property and an entity participating in the birth as a child, you can infer the birthdate of the child to be the date of the event.</p>
+</blockquote>
+<p>P12 and P3 agree, with P3 more precise than P12, but I'd leave them both in the data since they are both claims supported by O2 and let the user interface handle displaying just one of the two.</p>
 </body>
 </html>
