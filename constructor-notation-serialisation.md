@@ -272,7 +272,8 @@ The following encodes one possible form of an inference that someone named "John
     O({},{"type":"imagination","author":"Luther Tychonievich"})
     S(3,"example person")
     P(3,"gx1:Name",4,"John Doe")
-    E([S(,),P(,"gx1:Name",0,QRegex("Joh?n( |$)"))]
+    E([S(,)
+      ,P(,"gx1:Name",0,QRegex("Joh?n( |$)"))]
      ,[P(,"gx1:Gender",0,"gx:Male")])
     I([4,5],6)
     P(7,"gx1:Gender",4,"gx:Male")
