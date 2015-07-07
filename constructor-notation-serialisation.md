@@ -118,8 +118,8 @@ read-access to an integer _index_,
 
 1.  Let _x_ be the integer paired with _r_ in _indexOf_ (by construction, there will always be such an integer).
 2.  Let _y_ be the result of computing _index_ − _x_ (by construction, this will always be a positive number).
-3.  Let _dx_ be the result of computing log<sub>10</sub>(_x_), which is the number of decimal digits needed to represent _x_.
-4.  Let _dy_ be the result of computing 1 + log<sub>10</sub>(_y_), which is one more than the number of decimal digits needed to represent _y_.
+3.  Let _dx_ be the result of computing &lceil;log<sub>10</sub>(_x_)&rceil;, which is the number of decimal digits needed to represent _x_.  If _x_ is 0, let _dx_ be 1.
+4.  Let _dy_ be the result of computing 1 + &lceil;log<sub>10</sub>(_y_)&rceil;, which is one more than the number of decimal digits needed to represent _y_.
 5.  If _dy_ < _dx_,
     1.  Output a HYPHEN-MINUS `-`
     2.  Encode _y_
@@ -144,7 +144,7 @@ read-access to a (string : string) mapping called _abbreviations_,
     1.  For each character _c_ in _s_ after the prefix,
         2.  Output _c_
         1.  If _c_ is a QUOTATION MARK `"`, output _c_ again
-4.  If _s_ does not begin with a COLON `:` nor key nor value from by _abbreviations_,    
+4.  If _s_ does not begin with a COLON `:` nor key nor value in _abbreviations_,    
     1.  For each character _c_ in _s_,
         2.  Output _c_
         1.  If _c_ is a QUOTATION MARK `"`, output _c_ again
@@ -163,7 +163,7 @@ Choosing a shorter prefix (or none at all, skipping to step 4) will still correc
 
 ## Encoding an integer
 
-Integer values are encoded using a standard base-10 representation with the ASCII decimal digits.
+Integer values (excepting &minus;1) are encoded using a standard base-10 representation with the ASCII decimal digits.
 They always match the regular expression `-?(0|[1-9][0-9]*)`.
 
 It is RECOMMENDED that the value −1 be encoded as the empty string, but implementations MAY use `-1` instead.

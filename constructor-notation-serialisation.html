@@ -26,8 +26,6 @@ h3 {counter-reset: h4;}
 h4:before { content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "; counter-increment: h4; }
 h4 {counter-reset: h5;}
 </style>
-
-
 <p>This document presents a simple UTF-8 serialisation of a dataset as defined in the accompanying <a href="overview.html">conceptual model</a>. The goal is to make a simple and compact textual representation, not to abide by any particular existing standard.</p>
 <h1 id="encoding">Encoding</h1>
 <p>This document describes outputing characters. This output stream SHALL be encoded in UTF-8 unless embedded in a data stream that unambiguously identified a different encoding.</p>
@@ -151,8 +149,8 @@ N(&quot;pg:Tag&quot;,&quot;pgt&quot;)</code></pre>
 <ol>
 <li>Let <em>x</em> be the integer paired with <em>r</em> in <em>indexOf</em> (by construction, there will always be such an integer).</li>
 <li>Let <em>y</em> be the result of computing <em>index</em> − <em>x</em> (by construction, this will always be a positive number).</li>
-<li>Let <em>dx</em> be the result of computing log<sub>10</sub>(<em>x</em>), which is the number of decimal digits needed to represent <em>x</em>.</li>
-<li>Let <em>dy</em> be the result of computing 1 + log<sub>10</sub>(<em>y</em>), which is one more than the number of decimal digits needed to represent <em>y</em>.</li>
+<li>Let <em>dx</em> be the result of computing ⌈log<sub>10</sub>(<em>x</em>)⌉, which is the number of decimal digits needed to represent <em>x</em>. If <em>x</em> is 0, let <em>dx</em> be 1.</li>
+<li>Let <em>dy</em> be the result of computing 1 + ⌈log<sub>10</sub>(<em>y</em>)⌉, which is one more than the number of decimal digits needed to represent <em>y</em>.</li>
 <li>If <em>dy</em> &lt; <em>dx</em>,
 <ol>
 <li>Output a HYPHEN-MINUS <code>-</code></li>
@@ -186,7 +184,7 @@ N(&quot;pg:Tag&quot;,&quot;pgt&quot;)</code></pre>
 <li>If <em>c</em> is a QUOTATION MARK <code>&quot;</code>, output <em>c</em> again</li>
 </ol></li>
 </ol></li>
-<li>If <em>s</em> does not begin with a COLON <code>:</code> nor key nor value from by <em>abbreviations</em>,
+<li>If <em>s</em> does not begin with a COLON <code>:</code> nor key nor value in <em>abbreviations</em>,
 <ol>
 <li>For each character <em>c</em> in <em>s</em>,
 <ol>
@@ -204,7 +202,7 @@ N(&quot;pg:Tag&quot;,&quot;pgt&quot;)</code></pre>
 <p>There does not need to be any text after an abbreviated prefix.</p>
 <p>If there are more than one possible prefixes that could be chosen in step 3, there is a quality-of-implementation expectation that the longest such prefix be used. Choosing a shorter prefix (or none at all, skipping to step 4) will still correctly represent the string, albeit not as concisely.</p>
 <h2 id="encoding-an-integer">Encoding an integer</h2>
-<p>Integer values are encoded using a standard base-10 representation with the ASCII decimal digits. They always match the regular expression <code>-?(0|[1-9][0-9]*)</code>.</p>
+<p>Integer values (excepting −1) are encoded using a standard base-10 representation with the ASCII decimal digits. They always match the regular expression <code>-?(0|[1-9][0-9]*)</code>.</p>
 <p>It is RECOMMENDED that the value −1 be encoded as the empty string, but implementations MAY use <code>-1</code> instead.</p>
 <h2 id="encoding-a-datum">Encoding a datum</h2>
 <p>Given a datum value <em>x</em>,</p>
