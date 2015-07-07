@@ -262,3 +262,17 @@ The letter `B` is selected because it is
 not a letter that could start any other type
 and suggests "builder", an approximate synonym for "producer"
 
+## Example
+
+The following encodes one possible form of an inference that someone named "John" is male.
+
+    N("http://schema.org/","s")
+    N("http://gedcomx.org/","gx")
+    N("gx:v1/","gx1")
+    O({},{"type":"imagination","author":"Luther Tychonievich"})
+    S(3,"example person")
+    P(3,"gx1:Name",4,"John Doe")
+    E([S(,),P(,"gx1:Name",0,QRegex("Joh?n( |$)"))]
+     ,[P(,"gx1:Gender",0,"gx:Male")])
+    I([4,5],6)
+    P(7,"gx1:Gender",4,"gx:Male")
