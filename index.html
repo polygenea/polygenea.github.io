@@ -48,23 +48,16 @@
 <dd><p>a finite-length sequence of octets.</p>
 </dd>
 <dt><strong>datum</strong></dt>
-<dd><p>a (string, string, blob) tuple. Each string specifies part of the interpretation of the blob; they mean (in order)</p>
-<ul>
-<li><p>Media type, as specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a>, such as &quot;application/javascript&quot;. If &quot;&quot;, assumed to be &quot;text/plain;charset=UTF-8&quot;. If media type alone does not specify an unambiguous interpretation of the bytes, clarifying parameters (as the charset of various text types) are REQUIRED.</p>
-<p>Alternatively, this may be an absolute IRI describing a type, such as &quot;http://gedcomx.org/date/v1&quot;. Because absolute IRIs always contain a COLON <code>:</code> and media types never contain a COLON, it is unambiguous which form of media type is being specified.</p></li>
-<li><p>Language, as specified by <a href="http://tools.ietf.org/html/bcp47">IETF BCP 47</a>; if &quot;&quot;, assumed to be locale-independent (i.e., may be processed using the default locale of the processor).</p></li>
-</ul>
+<dd><p>a paired media type and payload.</p>
+<p>Media types may be specified by <a href="http://tools.ietf.org/html/rfc4288">RFC 4288</a> (e.g., <code>text/javascript</code>) or represented by an IRI (e.g., <code>http://gedcomx.org/date/v1</code>). Because absolute IRIs always contain a COLON <code>:</code> and media types never contain a COLON, it is unambiguous which form of media type is being specified.</p>
+<p>Payload is typically a blob, but may be a string for some media types.</p>
 </dd>
 <dt><strong>reference</strong></dt>
 <dd><p>indicating exactly one node within the same dataset. Because they do not span datasets, references may have an implementation-defined format.</p>
 <p>The phrase &quot;reference to a <em>X</em>&quot;, where <em>X</em> is Node or one of Node's subtypes, means the reference indicates an element of type <em>X</em> or one of <em>X</em>'s subtypes.</p>
 </dd>
 <dt><strong>integer</strong></dt>
-<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval [−1, 32767). During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
-</dd>
-<dt><strong>regex</strong></dt>
-<dd><p>a string containing either (a) a <em>RegularExpressionLiteral</em> or (b) a <em>RegularExpressionBody</em>, both defined in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.5">ECMA 262 section 7.8.5</a>. Because <em>RegularExpressionLiteral</em>s always begin with a SOLIDUS <code>/</code> and <em>RegularExpressionBody</em>s never begin with a SOLIDUS, it is unambiguous which is present in a string. Unlike the ECMA 262 standard, empty regular expressions are allowed. If only a <em>RegularExpressionBody</em> is provided, it is treated as if it had no flags.</p>
-<p>Values of type regexs are used in some predicates and producers and behave as documented in <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10">ECMA 262 section 15.10</a>.</p>
+<dd><p>a signed integer. Every implementations must be able to represent (at least) all integers in the interval between −1 and 32766, inclusive. During serialisation or deserialisation the maximum number of nodes an implementation can handle may be constrained by the largest magnitude integer that the implementation can represent.</p>
 </dd>
 </dl>
 <h2 id="composite-datatypes">Composite Datatypes</h2>
@@ -82,202 +75,6 @@
 <dd><p>A tuple of two elements. If <em>X</em> and <em>Y</em> are types, they specify the types of the elements. Otherwise, <em>X</em> and <em>Y</em> are the names of the elements and types are given elsewhere in the specification text.</p>
 </dd>
 </dl>
-<h2 id="predicate-and-producer-datatypes">Predicate and Producer Datatypes</h2>
-<h3 id="predicates">Predicates</h3>
-<p>This specification uses the term &quot;<em>X</em> predicate&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameters</p>
-<ul>
-<li>a single value (called <em>v</em> in the table below) of type <em>X</em>, and</li>
-<li>a list of node tuples (called <em>s</em> in the table below)</li>
-</ul>
-<p>and returns either <code>true</code> or <code>false</code>.</p>
-<p>In this specification, predicates are only evaluated when matching a list of Node Queries against a list of node references; the value of <em>s</em> is created by taking the prefix of that list of node references, up to and including the node reference being matched against the Node Query containing the predicate, and dereferencing each.</p>
-<p>Inside a predicate, neither <em>s</em> nor <em>v</em> may be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">name</th>
-<th align="left">status</th>
-<th align="left">types</th>
-<th align="left">defined with</th>
-<th align="left">returns <code>true</code> when</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Top</td>
-<td align="left">REQUIRED</td>
-<td align="left">any</td>
-<td align="left">(nothing)</td>
-<td align="left">always</td>
-</tr>
-<tr class="even">
-<td align="left">Lit</td>
-<td align="left">REQUIRED</td>
-<td align="left">any</td>
-<td align="left"><em>x</em>, a value of the same type as the predicate</td>
-<td align="left"><em>v</em> equals <em>x</em></td>
-</tr>
-<tr class="odd">
-<td align="left">MapHas</td>
-<td align="left">REQUIRED</td>
-<td align="left">set of string ↦ datum pairs</td>
-<td align="left"><em>x</em>, a set of string ↦ (datum predicate) pairs</td>
-<td align="left">for each (<em>a</em> ↦ <em>b</em>) in <em>x</em>, there is a (<em>c</em> ↦ <em>d</em>) pair in <em>v</em> such that <em>a</em> equals <em>c</em> and <em>b</em>(<em>d</em>) is <code>true</code></td>
-</tr>
-<tr class="even">
-<td align="left">Same</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">any</td>
-<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left"><em>v</em> equals the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Has</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set or list of <em>X</em></td>
-<td align="left"><em>f</em>, an <em>X</em> predicate</td>
-<td align="left"><em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code> for any <em>e</em> in <em>v</em></td>
-</tr>
-<tr class="even">
-<td align="left">SetHas</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">set of <em>X</em></td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left">for each <em>f</em> in <em>x</em> there is a <em>e</em> in <em>v</em> such that <em>f</em>(<em>e</em>, <em>s</em>) is <code>true</code></td>
-</tr>
-<tr class="odd">
-<td align="left">Cmp</td>
-<td align="left">OPTIONAL</td>
-<td align="left">either string or datum with a media type that has defined order</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, a value of the same type as the predicate</td>
-<td align="left">for a datum: <em>v</em> ∙ <em>x</em> under the media type's defined ordering<br/>for a string: <em>v</em> ∙ <em>x</em> under a lexicographical ordering</td>
-</tr>
-<tr class="even">
-<td align="left">ICmp</td>
-<td align="left">OPTIONAL</td>
-<td align="left">as <code>Cmp</code></td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">as <code>Cmp</code>, but using the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em> instead of <em>v</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Regex</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left"><em>r</em>, a regex</td>
-<td align="left"><em>r</em> matches <em>v</em></td>
-</tr>
-<tr class="even">
-<td align="left">Len</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set or list</td>
-<td align="left"><em>∙</em>, an operator from the set {<code>&lt;</code>, <code>≤</code>, <code>=</code>, <code>≠</code>, <code>≥</code>, <code>&gt;</code>}<br/><em>x</em>, an integer</td>
-<td align="left">((the number of elements in <em>v</em>) ∙ <em>x</em>) is <code>true</code></td>
-</tr>
-<tr class="odd">
-<td align="left">And</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for all <em>f</em> in <em>x</em></td>
-</tr>
-<tr class="even">
-<td align="left">Or</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
-<td align="left"><em>x</em>, a set of <em>X</em> predicates</td>
-<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>true</code> for at least one <em>f</em> in <em>x</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Not</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any (call it <em>X</em>)</td>
-<td align="left"><em>f</em>, an <em>X</em> predicate</td>
-<td align="left"><em>f</em>(<em>v</em>, <em>s</em>) is <code>false</code></td>
-</tr>
-<tr class="even">
-<td align="left">Script</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any</td>
-<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
-<td align="left">evaluating the function in <em>x</em> with arguments <em>v</em> and <em>s</em> returns <code>true</code></td>
-</tr>
-</tbody>
-</table>
-<p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a Boolean value for every input.</p>
-<h3 id="producers">Producers</h3>
-<p>This specification uses the term &quot;<em>X</em> producer&quot;, where <em>X</em> is a datatype, to mean a function that takes as its parameter a list of node tuples (called <em>s</em> in the table below) and returns a value of type <em>X</em>.</p>
-<p>In this specification, producers are only evaluated when evaluating a Node Template in the context of a list of node references; the value of <em>s</em> is created by dereferencing each element of that list.</p>
-<p>Inside a producer, <em>s</em> may not be modified and any node references inside tuples inside <em>s</em> are treated as opaque types (i.e., they may not be dereferenced).</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">name</th>
-<th align="left">status</th>
-<th align="left">types</th>
-<th align="left">defined with</th>
-<th align="left">returns</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Lit</td>
-<td align="left">REQUIRED</td>
-<td align="left">any</td>
-<td align="left"><em>x</em>, a value of the same type as the producer</td>
-<td align="left"><em>x</em></td>
-</tr>
-<tr class="even">
-<td align="left">Lookup</td>
-<td align="left">RECOMMENDED</td>
-<td align="left">any</td>
-<td align="left"><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the <em>j</em>th value of the <em>i</em>th tuple in <em>s</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Match</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string</td>
-<td align="left"><em>f</em>, a string producer<br/><em>r</em>, a regex<br/><em>i</em>, an integer</td>
-<td align="left">the contents of the <em>i</em>th matching group after matching <em>f</em>(<em>s</em>) with <em>r</em>, or the empty string if it does not match or the match has no such group</td>
-</tr>
-<tr class="even">
-<td align="left">Slice</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>f</em>, a string or list producer<br/><em>i</em>, an integer<br/><em>j</em>, an integer</td>
-<td align="left">the zero-indexed subsequence of <em>f</em>(<em>s</em>) from <em>i</em> (inclusive) to <em>j</em> (exclusive).<br/>Negative indices have the length of the sequence added to them before dereferencing;<br/>out-of-bounds indices are clamped to bounds; and<br/>negative-width subsequences return the empty sequence</td>
-</tr>
-<tr class="odd">
-<td align="left">Cat</td>
-<td align="left">OPTIONAL</td>
-<td align="left">string or list</td>
-<td align="left"><em>x</em>, a list of string or list producers</td>
-<td align="left">the sequence produced by concatenating the sequenced returned by each elements of <em>x</em> in order</td>
-</tr>
-<tr class="even">
-<td align="left">Union</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
-<td align="left">a set containing every value contained in any of the sets produced by each of the elements of <em>x</em></td>
-</tr>
-<tr class="odd">
-<td align="left">Intersect</td>
-<td align="left">OPTIONAL</td>
-<td align="left">set</td>
-<td align="left"><em>x</em>, a set of set producers</td>
-<td align="left">a set containing those values that are in every set produced by each element of <em>x</em></td>
-</tr>
-<tr class="even">
-<td align="left">Script</td>
-<td align="left">OPTIONAL</td>
-<td align="left">any</td>
-<td align="left"><em>x</em>, a datum defining a single function in some programming language</td>
-<td align="left">the value returned when evaluating the function in <em>x</em> with argument <em>s</em></td>
-</tr>
-</tbody>
-</table>
-<p>Implementations supporting the <code>Script</code> predicate type SHOULD ensure that all scripts are side-effect-free and return a value of the appropriate type for every input.</p>
 <h2 id="the-eight-node-types">The Eight Node Types</h2>
 <p>This specification defines several concrete types. These form a type hierarchy:</p>
 <ul>
@@ -299,9 +96,9 @@
 <li>Expectation: structured descriptions of trends, inference rules, and external knowledge</li>
 </ul></li>
 </ul>
-<p>For each Node type there is a Node Query type, with the exception that Subject and Aggregated Subject nodes share a single Node Query type. Node Queries are used to structure the preconditions or antecedents of an Expectation and contain <a href="#predicates">predicates</a>.</p>
-<p>For each Claim type there is a Node Template type. Node Templates are used to structure the postconditions or consequent of an Expectation and contain <a href="#producers">producers</a>.</p>
-<p>Each type is described in terms of its constituent fields; each field is given both an index and a name. Indices are used to create tuples from nodes and streamline the presentation of <a href="#predicate-and-producer-datatypes">Predicate and Producer Datatypes</a>. Names are used in most other places in this specification because they are more suggestive of the purpose of the various fields.</p>
+<p>For each Node type there is a Node Query type, with the exception that Subject and Aggregated Subject nodes share a single Node Query type. Node Queries are used to structure the preconditions or antecedents of an Expectation.</p>
+<p>For each Claim type there is a Node Template type. Node Templates are used to structure the postconditions or consequent of an Expectation.</p>
+<p>Each type is described in terms of its constituent fields; each field is given both an index and a name. Indices are used to create tuples from nodes and streamline the presentation of aspects of the specification that are not dependent on the particular node types; names are when discussing particular nodes because they are more suggestive of the purpose of the various fields.</p>
 <p>By design, each field name corresponds to the same index everywhere it appears. To achieve that end, each Node Template has a dummy <code>source</code> field (index 0, always value <code>-1</code>).</p>
 <h3 id="nodes">Nodes</h3>
 <table>
@@ -318,7 +115,7 @@
 <td align="left">Aggregated Subject</td>
 <td align="left"></td>
 <td align="left">0. <code>parts</code> : reference to a Tag</td>
-<td align="left"><code>parts</code>'s <code>key</code> MUST be &quot;same&quot; <br/> Each node referenced in <code>parts</code>'s <code>key</code>'s <code>of</code> MUST be either a Subject or and Aggregated Subject</td>
+<td align="left"><code>parts</code>'s <code>key</code> MUST be &quot;same&quot;</td>
 </tr>
 <tr class="even">
 <td align="left">Connection</td>
@@ -375,88 +172,37 @@
 <p>Some constraints on Node Queries and Node Templates involve their containing Expectation, and can be seen as constraints on Expectations.</p>
 <p>All nodes that could be <a href="#instantiating-nodes-from-inferences">instantiated from an Inference</a> MUST satisfy any constraints that apply to other nodes of that type. Implementations SHOULD enforce these constraints during Expectation and Node Template construction, but MAY delay enforcement until Inference construction instead.</p>
 <h3 id="node-queries">Node Queries</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Node Query subtype</th>
-<th align="left">Properties (index. name : type)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Connection Query</td>
-<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : int<br/>3. <code>value</code> : int</td>
-</tr>
-<tr class="even">
-<td align="left">Derivation Query</td>
-<td align="left">0. <code>support</code> : set of ints<br/>1. <code>reason</code> : string predicate</td>
-</tr>
-<tr class="odd">
-<td align="left">Expectation Query</td>
-<td align="left"><em>exactly the same an Expectation</em></td>
-</tr>
-<tr class="even">
-<td align="left">Inference Query</td>
-<td align="left">0. <code>support</code> : list of ints<br/>1. <code>reason</code> : integer</td>
-</tr>
-<tr class="odd">
-<td align="left">OutRef Query</td>
-<td align="left">0. <code>parents</code> : set of (string ↦ int) pairs<br/>1. <code>details</code> : set of (string ↦ datum predicate) pairs</td>
-</tr>
-<tr class="even">
-<td align="left">Property Query</td>
-<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : int<br/>3. <code>value</code> : datum predicate</td>
-</tr>
-<tr class="odd">
-<td align="left">Subject Query</td>
-<td align="left">0. <code>from</code> : integer</td>
-</tr>
-<tr class="even">
-<td align="left">Tag Query</td>
-<td align="left">0. <code>source</code> : integer<br/>1. <code>key</code> : string predicate <br/>2. <code>of</code> : set of ints</td>
-</tr>
-</tbody>
-</table>
-<p>The Subject Query matches both Subjects and Aggregated Subjects; there is not a separate Aggregated Subject Query.</p>
-<p>Each integer value in a Node Query MUST either be <code>-1</code> or satisfy all of the following constraints:</p>
+<p>For each node type <em>X</em> (excepting Aggregated Subject), there is a corresponding node query type <em>X</em> Query, which differs from the <em>X</em> node type as follows:</p>
 <ul>
-<li>be inside a Node Query that is inside a list of Node Queries</li>
-<li>be ≥ 0</li>
-<li>be &lt; the index of the containing Node Query in its containing list</li>
+<li>where <em>X</em> has a &quot;reference to a <em>Y</em>&quot;, <em>X</em> Query has an integer</li>
+<li>where <em>X</em> has a &quot;string&quot;, <em>X</em> Query has a string predicate, which is one of
+<ul>
+<li><strong>Top</strong>, a special value meaning &quot;matches anything&quot;</li>
+<li>a string, matching only what it equals</li>
+<li>a datum with media type <code>application/javascript</code>; see <a href="#matching">Matching</a> below for details</li>
+</ul></li>
+<li>where <em>X</em> has a &quot;datum&quot;, <em>X</em> Query has a datum predicate, which is one of
+<ul>
+<li><strong>Top</strong>, a special value meaning &quot;matches anything&quot;</li>
+<li>a datum, matching only what it equals</li>
+<li>a datum with media type <code>application/javascript</code>; see <a href="#matching">Matching</a> below for details</li>
+</ul></li>
 </ul>
-<p>If an int value treated as an index into the containing list does not index a node with a type that the same field in the corresponding Node could reference then the Node Query will never match any Node. Node Queries containing &quot;mistyped&quot; integers of like this probably indicate user error, but are not forbidden by this specification.</p>
 <h3 id="node-templates">Node Templates</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Node Template subtype</th>
-<th align="left">Properties (index. name : type or value)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Connection Template</td>
-<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : int<br/>3. <code>value</code> : int</td>
-</tr>
-<tr class="even">
-<td align="left">Property Template</td>
-<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : int<br/>3. <code>value</code> : string producer</td>
-</tr>
-<tr class="odd">
-<td align="left">Subject Template</td>
-<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>slug</code> : string producer</td>
-</tr>
-<tr class="even">
-<td align="left">Tag Template</td>
-<td align="left">0. <code>source</code> : the integer value <code>-1</code><br/>1. <code>key</code> : string producer <br/>2. <code>of</code> : (set of ints) producer</td>
-</tr>
-</tbody>
-</table>
-<p>Each integer value in a Node Template MUST either be <code>-1</code> or satisfy all of the following constraints:</p>
+<p>For each claim node type <em>X</em> there is a corresponding node template type <em>X</em> Template, which differs from the <em>X</em> node type as follows:</p>
 <ul>
-<li>be inside a Node Template that is inside the <code>consequent</code> of an Expectation that has <em>n</em> elements in its <code>antecedent</code></li>
-<li>be ≥ 0</li>
-<li>be &lt; <em>n</em> + the the index of the containing Node Template the containing Expectation's <code>consequent</code></li>
+<li>field 0. <code>source</code> always has the value −1</li>
+<li>where <em>X</em> has a &quot;reference to a <em>Y</em>&quot; (other than <code>source</code>), <em>X</em> Template has an integer</li>
+<li>where <em>X</em> has a &quot;string&quot;, <em>X</em> Template has a string producer, which is one of
+<ul>
+<li>a string, producing only itself</li>
+<li>a datum with media type <code>application/javascript</code>; see <a href="#instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</a> below for details</li>
+</ul></li>
+<li>where <em>X</em> has a &quot;datum&quot;, <em>X</em> Template has a datum producer, which is one of
+<ul>
+<li>a datum, producing only itself</li>
+<li>a datum with media type <code>application/javascript</code>; see <a href="#instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</a> below for details</li>
+</ul></li>
 </ul>
 <h2 id="definitions-and-constraints">Definitions and Constraints</h2>
 <p>A set of nodes is called a <strong>dataset</strong>. This specification only discusses complete datasets, where all node references are to other nodes within the dataset. Communication protocols that communicate via partial datasets are neither forbidden by this specification nor discussed by it.</p>
@@ -470,10 +216,8 @@
 <li><p>Two references are equal if and only if they refer to nodes that are equal.</p></li>
 <li><p>Two sets are equal if and only if each element in each set has an equal element in the other set.</p></li>
 <li><p>Two lists are equal if and only if both (1) they have the same length and (2) for each valid index for the lists, the elements in both lists at that index are equal.</p></li>
-<li><p>Two predicates are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give different results. If they are defined differently but give the same result for all inputs, their equality is not specified by this specification.</p></li>
-<li><p>Two producers are equal if they have the same type and are defined with equal values. They are not equal if there exists some inputs for which they give non-equal results. If they are defined differently but give equal result for all inputs, their equality is not specified by this specification.</p></li>
-<li><p>Two strings are equal if they contain the same characters in the same order.</p></li>
-<li><p>Two data are equal if and only if either (1) there is an official notion of eqaulity for the given media type(s) and the blobs are equal under than definition or (2) the media types are equal and the blobs have the same bytes in the same order.</p></li>
+<li><p>Two strings are equal if they contain the same characters in the same order. Looser versions of equality using unicode normalized forms are also permitted, though not required by this specification.</p></li>
+<li><p>Two data are equal if the media types are equal and the payloads are equal. Looser versions of media-type-specific equality are also permitted, though not required by this specification.</p></li>
 </ul>
 <h3 id="constituents">Constituents</h3>
 <p>The <strong>constituents</strong> of any node that is not an Aggregated Subject node is defined to be the singleton set containing just that Node itself.</p>
@@ -481,13 +225,22 @@
 <h3 id="matching">Matching</h3>
 <p>Node and value <strong>matching</strong> is defined as follows:</p>
 <ul>
-<li><p>A predicate and a value match if all of the following are true:</p>
+<li><p>The <strong>Top</strong> predicate matches any value</p></li>
+<li><p>A literal predicate and a value match if they are equal</p></li>
+<li><p>A <code>application/javascript</code> predicate and a value match if the following process yields the value <code>true</code>:</p>
 <ol>
-<li>the matching is occurring within the context of matching a list of Node Queries and a list of node references</li>
-<li>the value has a type that allows the predicate to be evaluated using the value and the list of node tuples created from the list of node references, as described in the section <a href="#predicates">Predicates</a></li>
-<li>evaluating the predicate with the value and the list of tuples yields the value <code>true</code></li>
-</ol>
-<p>Optionally, if the predicate definition does not utilise its list of tuples parameter (i.e., <em>s</em> is not referenced in the table in section <a href="#predicates">Predicates</a>) then the predicate MAY be said to match if condition 3 alone would be true for any list of tuples supplied.</p></li>
+<li>create a javascript evaluation environment with two global variables
+<ul>
+<li><code>x</code> is the value to be matched against</li>
+<li><code>s</code> is an array of objects
+<ul>
+<li>if the matching is occurring within the context of matching a list of Node Queries to a list of node references, the <em>i</em>th object in the array is a javascript object representation of a dereference of the <em>i</em>th node reference</li>
+<li>otherwise, <code>s</code> is empty</li>
+</ul></li>
+</ul></li>
+<li>execute the javascript code</li>
+<li>yield the value produced by the last statement in the javascript code</li>
+</ol></li>
 <li><p>The integer value <code>-1</code> matches every node reference.</p></li>
 <li><p>A set of integers matches a set of node references if each integer in the set of integers matches some node reference in the set of node references. Note that it is <em>not</em> necessary for every node reference to match some integer.</p></li>
 <li><p>A set of string ↦ integer pairs <em>q</em> matches a set of string ↦ node reference pairs <em>s</em> if for each (<em>k1</em> ↦ <em>i</em>) in <em>q</em>, there is a (<em>k2</em> ↦ <em>r</em>) pair in <em>s</em> such that <em>k1</em> equals <em>k2</em> and <em>i</em> matches <em>r</em>.</p></li>
@@ -508,7 +261,12 @@
 <h3 id="instantiating-nodes-from-inferences">Instantiating Nodes from Inferences</h3>
 <p>The <strong>instantiated node list</strong> of an Inference is defined to be a list of Nodes having the same length as the <code>consequent</code> of the <code>reason</code> of the Inference such that the Node at index <em>i</em> of the instantiated node list is created from the Node Template at index <em>i</em> of the <code>consequent</code> by doing all of the following (in any order)</p>
 <ul>
-<li><p>replacing any producer values with the result of applying that function using a list of tuples created by dereferencing the elements of the <code>antecedent</code> of the Inference as the function's argument.</p></li>
+<li><p>replacing any <code>application/javascript</code> producer values with the value yielded by the following</p>
+<ol>
+<li><p>create a javascript evaluation environment with one global variable <code>s</code>, an array of objects. The <em>i</em>th elements of <code>s</code> should be a javascript object representation of a dereference of the <em>i</em>th node reference in the <code>antecedents</code> if <em>i</em> is less than the number of antecedent elements; otherwise it should be a javascript object representation of the (<em>i</em> − <em>n</em>)th instantiated node, where <em>n</em> is the number of antecedent elements.</p></li>
+<li>execute the javascript code</li>
+<li><p>yield the value produced by the last statement in the javascript code</p></li>
+</ol></li>
 <li><p>replacing the <code>source</code> value (which is <code>-1</code> in Node Templates) with a reference to the Inference.</p></li>
 <li><p>replacing any non-negative integers with the node reference in the <code>support</code> list at the integer's index if the integer is smaller than the length of the <code>support</code> list; otherwise with a reference to the node at index <em>i</em> − <em>n</em> of the instantiated node list being constructed, where <em>n</em> is the length of the <code>support</code> list.</p></li>
 </ul>
@@ -528,20 +286,25 @@
 <tbody>
 <tr class="odd">
 <td align="left">distinct</td>
-<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
-<td align="left">no two elements of <code>of</code> refers to the same real-world subject or contain equivalent information</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">no two elements of <code>of</code> refers to the same real-world subject</td>
 </tr>
 <tr class="even">
-<td align="left">same</td>
-<td align="left">≥ 2 elements in <code>of</code><br/>all elements referenced in <code>of</code> have same Node subtype (except may mix Subject and Aggregated Subject)</td>
-<td align="left">the elements of <code>of</code> are fully equivalent: the same real-world subject, alternative presentations of the same information, etc.</td>
+<td align="left">equivalent</td>
+<td align="left">≥ 2 elements in <code>of</code></td>
+<td align="left">the elements in <code>of</code> contain equivalent information (a hint that only one element needs to be displayed)</td>
 </tr>
 <tr class="odd">
+<td align="left">same</td>
+<td align="left">≥ 2 elements in <code>of</code><br/>each elements referenced in <code>of</code> either a Subject or and Aggregated Subject</td>
+<td align="left">all of the elements of <code>of</code> refer to the same real-world subject</td>
+</tr>
+<tr class="even">
 <td align="left">unsupported</td>
 <td align="left"><code>of</code> contains a single reference to a Claim, Inference, or Derivation</td>
 <td align="left">the <code>source</code> does not make this Claim or the <code>support</code> does not justify this Inference or Derivation</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">wrong</td>
 <td align="left"><code>of</code> cannot include both a &quot;wrong&quot; Tag and any element of that Tag's <code>of</code><br/><code>of</code> cannot include a Subject or Aggregated Subject</td>
 <td align="left">the indicated node asserts a falsehood</td>
@@ -643,13 +406,13 @@
 </ul>
 <p>General datasets may be reduced to a belief snapshot via the following process:</p>
 <ol>
-<li>Create a Subject for each group of Subjects and Aggregated Subjects linked by &quot;same&quot; Tags. The new Subject's <code>source</code> should be a Derivation whose <code>support</code> is the set of all OutRef nodes in any of the original nodes' dependencies.</li>
+<li>Create a Subject for each group of Nodes linked by &quot;same&quot; Tags. The new Subject's <code>source</code> should be a Derivation whose <code>support</code> is the set of all OutRef nodes in any of the original nodes' dependencies.</li>
 <li>Copy all Properties and Connections that pointed to any of the the original nodes to point to the new node. The new Properties' and Connections' <code>source</code>s should be Derivations whose <code>support</code>s are the sets of all OutRef nodes in any of the original nodes' dependencies.</li>
 <li>Replacing any set of Properties or Connections that differ only in <code>source</code> with a single node having as its <code>source</code> a Derivation with the union of the original claims' <code>source</code>s' <code>support</code> as the new Derivation's <code>support</code>.</li>
 </ol>
 <h3 id="handling-unsupported-values">Handling Unsupported Values</h3>
 <h4 id="optional-predicates-and-producers">Optional predicates and producers</h4>
-<p>When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate, it is RECOMMENDED that the recieving software keep the Expectation as received but treat the extra predicate as being equivalent to <em>Top</em> when error-checking received data and as equivalent to <em>Not</em>(<em>Top</em>) when deciding if the user can create new Inferences based on the Expectation.</p>
+<p>When software that supports Expectation nodes receives a dataset including Expectations that contain predicates that the receiving software cannot evaluate (i.e., their contained scripts use aspects of the language that the software's Javascript engine does not support), it is RECOMMENDED that the recieving software keep the Expectation as received but treat the unsupported predicates as being equivalent to <em>Top</em> when error-checking received data and as equivalent to <code>false</code> when deciding if the user can create new Inferences based on the Expectation.</p>
 <p>When software that supports Expectation nodes receives a dataset including Expectations that contain producers that the receiving software cannot evaluate, it is RECOMMENDED that the receiving software keep the Expectation as received but treat them as unchecked (like a Derivation).</p>
 <h4 id="constrained-vocabularies">Constrained vocabularies</h4>
 <p>If software desires a particular set of keys in its data, it is RECOMMENDED that a set of term-normalising Expectations be used to automatically create new Inferences and normalised terms upon receipt of new datasets, keeping the pre-normalised terms as <code>support</code> for the Inferences.</p>
@@ -676,10 +439,10 @@
 <li><p>Have the user specify the nodes they intend to infer and select the nodes they recognise as the support for their inference.</p>
 <p>(This step would also be present in creating Derivations, and would be followed by asking the user to type a free-text explanation.)</p></li>
 <li><p>Build a set of candidate antecedents from the nodes identified as support, augmented with any nodes referenced by the nodes identified as being inferred that are not already in the antecedent or inferred collections.</p></li>
-<li><p>For each field of each candidate antecedent (except the fields of an OutRef; see below), ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or predicate <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a predicate <em>Lit</em> (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
-<p>For the <code>details</code> field of an OutRef, instead ask this question of each pair in the set and, if the answer is &quot;no&quot;, remove the pair completely to create a predicate <em>MapHas</em>.</p>
+<li><p>For each field of each candidate antecedent (except the fields of an OutRef; see below), ask the user &quot;is this field important to your reasoning?&quot; If the answer is &quot;no&quot;, replace the field with <code>-1</code> (if a node reference) or predicate <em>Top</em> (otherwise). If the answer is &quot;yes&quot;, add the referenced node to the candidate antecedent set (if a node reference) or replace it with a literal predicate (otherwise). Continue until you have asked about all nodes of all fields in the antecedent set.</p>
+<p>For the <code>details</code> field of an OutRef, instead ask this question of each pair in the set and, if the answer is &quot;no&quot;, remove the pair completely.</p>
 <p>For the <code>parents</code> field of an OutRef, instead ask this question of each pair in the set and, if the answer is &quot;no&quot;, remove the pair completely; if it the answer is &quot;yes&quot;, add the referenced OutRef to the candidate antecedent set.</p>
-<p>You could optionally ask additional questions to build more advanced predicates; for example, to create a <em>Same</em> predicate you could ask something like &quot;we notice that these two nodes both have the same <code>value</code>; is that same-value characteristic important?&quot;</p></li>
+<p>You could optionally ask additional questions to build more advanced predicates; for example, to create a <code>x == s[i][j]</code> predicate you could ask something like &quot;we notice that these two nodes both have the same <code>value</code>; is that same-value characteristic important?&quot;</p></li>
 <li><p>Order the candidate antecedents such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are antecedents then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>antecedent</code> list and to replace node references with integers.</p>
 <p>There may be many orderings that satisfy this requirement. Future versions of this specification might recommend a particular canonical ordering in order to reduce variability in Expection nodes.</p></li>
 <li><p>Organise the inferred nodes such that, if node <em>A</em> is in node <em>B</em>'s dependencies and both are being inferred then <em>A</em> appears before <em>B</em>. Use this ordering to populate the <code>consequent</code> list and to replace node references with integers. Additionally, replace all inferred node <code>source</code> values with <code>-1</code>, as required by the definition of Node Template.</p>
@@ -689,6 +452,7 @@
 <h2 id="example-1-ad-hoc-notation-working-with-a-single-source-document">Example 1: ad-hoc notation, working with a single source document</h2>
 <p>This is a hasty example utilizing ad-hoc notation, including fairly arbitrary mixing of strings from various ontologies and strings of my own creation, displaying (type,language,value) triples as strings, and so on. Its goal is simply to present one possible use for this model.</p>
 <p>As suggested by Rob Hoare, the basis for this example is <a href="https://familysearch.org/ark:/61903/1:1:MS79-1S8" class="uri">https://familysearch.org/ark:/61903/1:1:MS79-1S8</a></p>
+<p style="background-color:#f70">This example is based on an oler version of this specification; updating it is on my to-do list. — Luther</p>
 <hr />
 <p>First, I'd make an OutRef for the source. Let's make two, so we can see what the parents field is for, one for the 1900 census and one for the particular part of it in question:</p>
 <pre><code>O1. OutRef(parents={},
